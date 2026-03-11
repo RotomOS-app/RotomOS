@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RotomOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+
+<!-- ═══ MOBILE BOTTOM NAV ════════════════════════════════════════════════════ -->
+<div id="bottom-nav">
+  <div class="bn-inner">
+    <button class="bn-item active" id="bn-home"       onclick="goSection('home')"        >
+      <span class="bn-icon">🏠</span><span class="bn-label">Home</span>
+    </button>
+    <button class="bn-item"        id="bn-aprimon"    onclick="goSection('aprimon')"     >
+      <span class="bn-icon">🎾</span><span class="bn-label">Aprimon</span>
+      <span class="bn-badge" id="bn-aprimon-badge"></span>
+    </button>
+    <button class="bn-item"        id="bn-shiny"      onclick="goSection('shiny')"       >
+      <span class="bn-icon">✨</span><span class="bn-label">Shinies</span>
+      <span class="bn-badge gold" id="bn-shiny-badge"></span>
+    </button>
+    <button class="bn-item"        id="bn-livingdex"  onclick="goSection('livingdex')"   >
+      <span class="bn-icon">📊</span><span class="bn-label">Living Dex</span>
+    </button>
+    <button class="bn-item"        id="bn-more"       onclick="toggleMoreDrawer()"       >
+      <span class="bn-icon">⋯</span><span class="bn-label">More</span>
+    </button>
+  </div>
+</div>
+
+<!-- More drawer (competitive, progress, reddit) -->
+<div id="mmd-backdrop" onclick="closeMoreDrawer()"></div>
+<div id="mobile-more-drawer">
+  <div class="mmd-handle"></div>
+  <div class="mmd-grid">
+    <div class="mmd-item" id="mmd-breeding"    onclick="goSection('breeding');closeMoreDrawer()">
+      <span class="mmd-icon">🥚</span><span class="mmd-label">Breeding</span>
+    </div>
+    <div class="mmd-item" id="mmd-competitive" onclick="goSection('competitive');closeMoreDrawer()">
+      <span class="mmd-icon">⚔️</span><span class="mmd-label">Competitive</span>
+    </div>
+    <div class="mmd-item" id="mmd-progress" onclick="goSection('progress');closeMoreDrawer()">
+      <span class="mmd-icon">🗺️</span><span class="mmd-label">Game Progress</span>
+    </div>
+    <div class="mmd-item" id="mmd-reddit" onclick="openReddit();closeMoreDrawer()">
+      <span class="mmd-icon">📝</span><span class="mmd-label">Reddit Post</span>
+    </div>
+    <div class="mmd-item" onclick="openSettings();closeMoreDrawer()">
+      <span class="mmd-icon">⚙️</span><span class="mmd-label">Settings</span>
+    </div>
+  </div>
+</div>
+
+<div id="app-layout">
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon" id="rotom-logo-icon" style="position:relative;overflow:visible;cursor:pointer" onclick="rotomPoke()" title="Bzzt!">
+        <img src="https://img.pokemondb.net/sprites/sword-shield/icon/rotom.png"
+          id="rotom-sidebar-sprite"
+          width="36" height="27"
+          style="image-rendering:pixelated;transition:transform .2s"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <div style="display:none;align-items:center;justify-content:center;width:100%;height:100%;font-size:18px">⚡</div>
+        <div id="rotom-spark" style="position:absolute;inset:-4px;border-radius:12px;pointer-events:none;opacity:0;transition:opacity .1s"></div>
+        <div id="rotom-crown">👑</div>
+      </div>
+      <div>
+        <div class="sidebar-logo-name" style="letter-spacing:.06em">RotomOS</div>
+        <div class="sidebar-logo-sub" id="rotom-status-text">System ready — bzzt!</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="sn-item active" id="sn-home"       onclick="goSection('home')">       <span class="sn-icon">🏠</span><span class="sn-label">Home</span></button>
+      <div class="sn-divider">Collections</div>
+      <button class="sn-item" id="sn-aprimon"   onclick="goSection('aprimon')">   <span class="sn-icon">🎾</span><span class="sn-label">Aprimon</span><span id="aprimonBadge" class="sn-badge" style="display:none"></span></button>
+      <button class="sn-item" id="sn-shiny"     onclick="goSection('shiny')">     <span class="sn-icon">✨</span><span class="sn-label">Shiny Hunter</span><span id="shinyBadge" class="sn-badge sn-badge-gold" style="display:none"></span></button>
+      <div class="sn-divider">Tracking</div>
+      <button class="sn-item" id="sn-livingdex" onclick="goSection('livingdex')"> <span class="sn-icon">📊</span><span class="sn-label">Living Dex</span></button>
+      <button class="sn-item" id="sn-breeding"    onclick="goSection('breeding')">   <span class="sn-icon">🥚</span><span class="sn-label">Breeding</span></button>
+      <button class="sn-item" id="sn-competitive" onclick="goSection('competitive')"><span class="sn-icon">⚔️</span><span class="sn-label">Competitive</span></button>
+      <button class="sn-item" id="sn-progress"  onclick="goSection('progress')">  <span class="sn-icon">🗺️</span><span class="sn-label">Game Progress</span></button>
+      <button class="sn-item" id="sn-halloffame" onclick="goSection('halloffame')" style="display:none"><span class="sn-icon">🏆</span><span class="sn-label">Hall of Fame</span><span class="sn-badge sn-badge-gold" style="display:inline-flex">★</span></button>
+      <button class="sn-item" onclick="openSettings()" style="margin-top:auto"><span class="sn-icon">⚙️</span><span class="sn-label">Settings</span></button>
+      <div class="sn-divider">Tools</div>
+      <button class="sn-item" id="sn-reddit"    onclick="openReddit()">           <span class="sn-icon">📝</span><span class="sn-label">Reddit Post</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <!-- Shiny Rotom toggle — hidden until unlocked -->
+      <!-- Shiny Rotom toggle -->
+      <div id="shiny-rotom-unlock" style="display:none;margin:0 8px 10px;background:linear-gradient(135deg,#2d2515,#1e1535);border:1px solid #fde68a33;border-radius:12px;padding:8px 10px">
+        <div style="font-size:9px;color:#fde68a88;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">★ Shiny Unlocked</div>
+        <button id="shiny-rotom-btn" onclick="toggleShinyRotom()"
+          style="width:100%;background:none;border:1px solid #fde68a44;border-radius:8px;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s">
+          <img id="shiny-rotom-btn-sprite" src="https://img.pokemondb.net/sprites/sword-shield/icon/rotom.png" width="32" height="24" style="image-rendering:pixelated"/>
+          <span id="shiny-rotom-btn-label" style="font-size:11px;font-weight:800;color:#fde68a">Enable Shiny ★</span>
+        </button>
+      </div>
+      <!-- Gold theme toggle — unlocked by full living dex -->
+      <div id="gold-theme-unlock" style="display:none;margin:0 8px 10px;background:linear-gradient(135deg,#2d2515,#1e1535);border:1px solid #fde68a33;border-radius:12px;padding:8px 10px">
+        <div style="font-size:9px;color:#fde68a88;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">✦ Living Dex Complete</div>
+        <button id="gold-theme-btn" onclick="toggleGoldTheme()"
+          style="width:100%;background:none;border:1px solid #fde68a44;border-radius:8px;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s">
+          <span style="font-size:14px">✦</span>
+          <span id="gold-theme-btn-label" style="font-size:11px;font-weight:800;color:#fde68a88">Enable Gold Theme</span>
+        </button>
+      </div>
+    <div style="font-size:9px;color:#3d3070;text-align:center;margin-bottom:8px;line-height:1.5">
+      Pokémon data via<br/>
+      <a href="https://pokeapi.co" target="_blank" style="color:#5b4690;text-decoration:none;font-weight:700">PokéAPI</a>
+      · sprites via
+      <a href="https://pokemondb.net" target="_blank" style="color:#5b4690;text-decoration:none;font-weight:700">PokémonDB</a>
+    </div>
+      <button id="clearBtn" class="sn-item sn-danger" onclick="confirmClear()" title="Erase all data"><span class="sn-icon">🗑</span><span class="sn-label">Clear Data</span></button>
+      <div id="clearConfirm" style="display:none;padding:8px 12px;background:#3a1020;border:1px solid #fda4af30;border-radius:12px;margin:6px 8px">
+        <div style="color:#fca5a5;font-size:11px;margin-bottom:6px;text-align:center">Erase all data?</div>
+        <div style="display:flex;gap:6px">
+          <button onclick="clearAll()" style="flex:1;background:#f47284;border:none;color:#fff;padding:5px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:700">Yes</button>
+          <button onclick="cancelClear()" style="flex:1;background:#372962;border:1px solid #5b4690;color:#c084fc;padding:5px;border-radius:8px;cursor:pointer;font-size:11px">No</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div id="main-content">
+    <!-- Top bar -->
+    <div id="top-bar">
+      <div id="top-bar-title">
+        <div class="tb-section-name" id="tbSectionName">Home</div>
+        <div class="tb-section-sub"  id="tbSectionSub">Your Pokémon dashboard</div>
+      </div>
+      <div id="top-bar-actions">
+        <button id="headerActionBtn" class="btn btn-primary" onclick="headerAction()" style="display:none">+ Add Aprimon</button>
+      </div>
+    </div>
+
+    <!-- Pages -->
+    <div id="page-content">
+
+<div id="aprimon-section" style="display:none">
+  <!-- Aprimon sub-tabs -->
+  <div class="section-subtabs" id="aprimonSubTabs">
+    <button class="section-subtab active" id="atab-collection" onclick="switchApriTab('collection')">📦 Collection</button>
+    <button class="section-subtab" id="atab-wants" onclick="switchApriTab('wants')">✦ Wants <span id="wantsBadge" class="sn-badge" style="background:#fda4af;color:#2b1f4e;display:none"></span></button>
+  </div>
+<div id="collection-page">
+  <div class="container">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="ball-filter" id="ballFilter"></div>
+    <div class="filter-bar">
+      <input id="searchInput" placeholder="🔍 Search species or egg move..." oninput="renderList()"/>
+      <select id="statusFilter" onchange="renderList()">
+        <option value="all">All Status</option><option value="available">Available</option>
+        <option value="keep">Keeping</option><option value="trade-only">Trade Only</option><option value="wanted">Wanted</option>
+      </select>
+      <label class="shiny-label"><input type="checkbox" id="shinyFilter" onchange="renderList()"/> ★ Shinies only</label>
+    </div>
+    <div class="results-hint" id="resultsHint"></div>
+    <div class="mon-list" id="monList"></div>
+  </div>
+</div>
+<div id="wants-page" style="display:none">
+  <div class="container">
+    <div style="margin-bottom:18px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <div class="cinzel" style="font-size:20px;font-weight:900;background:linear-gradient(135deg,#fda4af,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent">✦ Wanted List</div>
+      <div style="color:#7060a8;font-size:12px">Mons you're hunting for</div>
+    </div>
+    <div id="wantsList"></div>
+  </div>
+</div>
+</div><!-- /aprimon-section -->
+
+<div id="shiny-section" style="display:none">
+
+  <!-- Sub-tabs -->
+  <div class="shiny-subtabs">
+    <button class="shiny-subtab active" id="stab-hunts" onclick="shinyTab('hunts')">🎯 Shiny Hunts</button>
+    <button class="shiny-subtab"        id="stab-log"   onclick="shinyTab('log')">✨ Shiny Log</button>
+    <button class="shiny-subtab"        id="stab-stats" onclick="shinyTab('stats')">📈 Stats</button>
+  </div>
+
+  <!-- Hunts pane -->
+  <div id="sh-hunts" style="padding:20px 24px">
+    <div class="hunt-stat-row" id="huntStats"></div>
+    <div id="activeHunts"></div>
+    <button class="add-hunt-btn" onclick="openNewHuntModal()">＋ Start New Hunt</button>
+  </div>
+
+  <!-- Log pane -->
+  <div id="sh-log" style="display:none;padding:20px 24px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div class="cinzel" style="font-size:18px;font-weight:900;background:linear-gradient(135deg,#fde68a,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent">★ Shiny Collection</div>
+        <div style="color:#7060a8;font-size:11px;margin-top:2px">Every shiny you've ever found — and lost</div>
+      </div>
+      <button onclick="openQuickLogModal()" style="background:#2b1f4e;border:1px solid #fde68a33;color:#fde68a;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:700;transition:all .2s" onmouseover="this.style.borderColor='#fde68a66'" onmouseout="this.style.borderColor='#fde68a33'">+ Log Manually</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div class="log-toggle">
+        <button class="log-toggle-btn active" id="ltab-caught" onclick="switchLogTab('caught')">✨ Caught <span id="caughtCount" style="opacity:.6"></span></button>
+        <button class="log-toggle-btn" id="ltab-failed" onclick="switchLogTab('failed')">💔 Got Away <span id="failedCount" style="opacity:.6"></span></button>
+      </div>
+      <div id="log-tab-hint" style="color:#5b4690;font-size:10px;font-weight:700"></div>
+    </div>
+    <div class="shiny-log-grid" id="shinyLogGrid"></div>
+  </div>
+
+  <!-- Stats pane -->
+  <div id="sh-stats" style="display:none;padding:20px 24px">
+
+    <!-- Show-off hero stats -->
+    <div class="hero-stats-grid" id="statsHeroGrid"></div>
+
+    <!-- Detailed show-off breakdown -->
+    <div class="stats-detail-grid" id="statsShowGrid"></div>
+
+    <!-- Method breakdown chart -->
+    <div class="method-breakdown">
+      <div style="font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:#ede9ff;margin-bottom:12px">Hunts by Method</div>
+      <div id="statsMethodChart"></div>
+    </div>
+
+    <!-- Top species podium -->
+    <div style="margin-top:24px">
+      <div style="font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:#ede9ff;margin-bottom:4px">Most Hunted Species</div>
+      <div style="color:#5b4690;font-size:10px;margin-bottom:12px">Completed hunts only</div>
+      <div class="podium-grid" id="statsPodium"></div>
+    </div>
+
+    <!-- Grudgingly show section -->
+    <div class="grudge-header">
+      <div class="grudge-line" style="background:linear-gradient(90deg,transparent,#fda4af22)"></div>
+      <div class="grudge-title">😬 The Ugly Truth</div>
+      <div class="grudge-line"></div>
+    </div>
+    <div class="stats-detail-grid" id="statsGrudgeGrid"></div>
+
+    <!-- Time estimate -->
+    <div id="statsTimeBox"></div>
+
+  </div>
+
+</div><!-- /shiny-section -->
+
+<!-- ═══ NEW HUNT MODAL ═══════════════════════════════════════════════════════ -->
+<div id="newHuntModal" style="display:none;position:fixed;inset:0;background:#0d082099;backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px" onclick="if(event.target===this)closeNewHuntModal()">
+  <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <div class="cinzel" style="font-size:17px;color:#ede9ff">🎯 Start New Hunt</div>
+      <button class="modal-close" onclick="closeNewHuntModal()">✕</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="grid-column:1/-1">
+        <div class="form-label">Pokémon Species</div>
+        <input class="form-input" id="nh-species" placeholder="e.g. Ralts" oninput="nhPreview()"/>
+      </div>
+
+      <div>
+        <div class="form-label">Target Ball</div>
+        <select class="form-select" id="nh-ball">
+          <option>Moon</option><option>Friend</option><option>Love</option><option>Lure</option>
+          <option>Dream</option><option>Beast</option><option>Fast</option><option>Heavy</option>
+          <option>Level</option><option>Safari</option><option>Sport</option><option>Poké</option>
+        </select>
+      </div>
+
+      <div>
+        <div class="form-label">Game</div>
+        <select class="form-select" id="nh-game">
+          <option>Scarlet / Violet</option>
+          <option>Sword / Shield</option>
+          <option>Brilliant Diamond / Shining Pearl</option>
+          <option>Legends: Arceus</option>
+          <option>Sun / Moon</option>
+          <option>Ultra Sun / Ultra Moon</option>
+          <option>X / Y</option>
+          <option>Omega Ruby / Alpha Sapphire</option>
+          <option>Black 2 / White 2</option>
+          <option>HeartGold / SoulSilver</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div style="grid-column:1/-1">
+        <div class="form-label">Hunt Method</div>
+        <select class="form-select" id="nh-method" onchange="nhPreview()">
+          <optgroup label="Breeding">
+            <option value="Masuda Method">Masuda Method</option>
+          </optgroup>
+          <optgroup label="Wild Encounters">
+            <option value="Random Encounter">Random Encounter</option>
+            <option value="DexNav Chaining">DexNav Chaining (ORAS)</option>
+            <option value="Poké Radar">Poké Radar (Sinnoh)</option>
+            <option value="SOS Chaining">SOS Chaining (SM/USUM)</option>
+            <option value="Outbreak">Mass Outbreak / Swarm</option>
+            <option value="Sandwich Method">Sandwich Method (SV)</option>
+            <option value="Fishing Chain">Fishing Chain</option>
+            <option value="Friend Safari">Friend Safari (X/Y)</option>
+          </optgroup>
+          <optgroup label="Static / Reset">
+            <option value="Soft Reset">Soft Reset</option>
+            <option value="Static">Static Encounter</option>
+            <option value="Dynamax Adventure">Dynamax Adventure</option>
+          </optgroup>
+          <optgroup label="Other">
+            <option value="Legends: Arceus">Space-Time Distortion (PLA)</option>
+            <option value="Community Day">Community Day / Event</option>
+            <option value="GO / HOME Transfer">GO / HOME Transfer</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- Odds preview -->
+      <div style="grid-column:1/-1" id="nh-odds-box" class="odds-preview-box">
+        <div>
+          <div class="odds-preview-num" id="nh-odds-num">1 / 4096</div>
+          <div class="odds-preview-label" id="nh-odds-lbl">Base odds · no charm</div>
+        </div>
+        <div style="text-align:right">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none">
+            <div style="position:relative;width:40px;height:22px">
+              <input type="checkbox" id="nh-charm" onchange="nhPreview()" style="opacity:0;position:absolute;inset:0;cursor:pointer;z-index:1;margin:0"/>
+              <div id="nh-charm-track" style="position:absolute;inset:0;background:#2b1f4e;border:1px solid #5b4690;border-radius:20px;transition:all .2s"></div>
+              <div id="nh-charm-thumb" style="position:absolute;top:3px;left:3px;width:16px;height:16px;background:#5b4690;border-radius:50%;transition:all .2s"></div>
+            </div>
+            <span style="color:#fde68a;font-size:12px;font-weight:700">✨ Shiny Charm</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="grid-column:1/-1">
+        <div class="form-label">Notes (optional)</div>
+        <input class="form-input" id="nh-notes" placeholder="e.g. HA target, breeding pair ready..."/>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button onclick="startHunt()" class="btn btn-primary" style="flex:1;justify-content:center;padding:12px">Start Hunt 🎯</button>
+      <button class="btn-cancel" onclick="closeNewHuntModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FOUND MODAL ═══════════════════════════════════════════════════════════ -->
+<div id="foundModal" style="display:none;position:fixed;inset:0;background:#0d082099;backdrop-filter:blur(10px);align-items:center;justify-content:center;z-index:2000;padding:20px" onclick="if(event.target===this)closeFoundModal()">
+  <div class="found-modal-box">
+    <div class="found-stars">★★★</div>
+    <div class="found-title">SHINY FOUND!</div>
+    <div class="found-sub" id="found-sub">Species · encounters · method</div>
+    <div class="found-sprite" id="found-sprite-wrap"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left;margin-bottom:14px">
+      <div>
+        <div class="form-label">Nature</div>
+        <select class="form-select" id="found-nature">
+          <option>Hardy</option><option>Lonely</option><option>Brave</option><option>Adamant</option>
+          <option>Naughty</option><option>Bold</option><option>Docile</option><option>Relaxed</option>
+          <option>Impish</option><option>Lax</option><option>Jolly</option><option>Timid</option>
+          <option>Hasty</option><option>Serious</option><option>Naive</option><option>Modest</option>
+          <option>Mild</option><option>Quiet</option><option>Bashful</option><option>Rash</option>
+          <option>Calm</option><option>Gentle</option><option>Sassy</option><option>Careful</option><option>Quirky</option>
+        </select>
+      </div>
+      <div>
+        <div class="form-label">Gender</div>
+        <select class="form-select" id="found-gender"><option>Male</option><option>Female</option><option>Unknown</option></select>
+      </div>
+    </div>
+    <div style="margin-bottom:18px;text-align:left">
+      <div class="form-label">Notes</div>
+      <input class="form-input" id="found-notes" placeholder="IVs, memories, etc."/>
+    </div>
+    <button onclick="confirmFound()" style="width:100%;background:linear-gradient(135deg,#fde68a,#fbbf24);border:none;color:#1a1535;padding:13px;border-radius:20px;cursor:pointer;font-family:'Cinzel',serif;font-size:15px;font-weight:800;box-shadow:0 4px 20px #fde68a33;margin-bottom:10px;transition:all .2s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">✓ Mark as Found!</button>
+    <button onclick="closeFoundModal()" style="background:none;border:none;color:#5b4690;cursor:pointer;font-size:12px;font-weight:700;width:100%">Cancel</button>
+  </div>
+</div>
+
+<!-- ═══ PHASE MODAL ════════════════════════════════════════════════════════════ -->
+<div id="phaseModal" style="display:none;position:fixed;inset:0;background:#0d082099;backdrop-filter:blur(10px);align-items:center;justify-content:center;z-index:2000;padding:20px" onclick="if(event.target===this)closePhaseModal()">
+  <div class="phase-modal">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+      <div class="cinzel" style="font-size:16px;color:#ede9ff">✨ Log Phase Shiny</div>
+    </div>
+    <div style="color:#7060a8;font-size:11px;margin-bottom:16px">Record the shiny you caught this phase — it'll be added to your log and dex automatically.</div>
+
+    <!-- Sprite preview -->
+    <div id="phase-sprite-preview" style="display:flex;align-items:center;gap:12px;background:#1a1230;border-radius:12px;padding:10px 14px;margin-bottom:14px;min-height:60px">
+      <div id="phase-sprite-img" style="width:52px;height:52px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative">
+        <div style="position:absolute;inset:0;border-radius:50%;filter:blur(6px);background:radial-gradient(circle,#fde68a22,transparent)"></div>
+        <div id="phase-sprite-inner" style="font-size:28px;position:relative;z-index:1">★</div>
+      </div>
+      <div>
+        <div id="phase-preview-name" style="color:#fde68a;font-family:'Cinzel',serif;font-size:14px;font-weight:700">—</div>
+        <div id="phase-preview-sub" style="color:#5b4690;font-size:10px;margin-top:2px">Enter a species above</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="grid-column:1/-1">
+        <div class="form-label">Shiny Pokémon caught</div>
+        <input class="form-input" id="phase-species" placeholder="e.g. Kecleon" oninput="updatePhasePreview()"/>
+      </div>
+      <div>
+        <div class="form-label">Encounters this phase</div>
+        <input class="form-input" id="phase-count" type="number" min="0" placeholder="0"/>
+      </div>
+      <div>
+        <div class="form-label">Nature</div>
+        <select class="form-select" id="phase-nature">
+          <option>Hardy</option><option>Lonely</option><option>Brave</option><option>Adamant</option>
+          <option>Naughty</option><option>Bold</option><option>Docile</option><option>Relaxed</option>
+          <option>Impish</option><option>Lax</option><option>Jolly</option><option>Timid</option>
+          <option>Hasty</option><option>Serious</option><option>Naive</option><option>Modest</option>
+          <option>Mild</option><option>Quiet</option><option>Bashful</option><option>Rash</option>
+          <option>Calm</option><option>Gentle</option><option>Sassy</option><option>Careful</option><option>Quirky</option>
+        </select>
+      </div>
+      <div>
+        <div class="form-label">Gender</div>
+        <select class="form-select" id="phase-gender"><option>Male</option><option>Female</option><option>Unknown</option></select>
+      </div>
+      <div style="grid-column:1/-1">
+        <div class="form-label">Notes (optional)</div>
+        <input class="form-input" id="phase-notes" placeholder="Ball, IVs, memories..."/>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="confirmPhase()" style="flex:1;background:linear-gradient(135deg,#c084fc,#818cf8);border:none;color:#fff;padding:10px;border-radius:20px;cursor:pointer;font-family:'Cinzel',serif;font-size:13px;font-weight:700">Log & Continue Hunt ›</button>
+      <button onclick="closePhaseModal()" style="background:#2b1f4e;border:1px solid #5b4690;color:#a898cc;padding:10px 16px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:700">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ QUICK LOG MODAL ═══════════════════════════════════════════════════════ -->
+<div id="quickLogModal" style="display:none;position:fixed;inset:0;background:#0d082099;backdrop-filter:blur(10px);align-items:center;justify-content:center;z-index:2000;padding:20px" onclick="if(event.target===this)closeQuickLogModal()">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <div class="cinzel" style="color:#fde68a;font-size:17px">★ Log a Shiny Manually</div>
+      <button class="modal-close" onclick="closeQuickLogModal()">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div><div class="form-label">Species</div><input class="form-input" id="ql-species" placeholder="e.g. Gardevoir"/></div>
+      <div><div class="form-label">Ball</div>
+        <select class="form-select" id="ql-ball">
+          <option>Moon</option><option>Friend</option><option>Love</option><option>Lure</option>
+          <option>Dream</option><option>Beast</option><option>Fast</option><option>Heavy</option>
+          <option>Level</option><option>Safari</option><option>Sport</option><option>Poké</option>
+        </select>
+      </div>
+      <div><div class="form-label">Method</div>
+        <select class="form-select" id="ql-method">
+          <option>Random Encounter</option><option>Masuda Method</option><option>DexNav Chaining</option>
+          <option>Poké Radar</option><option>SOS Chaining</option><option>Soft Reset</option>
+          <option>Static</option><option>Sandwich Method</option><option>Fishing Chain</option>
+          <option>Friend Safari</option><option>Outbreak</option><option>Dynamax Adventure</option>
+          <option>GO / HOME Transfer</option><option>Unknown</option>
+        </select>
+      </div>
+      <div><div class="form-label">Game</div>
+        <select class="form-select" id="ql-game">
+          <option>Scarlet / Violet</option><option>Sword / Shield</option>
+          <option>Brilliant Diamond / Shining Pearl</option><option>Legends: Arceus</option>
+          <option>Sun / Moon</option><option>Ultra Sun / Ultra Moon</option>
+          <option>X / Y</option><option>Omega Ruby / Alpha Sapphire</option>
+          <option>Black 2 / White 2</option><option>HeartGold / SoulSilver</option><option>Other</option>
+        </select>
+      </div>
+      <div><div class="form-label">Encounter Count</div><input class="form-input" id="ql-count" type="number" min="0" placeholder="0 = unknown"/></div>
+      <div><div class="form-label">Date Found</div><input class="form-input" id="ql-date" type="date"/></div>
+      <div><div class="form-label">Nature</div>
+        <select class="form-select" id="ql-nature">
+          <option>Hardy</option><option>Lonely</option><option>Brave</option><option>Adamant</option>
+          <option>Naughty</option><option>Bold</option><option>Docile</option><option>Relaxed</option>
+          <option>Impish</option><option>Lax</option><option>Jolly</option><option>Timid</option>
+          <option>Hasty</option><option>Serious</option><option>Naive</option><option>Modest</option>
+          <option>Mild</option><option>Quiet</option><option>Bashful</option><option>Rash</option>
+          <option>Calm</option><option>Gentle</option><option>Sassy</option><option>Careful</option><option>Quirky</option>
+        </select>
+      </div>
+      <div><div class="form-label">Gender</div>
+        <select class="form-select" id="ql-gender"><option>Male</option><option>Female</option><option>Unknown</option></select>
+      </div>
+    </div>
+    <div style="margin-top:12px"><div class="form-label">Notes</div><textarea class="form-textarea" id="ql-notes" placeholder="How you got it, memories, etc."></textarea></div>
+    <div class="modal-footer">
+      <button onclick="saveQuickLog()" style="flex:1;padding:11px;border-radius:20px;cursor:pointer;font-family:'Cinzel',serif;font-size:14px;font-weight:700;border:none;background:linear-gradient(135deg,#fde68a,#fbbf24);color:#1a1535">Log Shiny ★</button>
+      <button class="btn-cancel" onclick="closeQuickLogModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+      <!-- Home dashboard -->
+      <div id="home-section" style="display:block">
+        <div class="container">
+          <div id="dashStatsGrid" class="dash-stats-grid"></div>
+          <div id="dashBody" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px"></div>
+        </div>
+      </div>
+
+      <!-- Living Dex -->
+      <div id="livingdex-section" style="display:none">
+        <!-- Top bar: overall progress + view toggles -->
+        <div id="ldex-topbar" style="padding:14px 20px 0;background:linear-gradient(180deg,#231a3e,transparent)">
+          <!-- Overall rings row -->
+          <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+            <div id="ldex-ring-normal" style="position:relative;width:64px;height:64px;flex-shrink:0"></div>
+            <div id="ldex-ring-shiny"  style="position:relative;width:64px;height:64px;flex-shrink:0"></div>
+            <div>
+              <div id="ldex-overall-label" class="cinzel" style="font-size:18px;font-weight:900;color:#ede9ff"></div>
+              <div id="ldex-shiny-label"   style="font-size:12px;color:#fde68a;font-weight:700;margin-top:2px"></div>
+              <div style="font-size:10px;color:#5b4690;margin-top:2px">of 1,025 Pokémon</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <div style="display:flex;background:#1a1230;border-radius:20px;padding:3px;gap:2px">
+                <button class="ldex-view-btn active" id="ldvb-all"    onclick="ldexView('all')"   >All</button>
+                <button class="ldex-view-btn"        id="ldvb-missing" onclick="ldexView('missing')">Missing</button>
+                <button class="ldex-view-btn"        id="ldvb-caught"  onclick="ldexView('caught')" >Caught</button>
+                <button class="ldex-view-btn"        id="ldvb-shiny"   onclick="ldexView('shiny')"  >✦ Shiny</button>
+              </div>
+            </div>
+          </div>
+          <!-- Gen filter tabs -->
+          <div style="display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px" id="ldex-gen-tabs">
+            <button class="ldex-gen-tab active" id="ldgt-all" onclick="ldexGen('all')">All</button>
+            <button class="ldex-gen-tab" id="ldgt-1" onclick="ldexGen(1)">Gen I</button>
+            <button class="ldex-gen-tab" id="ldgt-2" onclick="ldexGen(2)">Gen II</button>
+            <button class="ldex-gen-tab" id="ldgt-3" onclick="ldexGen(3)">Gen III</button>
+            <button class="ldex-gen-tab" id="ldgt-4" onclick="ldexGen(4)">Gen IV</button>
+            <button class="ldex-gen-tab" id="ldgt-5" onclick="ldexGen(5)">Gen V</button>
+            <button class="ldex-gen-tab" id="ldgt-6" onclick="ldexGen(6)">Gen VI</button>
+            <button class="ldex-gen-tab" id="ldgt-7" onclick="ldexGen(7)">Gen VII</button>
+            <button class="ldex-gen-tab" id="ldgt-8" onclick="ldexGen(8)">Gen VIII</button>
+            <button class="ldex-gen-tab" id="ldgt-9" onclick="ldexGen(9)">Gen IX</button>
+          </div>
+        </div>
+        <!-- Grid -->
+        <div id="ldex-grid" style="padding:16px 20px 100px"></div>
+      </div>
+
+      <!-- Competitive -->
+      <div id="competitive-section" style="display:none">
+        <div class="container">
+          <div class="coming-soon-card">
+            <div class="cs-icon">⚔️</div>
+            <div class="cinzel cs-title">Competitive Builder</div>
+            <div class="cs-sub">Build teams, plan EV spreads, save movesets and type matchup notes for your competitive squad.</div>
+            <div class="cs-badge">Coming Soon</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Breeding -->
+      <div id="breeding-section" style="display:none">
+        <!-- Top bar -->
+        <div style="padding:16px 20px 0">
+          <div style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none" id="breed-tab-bar">
+            <button class="ldex-gen-tab active" id="btab-projects" onclick="breedTab('projects')">🥚 Projects</button>
+            <button class="ldex-gen-tab"        id="btab-guide"    onclick="breedTab('guide')">📖 IV Guide</button>
+            <button class="ldex-gen-tab"        id="btab-eggmoves" onclick="breedTab('eggmoves')">🔗 Egg Move Chains</button>
+          </div>
+        </div>
+        <div id="breed-pane-projects" style="padding:18px 20px 100px"></div>
+        <div id="breed-pane-guide"    style="padding:18px 20px 100px;display:none"></div>
+        <div id="breed-pane-eggmoves" style="padding:18px 20px 100px;display:none"></div>
+      </div>
+
+      <!-- Game Progress -->
+      <div id="progress-section" style="display:none">
+        <div class="container">
+          <div class="coming-soon-card">
+            <div class="cs-icon">🗺️</div>
+            <div class="cinzel cs-title">Game Progress</div>
+            <div class="cs-sub">Track badges, story milestones, and completion percentage for each game in your collection.</div>
+            <div class="cs-badge">Coming Soon</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hall of Fame — unlocked by Living Dex / Shiny Living Dex completion -->
+      <div id="halloffame-section" style="display:none">
+        <div class="container" id="hof-content"></div>
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
+<div id="dex-page">
+  <!-- Sticky header -->
+  <div id="dexHeader" style="border-bottom:1px solid #2e2858;padding:12px 20px;background:linear-gradient(180deg,#1e1535ee,#1e1535cc);position:sticky;top:0;z-index:100;backdrop-filter:blur(14px)">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+      <button onclick="closeDex()" style="background:#2a2255;border:1px solid #3d3570;color:#c084fc;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0">← Back</button>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div id="dexTitle" class="cinzel" style="font-size:20px;font-weight:900;letter-spacing:.06em;background:linear-gradient(135deg,#e9d5ff,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></div>
+          <div id="dexNumber" style="color:#5b4690;font-size:12px;font-weight:700"></div>
+          <div id="dexTypes" style="display:flex;gap:4px"></div>
+        </div>
+        <div id="dexGenus" style="color:#7060a8;font-size:10px;margin-top:1px;font-style:italic"></div>
+      </div>
+      <div id="dexCaughtBadges" style="display:flex;gap:6px;flex-shrink:0"></div>
+    </div>
+    <!-- Tab bar -->
+    <div style="display:flex;gap:2px;overflow-x:auto;scrollbar-width:none" id="dexTabBar">
+      <button class="dex-tab active" id="dtab-overview"   onclick="if(typeof dexTab==='function')dexTab('overview')">📖 Overview</button>
+      <button class="dex-tab"        id="dtab-moves"      onclick="if(typeof dexTab==='function')dexTab('moves')">⚔️ Moves</button>
+      <button class="dex-tab"        id="dtab-evolution"  onclick="if(typeof dexTab==='function')dexTab('evolution')">🔄 Evolution</button>
+      <button class="dex-tab"        id="dtab-mydata"     onclick="if(typeof dexTab==='function')dexTab('mydata')">🎒 My Data</button>
+    </div>
+  </div>
+
+  <!-- Tab panes -->
+  <div id="dpane-overview"  style="padding:18px 20px"></div>
+  <div id="dpane-moves"     style="padding:18px 20px;display:none"></div>
+  <div id="dpane-evolution" style="padding:18px 20px;display:none"></div>
+  <div id="dpane-mydata"    style="padding:18px 20px;display:none"></div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="overlay" id="addModal" style="display:none" onclick="if(event.target===this)closeAddModal()">
+  <div class="modal" id="addModalInner" style="border-top:3px solid #c084fc">
+    <div class="modal-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div id="previewBallImg"></div>
+        <div id="previewSpriteWrap" style="width:58px;height:58px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid #3d3570;background:#2a2350;overflow:hidden;flex-shrink:0">
+          <img id="previewSprite" src="" style="width:56px;height:56px;image-rendering:pixelated;display:none"/>
+          <span id="previewFallback" style="color:#3d3570;font-size:22px">?</span>
+        </div>
+        <div>
+          <div id="modalTitle" class="cinzel" style="color:#ede8de;font-size:17px;margin-bottom:3px">Add Aprimon</div>
+          <div id="modalSubtitle" style="font-size:12px;color:#8b80b8">Moon Ball</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeAddModal()">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Species Name</label><input class="form-input" id="fSpecies" placeholder="e.g. Bagon" oninput="updateModalPreview()"/></div>
+      <div class="form-group"><label class="form-label">Apriball</label>
+        <select class="form-select" id="fBall" onchange="updateModalPreview()">
+          <option>Friend</option><option>Love</option><option selected>Moon</option><option>Lure</option>
+          <option>Dream</option><option>Beast</option><option>Fast</option><option>Heavy</option>
+          <option>Level</option><option>Safari</option><option>Sport</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Nature</label>
+        <select class="form-select" id="fNature">
+          <option>Hardy</option><option>Lonely</option><option>Brave</option><option>Adamant</option><option>Naughty</option>
+          <option>Bold</option><option>Docile</option><option>Relaxed</option><option>Impish</option><option>Lax</option>
+          <option selected>Jolly</option><option>Timid</option><option>Hasty</option><option>Serious</option><option>Naive</option>
+          <option>Modest</option><option>Mild</option><option>Quiet</option><option>Bashful</option><option>Rash</option>
+          <option>Calm</option><option>Gentle</option><option>Sassy</option><option>Careful</option><option>Quirky</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">IV Spread</label><input class="form-input" id="fIVs" value="5IV -SpAtk"/></div>
+      <div class="form-group"><label class="form-label">Gender</label>
+        <select class="form-select" id="fGender"><option>Male</option><option>Female</option><option>Unknown</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Quantity</label><input class="form-input" id="fQty" type="number" min="1" value="1"/></div>
+      <div class="form-group"><label class="form-label">Game</label>
+        <select class="form-select" id="fGame">
+          <option>Sword/Shield</option><option>Brilliant Diamond/Shining Pearl</option>
+          <option>Scarlet/Violet</option><option>Legends: Arceus</option><option>HOME</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Trade Status</label>
+        <select class="form-select" id="fStatus">
+          <option value="available">✓ Available for Trade</option><option value="keep">♦ Keeping</option>
+          <option value="trade-only">⇄ Trade Only</option><option value="wanted">✦ Wanted</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding-top:8px">
+        <input type="checkbox" id="fShiny" onchange="updateModalPreview()" style="width:16px;height:16px;accent-color:#FFD700"/>
+        <label for="fShiny" style="color:#FFD700;font-size:13px;cursor:pointer">★ Shiny</label>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <label class="form-label">Egg Moves (<span id="eggCount">0</span>/4)</label>
+      <div class="tag-input-row"><input class="form-input" id="eggInput" placeholder="Move name — Enter to add" onkeydown="if(event.key==='Enter')addEggMove()"/><button class="btn-add-tag" onclick="addEggMove()">+</button></div>
+      <div class="tag-row" id="eggTags"></div>
+    </div>
+    <div style="margin-top:16px">
+      <label class="form-label">Looking For</label>
+      <div class="tag-input-row"><input class="form-input" id="wantInput" placeholder="e.g. Gible in Love Ball" onkeydown="if(event.key==='Enter')addWant()"/><button class="btn-add-tag" onclick="addWant()">+</button></div>
+      <div class="tag-row" id="wantTags"></div>
+    </div>
+    <div style="margin-top:16px"><label class="form-label">Notes</label><textarea class="form-textarea" id="fNotes" placeholder="Hidden ability, competitive notes..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn-save" id="btnSave" onclick="saveMon()" style="background:linear-gradient(135deg,#1a1c2e,#1a1535);border:1px solid #7986CB44;color:#9FA8DA">Add to Collection</button>
+      <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reddit Modal -->
+<div class="overlay" id="redditModal" style="display:none" onclick="if(event.target===this)closeReddit()">
+  <div class="modal" style="max-width:620px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div class="cinzel" style="color:#ede8de;font-size:17px">Reddit Post Generator</div>
+        <div style="color:#3d3570;font-size:10px;margin-top:3px">r/pokemontrades · r/mobileapricorn · r/bankballexchange</div>
+      </div>
+      <button class="modal-close" onclick="closeReddit()">✕</button>
+    </div>
+    <textarea class="reddit-textarea" id="redditText" readonly></textarea>
+    <button id="copyBtn" onclick="copyReddit()" style="padding:11px;border-radius:6px;cursor:pointer;font-family:'Cinzel',serif;font-size:14px;border:none;background:linear-gradient(135deg,#c084fc,#818cf8);color:#e9d5ff;transition:all .2s">📋 Copy to Clipboard</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+
+<!-- ═══ FAILED CATCH MODAL ══════════════════════════════════════════════════ -->
+<div id="failedModal" style="display:none;position:fixed;inset:0;background:#0d082099;backdrop-filter:blur(10px);align-items:center;justify-content:center;z-index:2000;padding:20px" onclick="if(event.target===this)closeFailedModal()">
+  <div class="found-modal-box" style="border-color:#fda4af33;box-shadow:0 0 60px #fda4af11,0 24px 60px #00000088">
+    <div class="found-stars" style="filter:grayscale(.4)">💔</div>
+    <div class="found-title" style="background:linear-gradient(135deg,#fda4af,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent">IT GOT AWAY.</div>
+    <div class="found-sub" id="failed-sub">That one hurts. Log it for posterity.</div>
+    <div id="failed-sprite-wrap" class="found-sprite"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left;margin-bottom:14px">
+      <div style="grid-column:1/-1">
+        <div class="form-label">Species (confirm or change)</div>
+        <input class="form-input" id="failed-species" oninput="updateFailedSprite()"/>
+      </div>
+      <div>
+        <div class="form-label">What happened</div>
+        <select class="form-select" id="failed-reason">
+          <option value="fled">It fled 🏃</option>
+          <option value="ko">Accidentally KO'd 💀</option>
+          <option value="out-of-balls">Ran out of balls 🎾</option>
+          <option value="reset">Lost to soft reset 💾</option>
+          <option value="crash">Game crashed / froze 💻</option>
+          <option value="chain-broke">Chain broke 🔗</option>
+          <option value="other">Other tragedy</option>
+        </select>
+      </div>
+      <div>
+        <div class="form-label">Encounter count</div>
+        <input class="form-input" id="failed-count" type="number" min="0"/>
+      </div>
+    </div>
+    <div style="margin-bottom:18px;text-align:left">
+      <div class="form-label">Notes (vent here)</div>
+      <input class="form-input" id="failed-notes" placeholder="e.g. used my last Poké Ball, game crashed..."/>
+    </div>
+    <button onclick="confirmFailed()" style="width:100%;background:linear-gradient(135deg,#3a1020,#2b1f4e);border:1px solid #fda4af44;color:#fda4af;padding:13px;border-radius:20px;cursor:pointer;font-family:'Cinzel',serif;font-size:14px;font-weight:800;margin-bottom:10px;transition:all .2s" onmouseover="this.style.background='linear-gradient(135deg,#4a1528,#372962)'" onmouseout="this.style.background='linear-gradient(135deg,#3a1020,#2b1f4e)'">💔 Log the Heartbreak</button>
+    <button onclick="closeFailedModal()" style="background:none;border:none;color:#5b4690;cursor:pointer;font-size:12px;font-weight:700;width:100%">Cancel</button>
+  </div>
+</div>
+
+
+<!-- ═══ BREEDING MODAL ══════════════════════════════════════════════════════ -->
+<div id="breedModal" style="display:none;position:fixed;inset:0;background:#0d082099;backdrop-filter:blur(10px);align-items:flex-start;justify-content:center;z-index:2000;padding:20px;overflow-y:auto" onclick="if(event.target===this)hideModal('breedModal')">
+  <div style="background:linear-gradient(135deg,#231a3e,#1e1535);border:1px solid #5b469066;border-radius:22px;padding:24px;width:100%;max-width:560px;margin:auto">
+    <div class="cinzel" id="breed-modal-title" style="font-size:18px;font-weight:900;color:#ede9ff;margin-bottom:18px;text-align:center">🥚 New Breeding Project</div>
+
+    <!-- Preview sprite -->
+    <div style="text-align:center;margin-bottom:14px">
+      <img id="bf-preview-img" src="" width="96" height="96" style="image-rendering:pixelated;display:none;filter:drop-shadow(0 0 12px #c084fc44)"/>
+    </div>
+
+    <!-- Target species + ball -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div>
+        <div class="form-label">Target Species</div>
+        <input class="form-input" id="bf-species" placeholder="e.g. Bagon" oninput="updateBreedPreview()"/>
+      </div>
+      <div>
+        <div class="form-label">Ball</div>
+        <select class="form-select" id="bf-ball">
+          <option>Moon</option><option>Love</option><option>Friend</option><option>Fast</option>
+          <option>Lure</option><option>Heavy</option><option>Level</option><option>Dream</option>
+          <option>Beast</option><option>Safari</option><option>Sport</option><option>Poké</option>
+          <option>Great</option><option>Ultra</option><option>Luxury</option><option>Premier</option>
+          <option>Dusk</option><option>Heal</option><option>Quick</option><option>Net</option>
+          <option>Dive</option><option>Nest</option><option>Repeat</option><option>Timer</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Nature + IV target -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div>
+        <div class="form-label">Target Nature</div>
+        <select class="form-select" id="bf-nature">
+          <option value="Hardy">Hardy</option>
+          <option value="Lonely">Lonely</option>
+          <option value="Brave">Brave</option>
+          <option value="Adamant">Adamant</option>
+          <option value="Naughty">Naughty</option>
+          <option value="Bold">Bold</option>
+          <option value="Docile">Docile</option>
+          <option value="Relaxed">Relaxed</option>
+          <option value="Impish">Impish</option>
+          <option value="Lax">Lax</option>
+          <option value="Timid">Timid</option>
+          <option value="Hasty">Hasty</option>
+          <option value="Serious">Serious</option>
+          <option value="Naive">Naive</option>
+          <option value="Jolly">Jolly</option>
+          <option value="Modest">Modest</option>
+          <option value="Mild">Mild</option>
+          <option value="Quiet">Quiet</option>
+          <option value="Bashful">Bashful</option>
+          <option value="Rash">Rash</option>
+          <option value="Calm">Calm</option>
+          <option value="Gentle">Gentle</option>
+          <option value="Sassy">Sassy</option>
+          <option value="Careful">Careful</option>
+          <option value="Quirky">Quirky</option>
+        </select>
+      </div>
+      <div>
+        <div class="form-label">IV Spread (e.g. 5IV -SpAtk)</div>
+        <input class="form-input" id="bf-ivs" placeholder="e.g. 31/31/31/x/31/31"/>
+      </div>
+    </div>
+
+    <!-- Gender + egg cycles -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div>
+        <div class="form-label">Target Gender</div>
+        <select class="form-select" id="bf-gender">
+          <option>Any</option><option>Male</option><option>Female</option>
+        </select>
+      </div>
+      <div>
+        <div class="form-label">Egg Cycles (for hatch time)</div>
+        <input class="form-input" id="bf-egg-cycles" type="number" min="1" placeholder="e.g. 40"/>
+      </div>
+    </div>
+
+    <!-- Toggles -->
+    <div style="display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#c4b5fd">
+        <input type="checkbox" id="bf-masuda"/> 🌍 Masuda Method
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#fde68a">
+        <input type="checkbox" id="bf-want-shiny"/> ★ Shiny Target
+      </label>
+    </div>
+
+    <!-- Egg moves -->
+    <div style="margin-bottom:14px">
+      <div class="form-label">Egg Moves (up to 4)</div>
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <input class="form-input" id="bf-move-input" placeholder="Move name" style="flex:1" onkeydown="if(event.key==='Enter')addBreedMove()"/>
+        <button onclick="addBreedMove()" style="background:#2b1f4e;border:1px solid #c084fc33;color:#c4b5fd;padding:8px 14px;border-radius:10px;cursor:pointer;font-size:12px">+ Add</button>
+      </div>
+      <div id="bf-move-tags" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+    </div>
+
+    <!-- Parents -->
+    <div style="margin-bottom:14px">
+      <div class="form-label" style="margin-bottom:8px">Breeding Pair</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:#1a1230;border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:#c084fc;font-weight:800;margin-bottom:8px">Parent 1</div>
+          <input class="form-input" id="bf-p1-species" placeholder="Species"  style="margin-bottom:6px"/>
+          <input class="form-input" id="bf-p1-ivs"     placeholder="IV spread" style="margin-bottom:6px"/>
+          <input class="form-input" id="bf-p1-nature"  placeholder="Nature"   style="margin-bottom:6px"/>
+          <input class="form-input" id="bf-p1-ball"    placeholder="Ball"     style="margin-bottom:6px"/>
+          <input class="form-input" id="bf-p1-item"    placeholder="Held item"/>
+        </div>
+        <div style="background:#1a1230;border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:#c084fc;font-weight:800;margin-bottom:8px">Parent 2</div>
+          <input class="form-input" id="bf-p2-species" placeholder="Species"  style="margin-bottom:6px"/>
+          <input class="form-input" id="bf-p2-ivs"     placeholder="IV spread" style="margin-bottom:6px"/>
+          <input class="form-input" id="bf-p2-nature"  placeholder="Nature"   style="margin-bottom:6px"/>
+          <input class="form-input" id="bf-p2-ball"    placeholder="Ball"     style="margin-bottom:6px"/>
+          <input class="form-input" id="bf-p2-item"    placeholder="Held item"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div style="margin-bottom:18px">
+      <div class="form-label">Notes</div>
+      <input class="form-input" id="bf-notes" placeholder="Any notes about this project…"/>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button onclick="saveBreedProject()" style="flex:1;background:linear-gradient(135deg,#c084fc,#818cf8);border:none;color:#fff;padding:12px;border-radius:12px;cursor:pointer;font-family:'Cinzel',serif;font-size:14px;font-weight:700">Save Project</button>
+      <button onclick="hideModal('breedModal')" style="background:#1a1230;border:1px solid #5b469033;color:#7060a8;padding:12px 18px;border-radius:12px;cursor:pointer;font-size:13px">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Rotom toast -->
+<div id="rotom-toast">
+  <img src="https://img.pokemondb.net/sprites/sword-shield/icon/rotom.png" width="40" height="30" onerror="this.style.display='none'"/>
+  <span id="rotom-toast-text"></span>
+</div>
+
+<!-- Rotom trainer name onboarding -->
+<div id="rotom-onboarding" onclick="if(event.target===this&&document.getElementById('trainer-name-input').value.trim())saveTrainerName()">
+  <div id="rotom-onboarding-card">
+    <img src="https://img.pokemondb.net/sprites/sword-shield/icon/rotom.png"
+      width="56" height="42" id="rotom-onboarding-sprite"
+      onerror="this.style.display='none'"/>
+    <div class="cinzel" style="font-size:20px;font-weight:900;color:#ede9ff;margin-bottom:8px">Bzzt-zzt!</div>
+    <div style="font-size:13px;color:#c4b5fd;line-height:1.6;margin-bottom:4px">
+      Whirr! RotomOS is booting up!<br/>
+      Before we go — what do I call you, Trainer?
+    </div>
+    <input class="form-input" id="trainer-name-input"
+      placeholder="Enter your name…"
+      maxlength="20"
+      onkeydown="if(event.key==='Enter')saveTrainerName()"
+      style="width:100%;margin:16px 0 12px;text-align:center;font-size:16px;font-weight:700;letter-spacing:.05em"/>
+    <button onclick="saveTrainerName()"
+      style="width:100%;background:linear-gradient(135deg,#c084fc,#818cf8);border:none;color:#fff;padding:13px;border-radius:14px;cursor:pointer;font-family:'Cinzel',serif;font-size:14px;font-weight:800;letter-spacing:.04em;transition:all .2s"
+      onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">
+      Let's GO! ⚡
+    </button>
+    <button onclick="saveTrainerName('Trainer')"
+      style="width:100%;background:none;border:none;color:#5b4690;padding:10px;cursor:pointer;font-size:11px;margin-top:4px">
+      Skip for now
+    </button>
+  </div>
+</div>
+
+
+<!-- ═══ SETTINGS MODAL ══════════════════════════════════════════════════════ -->
+<div id="settings-modal" onclick="if(event.target===this)closeSettings()">
+  <div id="settings-card">
+    <div class="settings-header">
+      <div class="cinzel" style="font-size:17px;color:#ede9ff">⚙️ Settings</div>
+      <button class="modal-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-body">
+
+      <!-- TRAINER -->
+      <div class="settings-section-label">Trainer</div>
+      <div class="settings-row" id="settings-trainer-row" onclick="settingsEditName()">
+        <div class="settings-row-left">
+          <span class="settings-row-icon">🎮</span>
+          <div>
+            <div class="settings-row-text" id="settings-name-display">Trainer</div>
+            <div class="settings-row-sub">Tap to change your name</div>
+          </div>
+        </div>
+        <span style="font-size:12px;color:#5b4690">Edit ›</span>
+      </div>
+      <div id="settings-name-edit" style="display:none;margin-bottom:6px">
+        <div style="display:flex;gap:8px;align-items:center;padding:8px 14px;background:#1a1230;border-radius:12px;border:1px solid #c084fc44">
+          <input id="settings-name-input" class="form-input" placeholder="Your name..." maxlength="20"
+            style="flex:1;margin:0" onkeydown="if(event.key==='Enter')settingsSaveName()"/>
+          <button onclick="settingsSaveName()"
+            style="background:#c084fc;border:none;color:#fff;padding:7px 14px;border-radius:8px;cursor:pointer;font-weight:800;font-size:12px;font-family:'Cinzel',serif">
+            Save
+          </button>
+          <button onclick="settingsCancelName()"
+            style="background:none;border:1px solid #5b469044;color:#7060a8;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:12px">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- APPEARANCE -->
+      <div class="settings-section-label">Appearance</div>
+      <div class="settings-row" onclick="toggleLightMode()">
+        <div class="settings-row-left">
+          <span class="settings-row-icon">☀️</span>
+          <div>
+            <div class="settings-row-text">Light Mode</div>
+            <div class="settings-row-sub">Switch to a lighter colour scheme</div>
+          </div>
+        </div>
+        <button class="settings-toggle" id="toggle-light-mode" onclick="event.stopPropagation();toggleLightMode()"></button>
+      </div>
+
+      <!-- UNLOCKED REWARDS -->
+      <div class="settings-section-label">Unlocked Rewards</div>
+      <div id="settings-no-rewards" style="padding:10px 14px;color:#3d3070;font-size:12px;font-style:italic">
+        Rewards unlock as you reach milestones. Keep playing! ⚡
+      </div>
+
+      <!-- Shiny Rotom — hidden until unlocked -->
+      <div id="settings-shiny-rotom" style="display:none">
+        <div class="settings-row" onclick="toggleShinyRotom()">
+          <div class="settings-row-left">
+            <span class="settings-row-icon">★</span>
+            <div>
+              <div class="settings-row-text" style="color:#fde68a">Shiny Rotom</div>
+              <div class="settings-row-sub">Unlocked: 50 shinies or 10% shiny dex</div>
+            </div>
+          </div>
+          <button class="settings-toggle" id="toggle-shiny-rotom" onclick="event.stopPropagation();toggleShinyRotom()"></button>
+        </div>
+      </div>
+
+      <!-- Gold Theme — hidden until living dex complete -->
+      <div id="settings-gold-theme" style="display:none">
+        <div class="settings-row" onclick="toggleGoldTheme()">
+          <div class="settings-row-left">
+            <span class="settings-row-icon">✦</span>
+            <div>
+              <div class="settings-row-text" style="color:#fde68a">Gold Theme</div>
+              <div class="settings-row-sub">Unlocked: Living Dex complete</div>
+            </div>
+          </div>
+          <button class="settings-toggle" id="toggle-gold-theme" onclick="event.stopPropagation();toggleGoldTheme()"></button>
+        </div>
+      </div>
+
+      <!-- Mystery locked slot -->
+      <div class="settings-locked" id="settings-mystery-slot">
+        <span style="font-size:18px">🔒</span>
+        <div>
+          <div class="settings-locked-text">??? Form</div>
+          <div class="settings-locked-hint">Bzzt... something's hiding here. Keep playing!</div>
+        </div>
+      </div>
+
+      <!-- DATA -->
+      <div class="settings-section-label">Data</div>
+      <div class="settings-row" onclick="exportData()">
+        <div class="settings-row-left">
+          <span class="settings-row-icon">📤</span>
+          <div>
+            <div class="settings-row-text">Export Backup</div>
+            <div class="settings-row-sub">Download all your data as JSON</div>
+          </div>
+        </div>
+        <span style="font-size:12px;color:#5b4690">Download ›</span>
+      </div>
+      <div class="settings-row" onclick="importData()">
+        <div class="settings-row-left">
+          <span class="settings-row-icon">📥</span>
+          <div>
+            <div class="settings-row-text">Import Backup</div>
+            <div class="settings-row-sub">Restore from a JSON backup file</div>
+          </div>
+        </div>
+        <span style="font-size:12px;color:#5b4690">Restore ›</span>
+      </div>
+      <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImportFile(event)"/>
+      <div class="settings-row" onclick="confirmClearFromSettings()" style="border-color:#fda4af22">
+        <div class="settings-row-left">
+          <span class="settings-row-icon">🗑️</span>
+          <div>
+            <div class="settings-row-text" style="color:#fda4af">Clear All Data</div>
+            <div class="settings-row-sub">Permanently erase everything</div>
+          </div>
+        </div>
+        <span style="font-size:12px;color:#fda4af66">Danger ›</span>
+      </div>
+      <div id="settings-clear-confirm" style="display:none;padding:12px 14px;background:#3a1020;border:1px solid #fda4af30;border-radius:12px;margin-bottom:6px">
+        <div style="color:#fca5a5;font-size:12px;margin-bottom:10px;text-align:center;font-weight:700">⚠️ This will erase ALL your data forever.</div>
+        <div style="display:flex;gap:8px">
+          <button onclick="executeSettingsClear()"
+            style="flex:1;background:#fda4af22;border:1px solid #fda4af44;color:#fda4af;padding:8px;border-radius:8px;cursor:pointer;font-weight:800;font-size:12px">
+            Yes, erase everything
+          </button>
+          <button onclick="cancelSettingsClear()"
+            style="flex:1;background:#2b1f4e;border:1px solid #5b469044;color:#ede9ff;padding:8px;border-radius:8px;cursor:pointer;font-weight:800;font-size:12px">
+            Cancel
+          </button>
+        </div>
+      </div>
+
+      <!-- SUPPORT -->
+      <div class="settings-section-label">Support</div>
+      <a href="https://ko-fi.com/rotomos" target="_blank" style="text-decoration:none">
+        <div class="settings-row" style="border-color:#fde68a22">
+          <div class="settings-row-left">
+            <span class="settings-row-icon">☕</span>
+            <div>
+              <div class="settings-row-text" style="color:#fde68a">Support RotomOS</div>
+              <div class="settings-row-sub">Buy me a coffee on Ko-fi ⚡</div>
+            </div>
+          </div>
+          <span style="font-size:12px;color:#fde68a66">Ko-fi ›</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
