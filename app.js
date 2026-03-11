@@ -3249,8 +3249,6 @@ updateWantsBadge();
 updateShinyBadge();
 // nhPreview() called when hunt modal opens
 
-</script>
-
 // ══ ROTOM COMPANION ══════════════════════════════════════════════════════════
 
 const ROTOM_QUIPS = {
