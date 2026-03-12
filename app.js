@@ -184,8 +184,8 @@ function renderCompactRow(g) {
   // Show all balls this species has
   const ballIcons = owned.map(b => {
     const mon = variants.find(v => v.ball === b);
-    return `<span class="cr-row-ball" title="${b} Ball">
-      <img src="${ballUrl(b)}" width="18" height="18" style="image-rendering:pixelated" onerror="this.style.display='none'"/>
+    return `<span class="cr-row-ball" title="${b} Ball${mon?.isShiny ? ' ★' : ''}">
+      <img src="${ballUrl(b)}" width="18" height="18" style="image-rendering:pixelated;display:block" onerror="this.style.display='none'"/>
       ${mon?.isShiny ? '<span class="cr-row-shiny">★</span>' : ''}
     </span>`;
   }).join('');
@@ -377,6 +377,65 @@ let prevApriTab = 'collection';
 
 // ══ DEX PAGE — PokéAPI integration ══════════════════════════════════════════
 
+// Forms to exclude from evolution chain display (battle/temporary/variant forms)
+const EVO_SKIP_SUFFIXES = [
+  '-mega','-mega-x','-mega-y','-primal',
+  '-crowned','-eternal','-ultra',
+  '-hangry','-own-tempo',
+  '-origin','-origin-paldea',
+  '-zen','-zen-galar',
+  '-dusk-mane','-dawn-wings',
+  '-ash','-battle-bond','-power-construct',
+  '-low-key','-amped',
+  '-school','-busted',
+  '-totem',
+  '-50','-10','-10-percent',
+  '-single-strike','-rapid-strike',
+  '-ice-rider','-shadow-rider',
+  '-white-striped',
+];
+
+// Legendary & mythical species — can't breed, don't show in egg move chains
+const LEGENDARY_SPECIES = new Set([
+  'articuno','zapdos','moltres','mewtwo','mew',
+  'raikou','entei','suicune','lugia','ho-oh','celebi',
+  'regirock','regice','registeel','latias','latios',
+  'kyogre','groudon','rayquaza','jirachi','deoxys',
+  'uxie','mesprit','azelf','dialga','palkia','heatran',
+  'regigigas','giratina','cresselia','phione','manaphy',
+  'darkrai','shaymin','arceus',
+  'victini','cobalion','terrakion','virizion',
+  'tornadus','thundurus','reshiram','zekrom','landorus','kyurem',
+  'keldeo','meloetta','genesect',
+  'xerneas','yveltal','zygarde','diancie','hoopa','volcanion',
+  'type-null','silvally',
+  'tapu-koko','tapu-lele','tapu-bulu','tapu-fini',
+  'cosmog','cosmoem','solgaleo','lunala',
+  'nihilego','buzzwole','pheromosa','xurkitree','celesteela',
+  'kartana','guzzlord','necrozma','magearna','marshadow',
+  'poipole','naganadel','stakataka','blacephalon','zeraora',
+  'meltan','melmetal',
+  'zacian','zamazenta','eternatus','kubfu','urshifu',
+  'zarude','regieleki','regidrago','glastrier','spectrier','calyrex',
+  'enamorus',
+  'wo-chien','chien-pao','ting-lu','chi-yu',
+  'koraidon','miraidon','walking-wake','iron-leaves',
+  'gouging-fire','raging-bolt','iron-boulder','iron-crown',
+  'terapagos','pecharunt','ogerpon','okidogi','munkidori','fezandipiti',
+]);
+
+const REGIONAL_SUFFIXES = ['-alola','-galar','-hisui','-paldea'];
+
+function shouldSkipEvoEntry(name) {
+  // Always keep regional forms — separate breedable variants
+  if (REGIONAL_SUFFIXES.some(s => name.endsWith(s))) return false;
+  // Skip legendaries and mythicals
+  if (LEGENDARY_SPECIES.has(name)) return true;
+  // Skip battle/alternate/mega forms
+  if (EVO_SKIP_SUFFIXES.some(s => name.endsWith(s))) return true;
+  return false;
+}
+
 const TYPE_COLORS = {
   normal:'#A8A878',fire:'#F08030',water:'#6890F0',electric:'#F8D030',
   grass:'#78C850',ice:'#98D8D8',fighting:'#C03028',poison:'#A040A0',
@@ -396,6 +455,90 @@ const STAT_COLORS = {
 };
 
 // In-memory cache so we don't re-fetch on every tab switch
+// ══ POKÉAPI CACHE WRAPPER ════════════════════════════════════════════════════
+// Two-layer cache: in-memory (session) → localStorage (30 days) → network
+// All PokéAPI calls should go through pokeGet() — never fetch() directly.
+
+const POKE_CACHE_PREFIX = 'at_pkc_';
+const POKE_CACHE_TTL    = 30 * 24 * 60 * 60 * 1000; // 30 days
+const POKE_CACHE_MAX    = 150; // max localStorage entries before LRU eviction
+const POKE_CACHE_INDEX  = 'at_pkc_index'; // JSON array of {key, ts} for LRU
+
+const _memCache = {}; // in-memory: key → parsed data (no expiry, lives for session)
+
+async function pokeGet(url) {
+  // Normalise key — strip base URL so cache keys are short
+  const key = url.replace('https://pokeapi.co/api/v2/', '').replace(/\/$/, '');
+
+  // 1. Memory cache — fastest, no parse needed
+  if (_memCache[key] !== undefined) return _memCache[key];
+
+  // 2. localStorage cache
+  try {
+    const raw = localStorage.getItem(POKE_CACHE_PREFIX + key);
+    if (raw) {
+      const { data, ts } = JSON.parse(raw);
+      if (Date.now() - ts < POKE_CACHE_TTL) {
+        _memCache[key] = data;
+        _touchLRU(key);
+        return data;
+      }
+      // Expired — remove it
+      localStorage.removeItem(POKE_CACHE_PREFIX + key);
+    }
+  } catch(e) {}
+
+  // 3. Network
+  let data = null;
+  try {
+    const res = await fetch(url);
+    if (res.ok) data = await res.json();
+  } catch(e) {}
+
+  // Store in both layers
+  _memCache[key] = data;
+  if (data) _lsWrite(key, data);
+  return data;
+}
+
+function _lsWrite(key, data) {
+  try {
+    // Evict if over limit
+    let index = _getLRUIndex();
+    if (index.length >= POKE_CACHE_MAX) {
+      // Remove oldest entry
+      const oldest = index.shift();
+      localStorage.removeItem(POKE_CACHE_PREFIX + oldest.key);
+    }
+    localStorage.setItem(POKE_CACHE_PREFIX + key, JSON.stringify({ data, ts: Date.now() }));
+    _touchLRU(key, index);
+  } catch(e) {
+    // Storage full — clear oldest half and try again
+    _evictHalf();
+    try { localStorage.setItem(POKE_CACHE_PREFIX + key, JSON.stringify({ data, ts: Date.now() })); } catch(e2) {}
+  }
+}
+
+function _getLRUIndex() {
+  try { return JSON.parse(localStorage.getItem(POKE_CACHE_INDEX) || '[]'); } catch(e) { return []; }
+}
+
+function _touchLRU(key, index) {
+  index = index || _getLRUIndex();
+  const i = index.findIndex(e => e.key === key);
+  if (i > -1) index.splice(i, 1);
+  index.push({ key, ts: Date.now() });
+  try { localStorage.setItem(POKE_CACHE_INDEX, JSON.stringify(index)); } catch(e) {}
+}
+
+function _evictHalf() {
+  const index = _getLRUIndex();
+  const half  = Math.ceil(index.length / 2);
+  index.splice(0, half).forEach(e => localStorage.removeItem(POKE_CACHE_PREFIX + e.key));
+  try { localStorage.setItem(POKE_CACHE_INDEX, JSON.stringify(index.slice(half))); } catch(e) {}
+}
+
+// Legacy in-memory only cache — kept for any missed call sites
 const pokeCache = {};
 
 let currentDexSpecies = null;
@@ -407,13 +550,13 @@ async function fetchPokeData(species) {
   if (pokeCache[key]) return pokeCache[key];
 
   const [poke, spec] = await Promise.all([
-    fetch(`https://pokeapi.co/api/v2/pokemon/${key}`).then(r => r.ok ? r.json() : null).catch(()=>null),
-    fetch(`https://pokeapi.co/api/v2/pokemon-species/${key}`).then(r => r.ok ? r.json() : null).catch(()=>null),
+    pokeGet(`https://pokeapi.co/api/v2/pokemon/${key}`),
+    pokeGet(`https://pokeapi.co/api/v2/pokemon-species/${key}`),
   ]);
 
   let evo = null;
   if (spec?.evolution_chain?.url) {
-    evo = await fetch(spec.evolution_chain.url).then(r => r.ok ? r.json() : null).catch(()=>null);
+    evo = await pokeGet(spec.evolution_chain.url);
   }
 
   const data = { poke, spec, evo };
@@ -637,7 +780,7 @@ const moveCache = {}; // move-name -> { type, category, power, accuracy }
 async function fetchMoveDetails(moveName) {
   if (moveCache[moveName]) return moveCache[moveName];
   try {
-    const data = await fetch(`https://pokeapi.co/api/v2/move/${moveName}`).then(r => r.ok ? r.json() : null);
+    const data = await pokeGet(`https://pokeapi.co/api/v2/move/${moveName}`);
     if (!data) return null;
     const detail = {
       type:     data.type?.name || null,
@@ -826,6 +969,10 @@ function renderEvolutionTab(species, poke, spec, evo) {
   // Render the chain recursively
   function renderChain(chain, depth=0) {
     const name = chain.species.name;
+
+    // Skip legendaries and alternate/battle forms
+    if (shouldSkipEvoEntry(name)) return '';
+
     const displayName = name.split('-').map(w=>w[0].toUpperCase()+w.slice(1)).join(' ');
     const isCurrent = name.toLowerCase() === species.toLowerCase();
     const isCaught  = !!(dexData[displayName]?.caught);
@@ -842,7 +989,9 @@ function renderEvolutionTab(species, poke, spec, evo) {
 
     if (!chain.evolves_to?.length) return nodeHTML;
 
-    return chain.evolves_to.map(next => {
+    return chain.evolves_to
+      .filter(next => !shouldSkipEvoEntry(next.species.name))
+      .map(next => {
       const trigger = next.evolution_details?.[0];
       const parts = [];
       if (trigger) {
@@ -2448,7 +2597,7 @@ async function toggleEggLearners(moveName, rowId, panelId) {
 
   try {
     // Fetch move data to get learned_by_pokemon
-    const data = await fetch('https://pokeapi.co/api/v2/move/' + moveName)
+    const data = await pokeGet('https://pokeapi.co/api/v2/move/' + moveName);
       .then(r => r.ok ? r.json() : null);
 
     if (!data?.learned_by_pokemon?.length) {
@@ -2598,7 +2747,7 @@ async function ensureLdexNames() {
   const el = document.getElementById('ldex-grid');
   if (el) el.innerHTML = '<div class="dex-loading"><div class="dex-loading-spinner"></div><div>Loading Pokédex…</div></div>';
   try {
-    const data = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025&offset=0').then(r => r.json());
+    const data = await pokeGet('https://pokeapi.co/api/v2/pokemon?limit=1025&offset=0');
     ldexNames = data.results.map((p, i) => ({
       id:      i + 1,
       name:    p.name,
@@ -3286,15 +3435,17 @@ function levenshtein(a, b) {
 // ── Egg Move Chain Finder — step-by-step ─────────────────────────────────────
 let emcSelectedSpecies = null;
 let emcPokeData        = null;
+let emcSpecData        = null;
 
 function renderEggMoveChains() {
   emcSelectedSpecies = null;
   emcPokeData        = null;
+  emcSpecData        = null;
   const el = document.getElementById('breed-pane-eggmoves');
   if (!el) return;
   el.innerHTML = `
     <div class="cinzel" style="font-size:16px;font-weight:900;color:#ede9ff;margin-bottom:4px">Egg Move Chain Finder</div>
-    <div style="color:#5b4690;font-size:11px;margin-bottom:20px">Pick a Pokémon, then pick a move — we'll find who can pass it</div>
+    <div style="color:#5b4690;font-size:11px;margin-bottom:20px">Pick a Pokémon, then pick an egg move — we'll show compatible parents filtered by egg group</div>
     <div id="emc-step1">
       <div style="font-size:10px;color:#c084fc;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">① Target Pokémon</div>
       <div style="position:relative;max-width:380px">
@@ -3344,8 +3495,9 @@ async function emcSelectSpecies(name, display, id) {
   step2.innerHTML = `<div class="dex-loading"><div class="dex-loading-spinner"></div><div>Loading egg moves…</div></div>`;
 
   try {
-    const { poke } = await fetchPokeData(display);
+    const { poke, spec } = await fetchPokeData(display);
     emcPokeData = poke;
+    emcSpecData = spec;
     if (!poke) { step2.innerHTML = `<div style="color:#fda4af;font-size:12px">Could not load data for ${display}.</div>`; return; }
 
     const eggMoves = poke.moves
@@ -3407,25 +3559,51 @@ async function emcPickMove(moveName) {
   document.querySelectorAll('.emc-move-row').forEach(r => r.style.borderColor = '#5b469022');
   event?.currentTarget?.style && (event.currentTarget.style.borderColor = '#c084fc66');
 
-  step3.innerHTML = `<div class="dex-loading"><div class="dex-loading-spinner"></div><div>Finding parents…</div></div>`;
+  step3.innerHTML = `<div class="dex-loading"><div class="dex-loading-spinner"></div><div>Checking egg groups…</div></div>`;
   step3.scrollIntoView({ behavior:'smooth', block:'nearest' });
 
   try {
-    const data = await fetch('https://pokeapi.co/api/v2/move/' + moveName).then(r => r.ok ? r.json() : null);
+    // Get target's egg groups from spec data
+    const targetEggGroups = emcSpecData?.egg_groups?.map(g => g.name) || [];
+    const targetName      = emcSelectedSpecies?.display || '';
+
+    // Fetch egg group members for each of the target's egg groups (usually 1-2 calls)
+    let compatibleNames = new Set(); // all Pokémon that share at least one egg group
+    await Promise.all(targetEggGroups.map(async groupName => {
+      // Skip undiscovered (legendaries/baby Pokémon — can't breed)
+      if (groupName === 'undiscovered' || groupName === 'no-eggs') return;
+
+      const egData = await pokeGet('https://pokeapi.co/api/v2/egg-group/' + groupName);
+      if (!egData) return;
+      egData.pokemon_species.map(p => p.name).forEach(m => compatibleNames.add(m));
+    }));
+
+    // Ditto special case — can breed with almost anything
+    compatibleNames.add('ditto');
+
+    // Fetch move data
+    const data = await pokeGet('https://pokeapi.co/api/v2/move/' + moveName);
     if (!data) { step3.innerHTML = '<div style="color:#fda4af">Move data not found.</div>'; return; }
 
-    const learners   = data.learned_by_pokemon || [];
-    const ownedNames = getAllOwnedNames();
-    const owned      = learners.filter(l => ownedNames.has(l.name.toLowerCase()) || ownedNames.has(l.name.replace(/-/g,' ')));
-    const notOwned   = learners.filter(l => !owned.includes(l));
+    // Filter: must pass form filter + be egg-group compatible
+    const allLearners = (data.learned_by_pokemon || []).filter(l => !shouldSkipEvoEntry(l.name));
+    const compatible  = allLearners.filter(l => compatibleNames.has(l.name));
+    const removed     = allLearners.length - compatible.length;
+
+    const ownedNames  = getAllOwnedNames();
+    const owned       = compatible.filter(l => ownedNames.has(l.name.toLowerCase()) || ownedNames.has(l.name.replace(/-/g,' ')));
+    const notOwned    = compatible.filter(l => !owned.includes(l));
+
+    // Egg group label for display
+    const groupLabel  = targetEggGroups.filter(g => g !== 'undiscovered' && g !== 'no-eggs')
+      .map(g => g.split('-').map(w => w[0].toUpperCase()+w.slice(1)).join(' ')).join(' & ');
+
+    const noEggGroups = targetEggGroups.includes('undiscovered') || targetEggGroups.length === 0;
 
     const chipHTML = (list, hl) => list.map(l => {
       const disp   = l.name.split('-').map(w => w[0].toUpperCase()+w.slice(1)).join(' ');
       const sprite = `https://img.pokemondb.net/sprites/sword-shield/icon/${l.name}.png`;
-      // Owned chips get a double-tap option: long-press/right-click → populate into parent field
-      const clickHandler = hl
-        ? `emcPopulateParent('${disp}', event)`
-        : `openDex('${disp}')`;
+      const clickHandler = hl ? `emcPopulateParent('${disp}', event)` : `openDex('${disp}')`;
       return `<div class="learner-chip ${hl?'owned':''}"
         onclick="${clickHandler}"
         title="${disp}${hl ? ' · Tap to use as parent' : ''}">
@@ -3435,24 +3613,50 @@ async function emcPickMove(moveName) {
       </div>`;
     }).join('');
 
+    if (noEggGroups) {
+      step3.innerHTML = `
+        <div style="background:#231a3e;border:1px solid #fda4af33;border-radius:16px;padding:16px;text-align:center">
+          <div style="font-size:22px;margin-bottom:8px">🚫</div>
+          <div style="font-weight:800;color:#fda4af;margin-bottom:6px">${targetName} cannot breed</div>
+          <div style="font-size:12px;color:#7c6fa0">This Pokémon is in the Undiscovered egg group and cannot inherit egg moves through breeding.</div>
+        </div>`;
+      return;
+    }
+
     step3.innerHTML = `
       <div style="background:#231a3e;border:1px solid #5b469044;border-radius:16px;padding:16px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px">
           <div>
-            <div style="font-size:13px;font-weight:800;color:#ede9ff">${label} → ${emcSelectedSpecies?.display||''}</div>
-            <div style="font-size:11px;color:#7060a8">${learners.length} Pokémon can pass this move</div>
+            <div style="font-size:13px;font-weight:800;color:#ede9ff">${label} → ${targetName}</div>
+            <div style="font-size:11px;color:#7060a8;margin-top:2px">${compatible.length} compatible parent${compatible.length!==1?'s':''} found</div>
           </div>
           <button onclick="this.closest('[style]').parentElement.innerHTML=''"
             style="background:none;border:1px solid #5b469033;color:#5b4690;padding:4px 12px;border-radius:8px;cursor:pointer;font-size:11px">✕</button>
         </div>
+
+        <!-- Egg group badge -->
+        <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#1e1535;border:1px solid #c084fc22;border-radius:100px;margin-bottom:14px">
+          <span style="font-size:10px;color:#7060a8">Egg group${targetEggGroups.length>1?'s':''}:</span>
+          <span style="font-size:11px;font-weight:800;color:#c084fc">${groupLabel}</span>
+          ${removed > 0 ? `<span style="font-size:10px;color:#5b4690">· ${removed} incompatible filtered out</span>` : ''}
+        </div>
+
         ${owned.length ? `
           <div style="font-size:10px;color:#86efac;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">✓ You Own These (${owned.length})</div>
           <div class="learner-grid" style="margin-bottom:14px">${chipHTML(owned,true)}</div>
         ` : `<div style="font-size:11px;color:#5b4690;margin-bottom:12px">None of your Pokémon can pass this move yet.</div>`}
         ${notOwned.length ? `
-          <div style="font-size:10px;color:#7060a8;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Other Learners (${notOwned.length})</div>
+          <div style="font-size:10px;color:#7060a8;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Other Compatible Parents (${notOwned.length})</div>
           <div class="learner-grid">${chipHTML(notOwned,false)}</div>
         ` : ''}
+
+        <!-- Remaining caveat: learn method -->
+        <div style="margin-top:12px;padding:10px 12px;background:#1a1230;border:1px solid #86efac22;border-radius:10px;font-size:11px;color:#7c6fa0;line-height:1.6">
+          <span style="color:#86efac;font-weight:800">✓ Egg group verified.</span>
+          These Pokémon share an egg group with ${targetName} and can learn <strong style="color:#c084fc">${label}</strong>.
+          Note: learn method isn't confirmed — the parent may learn it via TM or level-up rather than as an egg move itself.
+          If you need <em>the move as an egg move specifically</em>, verify on Bulbapedia.
+        </div>
       </div>`;
   } catch(e) {
     step3.innerHTML = `<div style="color:#fda4af;font-size:12px">Failed: ${e.message}</div>`;
@@ -4188,6 +4392,14 @@ function openSettings() {
   // Update name display
   const nd = document.getElementById('settings-name-display');
   if (nd) nd.textContent = getTrainer();
+  // Update cache stats
+  const statsEl = document.getElementById('poke-cache-stats');
+  if (statsEl) {
+    const s = pokeCacheStats();
+    statsEl.textContent = s.entries > 0
+      ? `${s.entries} entries cached · ~${s.sizeKB} KB used`
+      : 'No cache yet — data is fetched as you browse';
+  }
 }
 
 function closeSettings() {
@@ -4283,6 +4495,26 @@ function cancelSettingsClear() {
 function executeSettingsClear() {
   localStorage.clear();
   location.reload();
+}
+
+// Clear just the PokéAPI cache — useful without wiping user data
+function clearPokeCache() {
+  const index = _getLRUIndex();
+  index.forEach(e => localStorage.removeItem(POKE_CACHE_PREFIX + e.key));
+  localStorage.removeItem(POKE_CACHE_INDEX);
+  Object.keys(_memCache).forEach(k => delete _memCache[k]);
+  const count = index.length;
+  alert(`PokéAPI cache cleared (${count} entries). Data will be re-fetched as needed.`);
+}
+
+function pokeCacheStats() {
+  const index = _getLRUIndex();
+  const memCount = Object.keys(_memCache).length;
+  const lsBytes  = index.reduce((sum, e) => {
+    const val = localStorage.getItem(POKE_CACHE_PREFIX + e.key);
+    return sum + (val ? val.length * 2 : 0); // UTF-16
+  }, 0);
+  return { entries: index.length, memEntries: memCount, sizeKB: Math.round(lsBytes / 1024) };
 }
 
 // Export/Import stubs (full implementation next session)
@@ -4745,8 +4977,8 @@ async function crLoadSpecies(name) {
   if (display) display.textContent = 'Loading...';
   try {
     const [specRes, pokeRes] = await Promise.all([
-      fetch(`https://pokeapi.co/api/v2/pokemon-species/${name.toLowerCase().replace(' ','-')}`),
-      fetch(`https://pokeapi.co/api/v2/pokemon/${name.toLowerCase().replace(' ','-')}`)
+      pokeGet(`https://pokeapi.co/api/v2/pokemon-species/${name.toLowerCase().replace(' ','-')}`),
+      pokeGet(`https://pokeapi.co/api/v2/pokemon/${name.toLowerCase().replace(' ','-')}`)
     ]);
     const specData = await specRes.json();
     const pokeData = await pokeRes.json();
