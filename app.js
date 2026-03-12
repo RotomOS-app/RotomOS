@@ -3473,6 +3473,8 @@ const _confirmFoundOrig = confirmFound;
 confirmFound = function() {
   _confirmFoundOrig();
   setTimeout(() => { rotomSay('shinyFound'); checkShinyRotomUnlock(); }, 300);
+  // Show Ko-fi nudge after first ever shiny found
+  setTimeout(() => showKofiBanner(), 3500);
 };
 
 // Patch confirmFailed
@@ -4176,3 +4178,58 @@ if (isReturning) {
 
 // Start idle chatter
 rotomIdleTimer = setTimeout(rotomIdle, 120000 + Math.random() * 60000);
+
+// ── Auto-hide bottom nav on scroll ──────────────────────────────────────────
+(function() {
+  const pageContent = document.getElementById('page-content');
+  const bottomNav   = document.getElementById('bottom-nav');
+  if (!pageContent || !bottomNav) return;
+
+  let lastScrollY  = 0;
+  let ticking      = false;
+
+  pageContent.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const currentY = pageContent.scrollTop;
+      const atTop    = currentY <= 10;
+      const scrollingUp = currentY < lastScrollY;
+
+      if (atTop || scrollingUp) {
+        bottomNav.classList.remove('nav-hidden');
+      } else {
+        bottomNav.classList.add('nav-hidden');
+      }
+
+      lastScrollY = currentY;
+      ticking = false;
+    });
+  }, { passive: true });
+})();
+
+// ── Ko-fi nudge banner ────────────────────────────────────────────────────────
+const KOFI_BANNER_KEY = 'at_kofi_nudge_shown';
+
+function showKofiBanner() {
+  if (localStorage.getItem(KOFI_BANNER_KEY)) return; // already shown once ever
+  const banner = document.getElementById('kofi-banner');
+  if (!banner) return;
+
+  banner.style.display = 'block';
+  // Small delay so the slide-in animates properly
+  setTimeout(() => banner.classList.add('banner-visible'), 50);
+
+  // Auto-dismiss after 8 seconds
+  setTimeout(() => dismissKofiBanner(), 8000);
+
+  localStorage.setItem(KOFI_BANNER_KEY, '1');
+}
+
+function dismissKofiBanner() {
+  const banner = document.getElementById('kofi-banner');
+  if (!banner) return;
+  banner.classList.remove('banner-visible');
+  banner.classList.add('banner-hiding');
+  setTimeout(() => { banner.style.display = 'none'; banner.classList.remove('banner-hiding'); }, 400);
+}

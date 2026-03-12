@@ -851,6 +851,10 @@ body{display:flex;flex-direction:column}
   backdrop-filter:blur(16px);
   border-top:1px solid #5b469033;
   padding:6px 4px max(8px, env(safe-area-inset-bottom)) 4px;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+#bottom-nav.nav-hidden {
+  transform:translateY(100%);
 }
 .bn-inner {
   display:flex; justify-content:space-around; align-items:flex-end; gap:2px;
@@ -2374,3 +2378,61 @@ body.theme-light #emc-step3 [style*="color:#86efac"] { color:#166534 !important;
   .ldex-dot-s { width: 7px; height: 7px; }
 }
 
+
+/* ── Ko-fi nudge banner ── */
+#kofi-banner {
+  position:fixed; top:0; left:0; right:0; z-index:999;
+  transform:translateY(-100%);
+  transition:transform .4s cubic-bezier(.4,0,.2,1), opacity .4s ease;
+  opacity:0;
+}
+#kofi-banner.banner-visible {
+  transform:translateY(0);
+  opacity:1;
+}
+#kofi-banner.banner-hiding {
+  transform:translateY(-100%);
+  opacity:0;
+}
+#kofi-banner-inner {
+  display:flex; align-items:center; gap:10px;
+  background:linear-gradient(90deg,#2b1f4e,#372962,#2b1f4e);
+  border-bottom:1px solid #d4a8ff33;
+  padding:10px 16px;
+  font-size:13px; font-weight:700;
+  backdrop-filter:blur(12px);
+}
+#kofi-banner-rotom {
+  font-size:18px; flex-shrink:0;
+  animation:rotom-pulse 1.5s ease-in-out infinite;
+}
+@keyframes rotom-pulse {
+  0%,100% { filter:drop-shadow(0 0 4px #d4a8ff88); }
+  50%      { filter:drop-shadow(0 0 10px #d4a8ffcc); }
+}
+#kofi-banner-text {
+  flex:1; color:#ede9ff; font-size:12px; line-height:1.4;
+}
+#kofi-banner-btn {
+  flex-shrink:0;
+  background:linear-gradient(135deg,#fde68a,#fda4af);
+  color:#1e1535; font-weight:900; font-size:11px;
+  padding:5px 12px; border-radius:100px;
+  text-decoration:none; white-space:nowrap;
+  transition:transform .15s;
+}
+#kofi-banner-btn:hover { transform:scale(1.05); }
+#kofi-banner-close {
+  flex-shrink:0; background:none; border:none;
+  color:#a898cc; font-size:18px; cursor:pointer;
+  padding:0 4px; line-height:1;
+  transition:color .15s;
+}
+#kofi-banner-close:hover { color:#ede9ff; }
+
+body.theme-light #kofi-banner-inner {
+  background:linear-gradient(90deg,#e1d4fa,#ede9ff,#e1d4fa) !important;
+  border-bottom-color:#d4a8ff55 !important;
+}
+body.theme-light #kofi-banner-text { color:#1e1535 !important; }
+body.theme-light #kofi-banner-close { color:#7c6aaa !important; }
