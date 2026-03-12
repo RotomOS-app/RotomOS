@@ -1764,6 +1764,20 @@ function confirmFailed() {
   lsSet(LSF.FAILS, failedCatches);
   lsSet(LSF.FID,   nextFid);
 
+  // Close the current phase and start a new one on the active hunt
+  if (h) {
+    if (!h.phases) h.phases = [];
+    if (h.phases.length) {
+      h.phases[h.phases.length - 1].count      = count;
+      h.phases[h.phases.length - 1].failedCatch = true;
+      h.phases[h.phases.length - 1].endedAt    = today();
+    }
+    h.phases.push({ species: h.species, count: 0, startedAt: today() });
+    h.count = 0;
+    lsSet(LSH.HUNTS, hunts);
+    lsSet(LSH.HID,   nextHid);
+  }
+
   // Also add a note to dex encounter log so it's visible there
   if (!dexData[species]) dexData[species] = { caught: false, shinyFound: false, encounters: [] };
   dexData[species].encounters.unshift({
