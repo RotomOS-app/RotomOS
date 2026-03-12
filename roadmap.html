@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RotomOS — Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #2b1f4e;
+    --surface:  #372962;
+    --surface2: #422f72;
+    --border:   #5b4690;
+    --text:     #ede9ff;
+    --muted:    #a898cc;
+    --accent:   #d4a8ff;
+    --rose:     #fda4af;
+    --mint:     #86efac;
+    --gold:     #fde68a;
+    --sky:      #93c5fd;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ── Starfield ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      radial-gradient(1px 1px at 8%  6%, #ffffffcc, transparent),
+      radial-gradient(1.5px 1.5px at 22% 14%, #e9d5ffaa, transparent),
+      radial-gradient(1px 1px at 37%  4%, #ffffff99, transparent),
+      radial-gradient(2px 2px at 54% 10%, #fda4af88, transparent),
+      radial-gradient(1px 1px at 71%  3%, #ffffffbb, transparent),
+      radial-gradient(1.5px 1.5px at 88% 16%, #93c5fd99, transparent),
+      radial-gradient(1px 1px at 5%  28%, #ffffffaa, transparent),
+      radial-gradient(1px 1px at 48% 24%, #e9d5ff88, transparent),
+      radial-gradient(1.5px 1.5px at 79% 31%, #ffffff99, transparent),
+      radial-gradient(1px 1px at 16% 47%, #fde68a66, transparent),
+      radial-gradient(1px 1px at 33% 41%, #ffffffaa, transparent),
+      radial-gradient(2px 2px at 65% 44%, #d4a8ff55, transparent),
+      radial-gradient(1px 1px at 93% 38%, #ffffff88, transparent),
+      radial-gradient(1.5px 1.5px at 12% 64%, #fda4af55, transparent),
+      radial-gradient(1px 1px at 44% 60%, #ffffffaa, transparent),
+      radial-gradient(1px 1px at 28% 78%, #93c5fd66, transparent),
+      radial-gradient(1.5px 1.5px at 73% 72%, #ffffff99, transparent),
+      radial-gradient(1px 1px at 86% 84%, #e9d5ff77, transparent),
+      radial-gradient(1px 1px at 58% 88%, #ffffffaa, transparent),
+      radial-gradient(1.5px 1.5px at 3%  90%, #fde68a55, transparent);
+  }
+
+  /* ── Layout ── */
+  .page { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── Header ── */
+  .hero {
+    text-align: center;
+    padding: 64px 0 56px;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #d4a8ff18; border: 1px solid #d4a8ff33;
+    border-radius: 100px; padding: 6px 16px;
+    font-size: 11px; font-weight: 800; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 24px;
+  }
+  .hero-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: .02em;
+    margin-bottom: 16px;
+  }
+  .hero-title span { color: var(--accent); }
+  .hero-sub {
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 600;
+    max-width: 480px;
+    margin: 0 auto 32px;
+    line-height: 1.6;
+  }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #c084fc, #818cf8);
+    color: white; font-family: 'Cinzel', serif;
+    font-size: 13px; font-weight: 700; letter-spacing: .06em;
+    padding: 12px 28px; border-radius: 100px;
+    text-decoration: none;
+    box-shadow: 0 4px 24px #c084fc44;
+    transition: transform .18s, box-shadow .18s;
+  }
+  .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 32px #c084fc66; }
+
+  /* ── Section headers ── */
+  .section-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ── Phase cards (hosting) ── */
+  .phases {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 56px;
+  }
+  .phase-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 16px;
+    position: relative;
+    overflow: hidden;
+    transition: transform .18s;
+  }
+  .phase-card:hover { transform: translateY(-3px); }
+  .phase-card.done { border-color: #86efac44; }
+  .phase-card.done::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #86efac08, transparent);
+  }
+  .phase-card.current { border-color: #d4a8ff55; }
+  .phase-card.current::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #d4a8ff0d, transparent);
+  }
+  .phase-num {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .phase-name {
+    font-size: 13px; font-weight: 800;
+    margin-bottom: 4px; line-height: 1.3;
+  }
+  .phase-detail { font-size: 11px; color: var(--muted); font-weight: 600; line-height: 1.4; }
+  .phase-status {
+    margin-top: 12px;
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 800; letter-spacing: .08em;
+    text-transform: uppercase; padding: 3px 10px; border-radius: 100px;
+  }
+  .phase-status.live { background: #86efac22; color: var(--mint); }
+  .phase-status.next { background: #d4a8ff22; color: var(--accent); }
+  .phase-status.future { background: #ffffff08; color: var(--muted); }
+
+  /* ── Timeline ── */
+  .timeline { margin-bottom: 56px; }
+  .tl-group { margin-bottom: 8px; }
+  .tl-group-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted);
+    padding: 4px 0 10px 36px;
+  }
+
+  .tl-item {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    margin-bottom: 6px;
+    transition: background .18s, border-color .18s;
+    position: relative;
+  }
+  .tl-item:hover { background: #ffffff06; border-color: var(--border); }
+  .tl-item.done { opacity: .75; }
+
+  .tl-dot {
+    width: 20px; height: 20px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+  }
+  .tl-dot.done-dot  { background: #86efac22; border: 2px solid var(--mint); color: var(--mint); }
+  .tl-dot.todo-dot  { background: #ffffff08; border: 2px solid var(--border); }
+  .tl-dot.long-dot  { background: #93c5fd15; border: 2px solid #93c5fd55; }
+
+  .tl-body { flex: 1; }
+  .tl-title {
+    font-size: 14px; font-weight: 800;
+    margin-bottom: 3px; line-height: 1.3;
+  }
+  .tl-item.done .tl-title { text-decoration: line-through; color: var(--muted); }
+  .tl-desc { font-size: 12px; color: var(--muted); font-weight: 600; line-height: 1.5; }
+
+  .tl-tag {
+    flex-shrink: 0;
+    font-size: 10px; font-weight: 800;
+    letter-spacing: .06em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 100px;
+  }
+  .tl-tag.tag-done   { background: #86efac18; color: var(--mint); }
+  .tl-tag.tag-polish { background: #d4a8ff18; color: var(--accent); }
+  .tl-tag.tag-feat   { background: #fda4af18; color: var(--rose); }
+  .tl-tag.tag-infra  { background: #fde68a18; color: var(--gold); }
+  .tl-tag.tag-long   { background: #93c5fd18; color: var(--sky); }
+
+  /* ── Ko-fi section ── */
+  .kofi-card {
+    background: linear-gradient(135deg, var(--surface), #2f2358);
+    border: 1px solid #d4a8ff33;
+    border-radius: 20px;
+    padding: 32px;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .kofi-card::before {
+    content: '';
+    position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, #d4a8ff18, transparent 70%);
+    pointer-events: none;
+  }
+  .kofi-icon { font-size: 32px; margin-bottom: 12px; }
+  .kofi-title {
+    font-family: 'Cinzel', serif;
+    font-size: 20px; font-weight: 900;
+    margin-bottom: 10px;
+  }
+  .kofi-desc {
+    color: var(--muted); font-size: 13px; font-weight: 600;
+    max-width: 400px; margin: 0 auto 24px; line-height: 1.6;
+  }
+  .kofi-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #fde68a, #fda4af);
+    color: #1e1535; font-weight: 900; font-family: 'Cinzel', serif;
+    font-size: 13px; letter-spacing: .06em;
+    padding: 12px 28px; border-radius: 100px;
+    text-decoration: none;
+    box-shadow: 0 4px 24px #fde68a33;
+    transition: transform .18s, box-shadow .18s;
+  }
+  .kofi-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px #fde68a55; }
+  .kofi-goal {
+    margin-top: 20px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 12px; color: var(--muted); font-weight: 700;
+  }
+  .kofi-goal-bar {
+    width: 120px; height: 6px;
+    background: #ffffff10; border-radius: 100px; overflow: hidden;
+  }
+  .kofi-goal-fill {
+    height: 100%; width: 20%;
+    background: linear-gradient(90deg, #fde68a, #fda4af);
+    border-radius: 100px;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .6; }
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center; padding: 32px 0 0;
+    color: var(--muted); font-size: 12px; font-weight: 600;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  /* ── Animations ── */
+  .fade-in {
+    opacity: 0; transform: translateY(16px);
+    animation: fadeUp .5s ease forwards;
+  }
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in:nth-child(1) { animation-delay: .05s; }
+  .fade-in:nth-child(2) { animation-delay: .10s; }
+  .fade-in:nth-child(3) { animation-delay: .15s; }
+  .fade-in:nth-child(4) { animation-delay: .20s; }
+  .fade-in:nth-child(5) { animation-delay: .25s; }
+  .fade-in:nth-child(6) { animation-delay: .30s; }
+  .fade-in:nth-child(7) { animation-delay: .35s; }
+  .fade-in:nth-child(8) { animation-delay: .40s; }
+
+  @media (max-width: 600px) {
+    .tl-item { padding: 12px 12px; }
+    .tl-tag { display: none; }
+    .phases { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">⚡ RotomOS Roadmap</div>
+    <h1 class="hero-title">Built by a fan,<br><span>for fans.</span></h1>
+    <p class="hero-sub">RotomOS is a free, open Pokémon companion app. Here's what's done, what's coming, and where we're headed.</p>
+    <a href="https://rotomos-app.github.io/RotomOS/" class="hero-cta">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="12" y1="6" x2="18" y2="12"/><line x1="12" y1="18" x2="18" y2="12"/></svg>
+      Try It Now
+    </a>
+  </div>
+
+  <!-- HOSTING PHASES -->
+  <div class="section-label">Hosting Phases</div>
+  <div class="phases">
+    <div class="phase-card done fade-in">
+      <div class="phase-num">Phase 01</div>
+      <div class="phase-name">GitHub Pages</div>
+      <div class="phase-detail">Free hosting, live to the world</div>
+      <div class="phase-status live">✓ Live</div>
+    </div>
+    <div class="phase-card current fade-in">
+      <div class="phase-num">Phase 02</div>
+      <div class="phase-name">Vercel + Supabase</div>
+      <div class="phase-detail">Backend, accounts & cloud saves</div>
+      <div class="phase-status next">Up Next</div>
+    </div>
+    <div class="phase-card fade-in">
+      <div class="phase-num">Phase 03</div>
+      <div class="phase-name">Desktop App</div>
+      <div class="phase-detail">Tauri — native Windows & Mac</div>
+      <div class="phase-status future">Future</div>
+    </div>
+    <div class="phase-card fade-in">
+      <div class="phase-num">Phase 04</div>
+      <div class="phase-name">Mobile App</div>
+      <div class="phase-detail">Capacitor — iOS & Android</div>
+      <div class="phase-status future">Future</div>
+    </div>
+  </div>
+
+  <!-- FEATURES TIMELINE -->
+  <div class="section-label">Features</div>
+  <div class="timeline">
+
+    <div class="tl-group">
+      <div class="tl-group-label">Shipped ✓</div>
+
+      <div class="tl-item done fade-in">
+        <div class="tl-dot done-dot">✓</div>
+        <div class="tl-body">
+          <div class="tl-title">Aprimon Collection Tracker</div>
+          <div class="tl-desc">Log species, ball types, availability, and trade notes</div>
+        </div>
+        <span class="tl-tag tag-done">Done</span>
+      </div>
+
+      <div class="tl-item done fade-in">
+        <div class="tl-dot done-dot">✓</div>
+        <div class="tl-body">
+          <div class="tl-title">Shiny Hunter</div>
+          <div class="tl-desc">Multi-phase hunt tracker with odds, probability bar & counter</div>
+        </div>
+        <span class="tl-tag tag-done">Done</span>
+      </div>
+
+      <div class="tl-item done fade-in">
+        <div class="tl-dot done-dot">✓</div>
+        <div class="tl-body">
+          <div class="tl-title">Living Dex</div>
+          <div class="tl-desc">Track all 1,025 Pokémon with shiny & caught states</div>
+        </div>
+        <span class="tl-tag tag-done">Done</span>
+      </div>
+
+      <div class="tl-item done fade-in">
+        <div class="tl-dot done-dot">✓</div>
+        <div class="tl-body">
+          <div class="tl-title">Pokédex Viewer</div>
+          <div class="tl-desc">Full dex entries, stats, moves, evolutions & egg move chains</div>
+        </div>
+        <span class="tl-tag tag-done">Done</span>
+      </div>
+
+      <div class="tl-item done fade-in">
+        <div class="tl-dot done-dot">✓</div>
+        <div class="tl-body">
+          <div class="tl-title">Export / Import Backup</div>
+          <div class="tl-desc">Full JSON backup and restore of all your data</div>
+        </div>
+        <span class="tl-tag tag-done">Done</span>
+      </div>
+
+      <div class="tl-item done fade-in">
+        <div class="tl-dot done-dot">✓</div>
+        <div class="tl-body">
+          <div class="tl-title">Light Mode</div>
+          <div class="tl-desc">Full pastel light theme across every page</div>
+        </div>
+        <span class="tl-tag tag-done">Done</span>
+      </div>
+    </div>
+
+    <div class="tl-group">
+      <div class="tl-group-label">In Progress</div>
+
+      <div class="tl-item fade-in">
+        <div class="tl-dot todo-dot"></div>
+        <div class="tl-body">
+          <div class="tl-title">SVG Nav Icons</div>
+          <div class="tl-desc">Replace emoji nav with crisp, scalable vector icons</div>
+        </div>
+        <span class="tl-tag tag-polish">Polish</span>
+      </div>
+
+      <div class="tl-item fade-in">
+        <div class="tl-dot todo-dot"></div>
+        <div class="tl-body">
+          <div class="tl-title">Egg Move Chain Calculator</div>
+          <div class="tl-desc">Plan breeding chains for any egg move combination</div>
+        </div>
+        <span class="tl-tag tag-feat">Feature</span>
+      </div>
+    </div>
+
+    <div class="tl-group">
+      <div class="tl-group-label">Coming Soon</div>
+
+      <div class="tl-item fade-in">
+        <div class="tl-dot todo-dot"></div>
+        <div class="tl-body">
+          <div class="tl-title">Competitive / VGC Builder</div>
+          <div class="tl-desc">Team builder with format rules, coverage & speed tiers</div>
+        </div>
+        <span class="tl-tag tag-feat">Feature</span>
+      </div>
+
+      <div class="tl-item fade-in">
+        <div class="tl-dot todo-dot"></div>
+        <div class="tl-body">
+          <div class="tl-title">Game Progress Tracker</div>
+          <div class="tl-desc">Track badges, story milestones and completion across games</div>
+        </div>
+        <span class="tl-tag tag-feat">Feature</span>
+      </div>
+
+      <div class="tl-item fade-in">
+        <div class="tl-dot todo-dot"></div>
+        <div class="tl-body">
+          <div class="tl-title">Cloud Saves & Accounts</div>
+          <div class="tl-desc">Sync your data across devices — no more export/import</div>
+        </div>
+        <span class="tl-tag tag-infra">Infrastructure</span>
+      </div>
+
+      <div class="tl-item fade-in">
+        <div class="tl-dot todo-dot"></div>
+        <div class="tl-body">
+          <div class="tl-title">PokéAPI Local Cache</div>
+          <div class="tl-desc">Faster load times — dex data cached in your browser</div>
+        </div>
+        <span class="tl-tag tag-infra">Infrastructure</span>
+      </div>
+    </div>
+
+    <div class="tl-group">
+      <div class="tl-group-label">Long Term Vision</div>
+
+      <div class="tl-item fade-in">
+        <div class="tl-dot long-dot"></div>
+        <div class="tl-body">
+          <div class="tl-title">Ambient Social Features</div>
+          <div class="tl-desc">See what the community is hunting — optional, cozy, low-pressure</div>
+        </div>
+        <span class="tl-tag tag-long">Vision</span>
+      </div>
+
+      <div class="tl-item fade-in">
+        <div class="tl-dot long-dot"></div>
+        <div class="tl-body">
+          <div class="tl-title">Native Desktop & Mobile Apps</div>
+          <div class="tl-desc">Tauri desktop app + Capacitor iOS/Android builds</div>
+        </div>
+        <span class="tl-tag tag-long">Vision</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- KO-FI -->
+  <div class="kofi-card">
+    <div class="kofi-icon">☕</div>
+    <div class="kofi-title">Support RotomOS</div>
+    <div class="kofi-desc">RotomOS is free and always will be. But if it's saved you from typing into your notes app, a coffee goes a long way.</div>
+    <a href="https://ko-fi.com/rotomos" class="kofi-btn" target="_blank">☕ Buy me a coffee</a>
+    <div class="kofi-goal">
+      <span>Domain name goal</span>
+      <div class="kofi-goal-bar"><div class="kofi-goal-fill"></div></div>
+      <span>$20</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Built with ⚡ by a shiny hunter · <a href="https://rotomos-app.github.io/RotomOS/">Try RotomOS</a> · <a href="https://ko-fi.com/rotomos">Ko-fi</a> · <a href="https://bsky.app/profile/rotomos-app.bsky.social">Bluesky</a></p>
+  </div>
+
+</div>
+</body>
+</html>

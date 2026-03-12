@@ -8,6 +8,14 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+<!-- Compact detail sheet -->
+<div id="compact-detail-backdrop" style="display:none;position:fixed;inset:0;background:#0d082099;z-index:1800;backdrop-filter:blur(6px)" onclick="closeCompactDetail()"></div>
+<div id="compact-detail-sheet" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1900;background:linear-gradient(180deg,#2f2358,#1a1230);border-radius:24px 24px 0 0;padding:20px;max-height:85vh;overflow-y:auto;transition:transform .3s cubic-bezier(.4,0,.2,1)">
+  <div style="width:40px;height:4px;background:#5b469055;border-radius:4px;margin:0 auto 16px"></div>
+  <div id="compact-detail-content"></div>
+</div>
+
 <!-- Ko-fi nudge banner -->
 <div id="kofi-banner" style="display:none">
   <div id="kofi-banner-inner">
@@ -63,6 +71,9 @@
     <div class="mmd-item" id="mmd-reddit" onclick="openReddit();closeMoreDrawer()">
       <span class="mmd-icon">📝</span><span class="mmd-label">Reddit Post</span>
     </div>
+    <div class="mmd-item" id="mmd-about" onclick="goSection('about');closeMoreDrawer()">
+      <span class="mmd-icon">💜</span><span class="mmd-label">About</span>
+    </div>
     <div class="mmd-item" onclick="openSettings();closeMoreDrawer()">
       <span class="mmd-icon">⚙️</span><span class="mmd-label">Settings</span>
     </div>
@@ -100,7 +111,8 @@
       <button class="sn-item" id="sn-competitive" onclick="goSection('competitive')"><span class="sn-icon">🎯</span><span class="sn-label">Tools</span></button>
       <button class="sn-item" id="sn-progress"  onclick="goSection('progress')">  <span class="sn-icon">🗺️</span><span class="sn-label">Game Progress</span></button>
       <button class="sn-item" id="sn-halloffame" onclick="goSection('halloffame')" style="display:none"><span class="sn-icon">🏆</span><span class="sn-label">Hall of Fame</span><span class="sn-badge sn-badge-gold" style="display:inline-flex">★</span></button>
-      <button class="sn-item" onclick="openSettings()" style="margin-top:auto"><span class="sn-icon">⚙️</span><span class="sn-label">Settings</span></button>
+      <button class="sn-item" onclick="openSettings();" style="margin-top:auto"><span class="sn-icon">⚙️</span><span class="sn-label">Settings</span></button>
+      <button class="sn-item" id="sn-about" onclick="goSection('about')"><span class="sn-icon">💜</span><span class="sn-label">About</span></button>
       <div class="sn-divider">Tools</div>
       <button class="sn-item" id="sn-reddit"    onclick="openReddit()">           <span class="sn-icon">📝</span><span class="sn-label">Reddit Post</span></button>
     </nav>
@@ -168,14 +180,24 @@
     <div class="stats-grid" id="statsGrid"></div>
     <div class="ball-filter" id="ballFilter"></div>
     <div class="filter-bar">
-      <input id="searchInput" placeholder="🔍 Search species or egg move..." oninput="renderList()"/>
-      <select id="statusFilter" onchange="renderList()">
+      <input id="searchInput" placeholder="🔍 Search species or egg move..." oninput="renderList(true)"/>
+      <select id="statusFilter" onchange="renderList(true)">
         <option value="all">All Status</option><option value="available">Available</option>
         <option value="keep">Keeping</option><option value="trade-only">Trade Only</option><option value="wanted">Wanted</option>
       </select>
-      <label class="shiny-label"><input type="checkbox" id="shinyFilter" onchange="renderList()"/> ★ Shinies only</label>
+      <label class="shiny-label"><input type="checkbox" id="shinyFilter" onchange="renderList(true)"/> ★ Shinies only</label>
     </div>
-    <div class="results-hint" id="resultsHint"></div>
+    <div class="collection-toolbar">
+      <div class="results-hint" id="resultsHint"></div>
+      <div class="view-toggle">
+        <button class="view-btn active" id="view-btn-compact" onclick="setCollectionView('compact')" title="Compact list">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="0" y="2" width="16" height="2" rx="1"/><rect x="0" y="7" width="16" height="2" rx="1"/><rect x="0" y="12" width="16" height="2" rx="1"/></svg>
+        </button>
+        <button class="view-btn" id="view-btn-cards" onclick="setCollectionView('cards')" title="Card view">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="0" y="0" width="7" height="7" rx="2"/><rect x="9" y="0" width="7" height="7" rx="2"/><rect x="0" y="9" width="7" height="7" rx="2"/><rect x="9" y="9" width="7" height="7" rx="2"/></svg>
+        </button>
+      </div>
+    </div>
     <div class="mon-list" id="monList"></div>
   </div>
 </div>
@@ -683,6 +705,10 @@
             <div id="pdex-recent" class="pdex-recent"></div>
           </div>
         </div>
+      </div>
+
+      <div id="about-section" style="display:none">
+        <div class="container" id="about-content"></div>
       </div>
 
       <div id="halloffame-section" style="display:none">

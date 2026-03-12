@@ -79,7 +79,28 @@ function renderBallFilter(){
   document.getElementById('ballFilter').innerHTML=`<button class="btn-all ${filterBall==='all'?'active':''}" onclick="setBallFilter('all')">All</button>`
     +BALL_NAMES.map(b=>{const bc=BALLS[b],a=filterBall===b;return`<button class="ball-btn ${a?'active':''}" style="--accent:${bc.accent};--light:${bc.light}" onclick="setBallFilter('${b}')" title="${b} Ball">${bImg(b,22)}<span class="ball-lbl">${b}</span></button>`;}).join('');
 }
-function renderList(){
+let collectionView = localStorage.getItem('at_collection_view') || 'compact';
+let collectionPage  = 0;
+const PAGE_SIZE     = 50;
+
+function setCollectionView(view) {
+  collectionView = view;
+  collectionPage = 0;
+  localStorage.setItem('at_collection_view', view);
+  document.getElementById('view-btn-compact')?.classList.toggle('active', view === 'compact');
+  document.getElementById('view-btn-cards')?.classList.toggle('active', view === 'cards');
+  renderList();
+}
+
+function setCollectionPage(p) {
+  collectionPage = p;
+  renderList();
+  // Scroll list back to top
+  document.getElementById('monList')?.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function renderList(resetPage){
+  if (resetPage) collectionPage = 0;
   const search=document.getElementById('searchInput').value.toLowerCase();
   const status=document.getElementById('statusFilter').value;
   const shinyOnly=document.getElementById('shinyFilter').checked;
@@ -91,8 +112,110 @@ function renderList(){
     if(search&&!g.species.toLowerCase().includes(search)&&!g.variants.some(v=>v.eggMoves.some(e=>e.toLowerCase().includes(search))))return false;
     return true;
   });
-  document.getElementById('resultsHint').textContent=`${filtered.length} species · ${mons.length} total entries · click sprite to view dex`;
-  document.getElementById('monList').innerHTML=filtered.length?filtered.map(renderCard).join(''):`<div class="empty-state">No Aprimon found.<br/><span style="font-size:12px;font-family:monospace;color:#5b4690">Add your first one above.</span></div>`;
+  document.getElementById('resultsHint').textContent=`${filtered.length} species · ${mons.length} total entries`;
+  // Apply correct view class
+  const listEl = document.getElementById('monList');
+  listEl.className = collectionView === 'compact' ? 'mon-list compact-list' : 'mon-list';
+  // Sync toggle buttons
+  document.getElementById('view-btn-compact')?.classList.toggle('active', collectionView === 'compact');
+  document.getElementById('view-btn-cards')?.classList.toggle('active', collectionView === 'cards');
+
+  if (!filtered.length) {
+    listEl.innerHTML = `<div class="empty-state">No Aprimon found.<br/><span style="font-size:12px;font-family:monospace;color:#5b4690">Add your first one above.</span></div>`;
+    return;
+  }
+
+  // Pagination — reset to page 0 when filter changes total
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  if (collectionPage >= totalPages) collectionPage = 0;
+  const pageSlice  = filtered.slice(collectionPage * PAGE_SIZE, (collectionPage + 1) * PAGE_SIZE);
+
+  const rowsHTML = collectionView === 'compact'
+    ? pageSlice.map(renderCompactRow).join('')
+    : pageSlice.map(renderCard).join('');
+
+  const paginationHTML = totalPages > 1 ? renderPagination(collectionPage, totalPages, filtered.length) : '';
+
+  listEl.innerHTML = rowsHTML + paginationHTML;
+}
+
+function renderPagination(page, total, count) {
+  const start = page * PAGE_SIZE + 1;
+  const end   = Math.min((page + 1) * PAGE_SIZE, count);
+
+  // Build page number buttons — show max 5 around current page
+  let pages = [];
+  if (total <= 7) {
+    pages = Array.from({length: total}, (_, i) => i);
+  } else {
+    pages = [0];
+    let lo = Math.max(1, page - 1);
+    let hi = Math.min(total - 2, page + 1);
+    if (lo > 1)        pages.push('…');
+    for (let i = lo; i <= hi; i++) pages.push(i);
+    if (hi < total - 2) pages.push('…');
+    pages.push(total - 1);
+  }
+
+  const btns = pages.map(p => {
+    if (p === '…') return `<span class="pg-ellipsis">…</span>`;
+    return `<button class="pg-btn ${p === page ? 'active' : ''}" onclick="setCollectionPage(${p})">${p + 1}</button>`;
+  }).join('');
+
+  return `
+  <div class="pagination-bar">
+    <button class="pg-arrow" onclick="setCollectionPage(${page - 1})" ${page === 0 ? 'disabled' : ''}>‹</button>
+    ${btns}
+    <button class="pg-arrow" onclick="setCollectionPage(${page + 1})" ${page === total - 1 ? 'disabled' : ''}>›</button>
+    <span class="pg-info">${start}–${end} of ${count}</span>
+  </div>`;
+}
+
+function renderCompactRow(g) {
+  const { species, variants } = g;
+  const owned = BALL_NAMES.filter(b => variants.some(v => v.ball === b));
+  const hasShiny = variants.some(v => v.isShiny);
+  const statusDots = {
+    'available':  '#86efac',
+    'keep':       '#93c5fd',
+    'trade-only': '#fde68a',
+    'wanted':     '#fda4af',
+  };
+  // Show all balls this species has
+  const ballIcons = owned.map(b => {
+    const mon = variants.find(v => v.ball === b);
+    return `<span class="cr-row-ball" title="${b} Ball">
+      <img src="${ballUrl(b)}" width="18" height="18" style="image-rendering:pixelated" onerror="this.style.display='none'"/>
+      ${mon?.isShiny ? '<span class="cr-row-shiny">★</span>' : ''}
+    </span>`;
+  }).join('');
+
+  // Status dots for all variants
+  const statuses = [...new Set(variants.map(v => v.tradeStatus))];
+  const statusHTML = statuses.map(s =>
+    `<span class="cr-status-dot" style="background:${statusDots[s]||'#5b4690'}" title="${s}"></span>`
+  ).join('');
+
+  // Egg moves preview — first variant's moves
+  const eggMoves = variants[0]?.eggMoves?.slice(0,3) || [];
+  const eggHTML = eggMoves.length
+    ? `<span class="cr-row-eggs">${eggMoves.join(', ')}${variants[0].eggMoves.length > 3 ? '…' : ''}</span>`
+    : '';
+
+  return `
+  <div class="compact-row" onclick="openCompactDetail('${species}')">
+    <div class="cr-sprite">
+      <img src="${poke(species, hasShiny)}" width="36" height="36" style="image-rendering:pixelated" onerror="this.style.display='none'"/>
+      ${hasShiny ? '<span class="cr-shiny-glow"></span>' : ''}
+    </div>
+    <div class="cr-info">
+      <div class="cr-name ${hasShiny ? 'shiny' : ''}">${species}${hasShiny ? ' <span style="color:#fde68a;font-size:10px">★</span>' : ''}</div>
+      ${eggHTML}
+    </div>
+    <div class="cr-balls">${ballIcons}</div>
+    <div class="cr-meta">${statusHTML}<span class="cr-variant-count">${variants.length > 1 ? variants.length + ' vars' : ''}</span></div>
+    <div class="cr-chevron">›</div>
+  </div>`;
 }
 
 function renderCard(g){
@@ -234,7 +357,16 @@ function removeWant(i){formWantList.splice(i,1);renderFormTags();}
 function saveMon(){
   const species=document.getElementById('fSpecies').value.trim();
   if(!species){alert('Species name is required');return;}
-  const mon={id:editingId||nextId++,species,ball:document.getElementById('fBall').value,nature:document.getElementById('fNature').value,ivSpread:document.getElementById('fIVs').value.trim(),gender:document.getElementById('fGender').value,quantity:parseInt(document.getElementById('fQty').value)||1,game:document.getElementById('fGame').value,tradeStatus:document.getElementById('fStatus').value,isShiny:document.getElementById('fShiny').checked,notes:document.getElementById('fNotes').value.trim(),eggMoves:[...formEggMoves],wantList:[...formWantList]};
+  const ball=document.getElementById('fBall').value;
+
+  // Ball legality check
+  const warning = getLegalityWarning(species, ball);
+  if (warning) {
+    const proceed = confirm(warning + '\n\nLog it anyway?');
+    if (!proceed) return;
+  }
+
+  const mon={id:editingId||nextId++,species,ball,nature:document.getElementById('fNature').value,ivSpread:document.getElementById('fIVs').value.trim(),gender:document.getElementById('fGender').value,quantity:parseInt(document.getElementById('fQty').value)||1,game:document.getElementById('fGame').value,tradeStatus:document.getElementById('fStatus').value,isShiny:document.getElementById('fShiny').checked,notes:document.getElementById('fNotes').value.trim(),eggMoves:[...formEggMoves],wantList:[...formWantList]};
   if(editingId){mons=mons.map(m=>m.id===editingId?mon:m);}else{mons.push(mon);lsSet(LS.N,nextId);}
   lsSet(LS.M,mons);closeAddModal();renderStats();renderBallFilter();renderList();updateWantsBadge();if(currentTab==='wants')renderWants();
 }
@@ -758,23 +890,34 @@ function renderMyData(species) {
 
   // Ball collection grid
   const gridHTML = BALL_NAMES.map(b => {
-    const bbc = BALLS[b];
-    const o   = ownedBalls.has(b);
-    const w   = wantedBalls.has(b) && !o;
-    const qty = owned.filter(m => m.ball===b).reduce((s,m)=>s+m.quantity,0);
-    const mon = owned.find(m=>m.ball===b) || wanted.find(m=>m.ball===b);
-    const bg     = o ? `${bbc.accent}15` : w ? '#fda4af08' : '#2b1f4e';
+    const bbc      = BALLS[b];
+    const o        = ownedBalls.has(b);
+    const w        = wantedBalls.has(b) && !o;
+    const qty      = owned.filter(m => m.ball===b).reduce((s,m)=>s+m.quantity,0);
+    const mon      = owned.find(m=>m.ball===b) || wanted.find(m=>m.ball===b);
+    const legality = getBallLegality(species, b);
+    const illegal  = legality === 'illegal';
+
+    const bg      = o ? `${bbc.accent}15` : w ? '#fda4af08' : '#2b1f4e';
     const border  = o ? bbc.accent+'44'  : w ? '#fda4af44' : '#2e2858';
     const nameCol = o ? bbc.light        : w ? '#fda4af88' : '#3d3570';
     const img     = bImg(b, 32, !o && !w);
     const label   = o ? `<span style="font-size:8px;color:${bbc.accent}">×${qty}</span>`
                   : w ? `<span style="font-size:8px;color:#fda4af88">want</span>` : '';
-    return `<div class="bgi" title="${b}${mon?' — '+mon.nature+', '+mon.ivSpread:''}" style="background:${bg};border:1px solid ${border}">
-      ${img}<span style="font-size:9px;color:${nameCol}">${b}</span>${label}
+
+    const illegalOverlay = illegal ? `
+      <div class="bgi-illegal-overlay" title="${b} Ball is not legal for ${species}">
+        <svg viewBox="0 0 24 24" width="28" height="28" stroke="#fda4af" stroke-width="2.5" fill="none">
+          <circle cx="12" cy="12" r="10"/><line x1="5" y1="5" x2="19" y2="19"/>
+        </svg>
+      </div>` : '';
+
+    return `<div class="bgi ${illegal ? 'bgi-illegal' : ''}" title="${b}${illegal ? ' — not legal for '+species : mon?' — '+mon.nature+', '+mon.ivSpread:''}" style="background:${illegal?'#1a1230':bg};border:1px solid ${illegal?'#fda4af18':border};${illegal?'opacity:.45':''}">
+      ${illegalOverlay}${img}<span style="font-size:9px;color:${illegal?'#fda4af33':nameCol}">${b}</span>${label}
     </div>`;
   }).join('');
 
-  const missing = BALL_NAMES.filter(b => !ownedBalls.has(b));
+  const missing = BALL_NAMES.filter(b => !ownedBalls.has(b) && getBallLegality(species, b) !== 'illegal');
 
   // Encounter log
   const mOpts = EGG_METHODS.map(m=>`<option>${m}</option>`).join('');
@@ -811,7 +954,7 @@ function renderMyData(species) {
     <div class="dex-section" style="margin-bottom:20px">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
         <div class="dex-section-title">Apriball Collection</div>
-        <div style="font-size:11px"><span style="color:#c084fc">${ownedBalls.size}</span><span style="color:#7c6fa0"> / ${BALL_NAMES.length}</span></div>
+        <div style="font-size:11px"><span style="color:#c084fc">${ownedBalls.size}</span><span style="color:#7c6fa0"> / ${BALL_NAMES.filter(b => getBallLegality(species,b) !== 'illegal').length} legal</span></div>
       </div>
       <div class="ball-grid">${gridHTML}</div>
       ${missing.length
@@ -1541,6 +1684,7 @@ const SECTIONS = {
   progress:    { el:'progress-section',   name:'Game Progress', sub:'Track your journey',              action:null },
   halloffame:  { el:'halloffame-section', name:'Hall of Fame',  sub:'Legendary achievements unlocked',  action:null },
   pokedex:     { el:'pokedex-section',    name:'Pokédex',       sub:'Look up any Pokémon',             action:null },
+  about:       { el:'about-section',      name:'About',         sub:'Meet the dev & credits',          action:null },
 };
 let currentSection = 'home';
 
@@ -1580,6 +1724,7 @@ function goSection(section) {
   if (section === 'halloffame') renderHallOfFame();
   if (section === 'competitive') initCatchRateCalc();
   if (section === 'pokedex')    initPdexPage();
+  if (section === 'about')      renderAbout();
 }
 
 function headerAction() {
@@ -4185,6 +4330,7 @@ checkLivingDexComplete();
 applyGoldTheme();
 applyShinyRotom();
 applyLightMode();
+ensureLegality(); // preload in background
 
 // Boot greeting — show onboarding first if new user, else greet by name
 const isReturning = checkTrainerOnboarding();
@@ -4640,4 +4786,284 @@ function initCatchRateCalc() {
     });
   }, 100);
   crUpdate();
+}
+
+// ── Compact collection detail sheet ─────────────────────────────────────────
+function openCompactDetail(species) {
+  const g = group(mons).find(x => x.species.toLowerCase() === species.toLowerCase());
+  if (!g) return;
+
+  const { variants } = g;
+  const owned = BALL_NAMES.filter(b => variants.some(v => v.ball === b));
+  if (!selBalls[species] || !owned.includes(selBalls[species])) selBalls[species] = owned[0];
+
+  const backdrop = document.getElementById('compact-detail-backdrop');
+  const sheet    = document.getElementById('compact-detail-sheet');
+  backdrop.style.display = 'block';
+  sheet.style.display    = 'block';
+  sheet.style.transform  = 'translateY(100%)';
+  setTimeout(() => sheet.style.transform = 'translateY(0)', 10);
+
+  renderCompactDetailContent(species);
+}
+
+function renderCompactDetailContent(species) {
+  const g = group(mons).find(x => x.species.toLowerCase() === species.toLowerCase());
+  if (!g) return;
+
+  const { variants } = g;
+  const owned = BALL_NAMES.filter(b => variants.some(v => v.ball === b));
+  const sb  = selBalls[species] || owned[0];
+  const am  = variants.find(v => v.ball === sb) || variants[0];
+  const bc  = BALLS[am.ball] || BALLS.Moon;
+  const hasShiny = variants.some(v => v.isShiny);
+
+  const tabsHTML = owned.length > 1 ? `
+    <div class="cds-ball-tabs">
+      ${owned.map(b => {
+        const bbc = BALLS[b] || BALLS.Moon;
+        const mon = variants.find(v => v.ball === b);
+        return `<button class="cds-ball-tab ${b === sb ? 'active' : ''}" style="--ta:${bbc.accent}" onclick="cdsSelectBall('${species}','${b}')">
+          ${bImg(b, 18)} <span style="color:${bbc.light}">${b}</span>${mon?.isShiny ? ' <span style="color:#fde68a;font-size:10px">★</span>' : ''}
+        </button>`;
+      }).join('')}
+    </div>` : '';
+
+  const em = am.eggMoves?.length ? `
+    <div class="cds-section">
+      <div class="cds-label">Egg Moves</div>
+      <div class="tag-row">${am.eggMoves.map(m => `<span class="tag" style="border-color:${bc.accent}25;color:${bc.light}">${m}</span>`).join('')}</div>
+    </div>` : '';
+
+  const wl = am.wantList?.length ? `
+    <div class="cds-section">
+      <div class="cds-label">Looking For</div>
+      <div class="tag-row">${am.wantList.map(w => `<span class="tag" style="border-color:#fdba7420;color:#fdba74">⇄ ${w}</span>`).join('')}</div>
+    </div>` : '';
+
+  const notes = am.notes ? `
+    <div class="cds-section">
+      <div class="cds-label">Notes</div>
+      <div class="notes-text" style="border-left-color:${bc.accent}33">${am.notes}</div>
+    </div>` : '';
+
+  document.getElementById('compact-detail-content').innerHTML = `
+    <div class="cds-header">
+      <div class="cds-sprite-wrap">
+        <img src="${poke(species, am.isShiny)}" width="72" height="72" style="image-rendering:pixelated;filter:drop-shadow(0 0 10px ${am.isShiny ? '#fde68a88' : bc.accent + '66'})" onerror="this.style.display='none'"/>
+      </div>
+      <div>
+        <div class="cds-name ${hasShiny ? 'shiny' : ''}">${species}${hasShiny ? ' <span style="color:#fde68a">★</span>' : ''}</div>
+        <div class="cds-sub">${owned.length} ball variant${owned.length > 1 ? 's' : ''}</div>
+      </div>
+      <button class="cds-close" onclick="closeCompactDetail()">✕</button>
+    </div>
+    ${tabsHTML}
+    <div class="cds-detail-row">
+      ${bdg(am.tradeStatus)}
+      <span style="color:#8b80b8;font-size:12px">${am.nature} · ${am.ivSpread} · ${am.gender}</span>
+      ${am.quantity > 1 ? `<span style="background:#2a2350;color:#9d93c0;font-size:11px;padding:2px 8px;border-radius:4px">×${am.quantity}</span>` : ''}
+    </div>
+    <div style="color:#5b4690;font-size:11px;margin-bottom:12px">${am.game}</div>
+    ${em}${wl}${notes}
+    <div class="cds-actions">
+      <button class="btn-edit" style="border-color:${bc.accent}30;color:${bc.light};flex:1" onclick="closeCompactDetail();openEditModal(${am.id})">✎ Edit</button>
+      <button class="btn btn-danger" onclick="closeCompactDetail();deleteMon(${am.id})">✕ Remove</button>
+      <button class="btn-dex-link" onclick="openDex('${species}')">📖 Dex</button>
+    </div>
+  `;
+}
+
+function cdsSelectBall(species, ball) {
+  selBalls[species] = ball;
+  renderCompactDetailContent(species);
+}
+
+function closeCompactDetail() {
+  const sheet    = document.getElementById('compact-detail-sheet');
+  const backdrop = document.getElementById('compact-detail-backdrop');
+  sheet.style.transform = 'translateY(100%)';
+  setTimeout(() => {
+    sheet.style.display    = 'none';
+    backdrop.style.display = 'none';
+  }, 300);
+}
+
+// ══ BALL LEGALITY ════════════════════════════════════════════════════════════
+const LEGALITY_CACHE_KEY = 'at_ball_legality';
+const LEGALITY_CACHE_TS  = 'at_ball_legality_ts';
+const LEGALITY_TTL       = 7 * 24 * 60 * 60 * 1000; // 1 week
+const APRI_BALLS         = new Set(['Fast','Friend','Heavy','Level','Love','Lure','Moon','Dream','Beast','Safari','Sport']);
+
+let ballLegality = null; // { "Bulbasaur": ["Moon","Dream",...], ... }
+
+async function ensureLegality() {
+  if (ballLegality) return ballLegality;
+
+  // Try localStorage cache first
+  const cached = localStorage.getItem(LEGALITY_CACHE_KEY);
+  const ts     = parseInt(localStorage.getItem(LEGALITY_CACHE_TS) || '0');
+  if (cached && Date.now() - ts < LEGALITY_TTL) {
+    try { ballLegality = JSON.parse(cached); return ballLegality; } catch(e) {}
+  }
+
+  // Fetch from file
+  try {
+    const res  = await fetch('./ball_legality.json');
+    const data = await res.json();
+    ballLegality = data;
+    localStorage.setItem(LEGALITY_CACHE_KEY, JSON.stringify(data));
+    localStorage.setItem(LEGALITY_CACHE_TS, Date.now().toString());
+  } catch(e) {
+    console.warn('Could not load ball legality data', e);
+    ballLegality = {};
+  }
+  return ballLegality;
+}
+
+// Normalise species name to match legality sheet keys
+// Handles: "Alolan Sandshrew" → "Alolan Sandshrew", accents, ♀/♂
+function normaliseName(name) {
+  if (!name) return '';
+  // Regional form prefixes the sheet uses
+  const regionalMap = {
+    'alolan ': 'Alolan ', 'galarian ': 'Galarian ',
+    'hisuian ': 'Hisuian ', 'paldean ': 'Paldean ',
+  };
+  let n = name.trim();
+  // Try direct match first
+  const lower = n.toLowerCase();
+  for (const [prefix, canonical] of Object.entries(regionalMap)) {
+    if (lower.startsWith(prefix)) {
+      n = canonical + n.slice(prefix.length);
+      break;
+    }
+  }
+  return n;
+}
+
+// Returns: 'legal' | 'illegal' | 'unknown'
+function getBallLegality(species, ball) {
+  if (!APRI_BALLS.has(ball)) return 'unknown'; // non-special balls not tracked
+  if (!ballLegality) return 'unknown';
+  const key   = normaliseName(species);
+  const entry = ballLegality[key];
+  if (!entry) return 'unknown'; // not in sheet (legendary/evolution/etc)
+  return entry.includes(ball) ? 'legal' : 'illegal';
+}
+
+// Check on add/edit — returns warning string or null
+function getLegalityWarning(species, ball) {
+  const status = getBallLegality(species, ball);
+  if (status === 'illegal') return `⚠️ ${species} cannot legally be in a ${ball} Ball`;
+  return null;
+}
+
+// ══ ABOUT ════════════════════════════════════════════════════════════════════
+function renderAbout() {
+  document.getElementById('about-content').innerHTML = `
+
+    <!-- Meet the Dev -->
+    <div class="about-card">
+      <div class="about-dev-header">
+        <div class="about-chandelure">
+          <img src="https://img.pokemondb.net/sprites/home/shiny/chandelure.png"
+               onerror="this.src='https://img.pokemondb.net/sprites/sword-shield/icon/chandelure.png'"
+               alt="Chandelure" class="about-sprite" />
+          <div class="about-sprite-label">Favourite ★</div>
+        </div>
+        <div class="about-dev-text">
+          <div class="about-dev-name cinzel">Hey, I'm Ash! <span style="color:#7c6fa0;font-size:14px;font-family:'Nunito',sans-serif;font-weight:600">she/her</span></div>
+          <div class="about-dev-bio">
+            I've been playing Pokémon since the very beginning — the kind of kid who'd hold her
+            Game Boy up to streetlights on car rides just to keep playing Blue a little longer.
+            I've played every game: mainline, side games, all of it. If it has Pokémon in the
+            title, I've put time into it.
+          </div>
+          <div class="about-dev-bio" style="margin-top:10px">
+            I built RotomOS for people like me. People who are juggling multiple apps,
+            spreadsheets, hand-written notes, and random browser tabs just to track what they're
+            doing in the games they love. I wanted one place for all of it — and I hope it becomes
+            that for you too.
+          </div>
+          <div class="about-tags">
+            <span class="about-tag about-tag-gold">✨ Shiny Hunter</span>
+            <span class="about-tag about-tag-mint">🌿 Aprimon Collector</span>
+            <span class="about-tag about-tag-purple">📖 Living Dex (shiny!)</span>
+            <span class="about-tag about-tag-muted">👻 Ghost type aficionado</span>
+            <span class="about-tag about-tag-muted">🐱 Cat mom × 2</span>
+            <span class="about-tag about-tag-muted">🖥️ PC builder</span>
+            <span class="about-tag about-tag-muted">🍰 Baker & crafter</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rotom quote -->
+      <div class="about-rotom-quote">
+        <span class="about-rotom-bolt">⚡</span>
+        <span style="color:#a898cc;font-style:italic;font-size:13px">
+          "She sat through 8,000+ soft resets for shiny Lugia. Bzzt. Trainer dedication confirmed."
+        </span>
+      </div>
+    </div>
+
+    <!-- Socials & Support -->
+    <div class="about-card">
+      <div class="about-section-title cinzel">Find Us</div>
+      <div class="about-links">
+        <a href="https://bsky.app/profile/rotomos-app.bsky.social" target="_blank" class="about-link about-link-blue">
+          <span class="about-link-icon">🦋</span>
+          <div><div class="about-link-name">Bluesky</div><div class="about-link-handle">@rotomos-app.bsky.social</div></div>
+        </a>
+        <a href="https://x.com/rotomosapp" target="_blank" class="about-link about-link-muted">
+          <span class="about-link-icon">𝕏</span>
+          <div><div class="about-link-name">Twitter / X</div><div class="about-link-handle">@rotomosapp</div></div>
+        </a>
+        <a href="https://ko-fi.com/rotomos" target="_blank" class="about-link about-link-kofi">
+          <span class="about-link-icon">☕</span>
+          <div><div class="about-link-name">Ko-fi</div><div class="about-link-handle">ko-fi.com/rotomos</div></div>
+        </a>
+        <a href="https://rotomos-app.github.io/RotomOS/roadmap.html" target="_blank" class="about-link about-link-purple">
+          <span class="about-link-icon">🗺️</span>
+          <div><div class="about-link-name">Roadmap</div><div class="about-link-handle">See what's coming next</div></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Credits -->
+    <div class="about-card">
+      <div class="about-section-title cinzel">Credits & Thanks</div>
+      <div class="about-credits-grid">
+        <div class="about-credit">
+          <div class="about-credit-name">PokéAPI</div>
+          <div class="about-credit-desc">Pokémon data, moves, abilities, evolution chains</div>
+          <a href="https://pokeapi.co" target="_blank" class="about-credit-link">pokeapi.co</a>
+        </div>
+        <div class="about-credit">
+          <div class="about-credit-name">PokémonDB</div>
+          <div class="about-credit-desc">Sprites used throughout the app</div>
+          <a href="https://pokemondb.net" target="_blank" class="about-credit-link">pokemondb.net</a>
+        </div>
+        <div class="about-credit">
+          <div class="about-credit-name">thefilght / Frisbee</div>
+          <div class="about-credit-desc">Pokéball & HA breeding legality sheet — the most complete resource out there</div>
+          <div class="about-credit-sub">Reddit / IGN</div>
+        </div>
+        <div class="about-credit">
+          <div class="about-credit-name">Cinzel & Nunito</div>
+          <div class="about-credit-desc">Fonts via Google Fonts</div>
+          <a href="https://fonts.google.com" target="_blank" class="about-credit-link">fonts.google.com</a>
+        </div>
+        <div class="about-credit">
+          <div class="about-credit-name">The Pokémon Community</div>
+          <div class="about-credit-desc">For being the reason this app exists — the hunters, traders, collectors, and dex completionists who make this hobby so special 💜</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Version -->
+    <div style="text-align:center;padding:24px 0 8px;color:#3d3570;font-size:11px;letter-spacing:.1em;text-transform:uppercase">
+      RotomOS · Built with 💜 by Ash · Not affiliated with Nintendo or The Pokémon Company
+    </div>
+  `;
 }
