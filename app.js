@@ -1283,6 +1283,10 @@ function openPhaseModal(id) {
   document.getElementById('phase-notes').value   = '';
   updatePhasePreview();
   showModal('phaseModal');
+  setTimeout(() => initSpeciesAC('phase-species', (name) => {
+    document.getElementById('phase-species').value = name;
+    updatePhasePreview();
+  }), 100);
 }
 function closePhaseModal() { hideModal('phaseModal'); phaseHuntId = null; }
 
@@ -1877,8 +1881,10 @@ function caughtCard(l) {
     else if (luckPct <= 2.0) luckHTML = `<div class="luck-pill" style="background:#fde68a22;border:1px solid #fde68a33;color:#fde68a">😤 Over odds</div>`;
     else                     luckHTML = `<div class="luck-pill" style="background:#fda4af22;border:1px solid #fda4af33;color:#fda4af">💀 Dry</div>`;
   }
+  const deleteBtn = l.fromCollection ? '' : `<button class="slc-delete" onclick="event.stopPropagation();deleteShinyLog(${l.id})" title="Delete">✕</button>`;
   return `
   <div class="shiny-log-card" onclick="openDex('${l.species}')">
+    ${deleteBtn}
     <div class="slc-sprite">
       <div style="position:absolute;inset:0;border-radius:50%;filter:blur(10px);background:radial-gradient(circle,#fde68a33,transparent)"></div>
       ${src ? `<img src="${src}" width="76" height="76" onerror="this.style.display='none'"/>` : `<div style="font-size:36px;filter:drop-shadow(0 0 6px #fde68a)">★</div>`}
@@ -1886,11 +1892,11 @@ function caughtCard(l) {
     <div class="slc-name">${l.species}</div>
     <div class="slc-ball">${bImg(l.ball, 18)}<span style="color:${bc.light};font-size:10px;font-weight:700">${l.ball}</span></div>
     <div class="slc-method">${l.method || ''}${l.game ? ' · ' + l.game.split(' / ')[0] : ''}</div>
-    ${l.count > 0 ? `<div class="slc-count">${l.count.toLocaleString()} enc.</div>` : ''}
     ${luckHTML}
+    ${l.count > 0 ? `<div class="slc-count">${l.count.toLocaleString()} enc.</div>` : ''}
+    ${l.isPhase && l.phaseNum && l.huntSpecies ? `<div class="slc-phase-tag">Phase ${l.phaseNum} of ${l.huntSpecies} hunt</div>` : ''}
     ${l.date ? `<div class="slc-date">${l.date}</div>` : ''}
     ${l.fromCollection ? `<div class="slc-date" style="font-style:italic">collection</div>` : ''}
-    ${l.isPhase && l.phaseNum && l.huntSpecies ? `<div class="slc-phase-tag">Phase ${l.phaseNum} of ${l.huntSpecies} hunt</div>` : ''}
   </div>`;
 }
 
@@ -2003,10 +2009,12 @@ function renderShinyStats() {
   const methodEntries = Object.entries(byMethod).sort((a,b) => b[1]-a[1]);
   const maxMethodCount = methodEntries[0]?.[1] || 1;
 
-  // Most hunted species (by completed hunt count)
-  const bySpecies = {};
-  done.forEach(h => { bySpecies[h.species] = (bySpecies[h.species]||0) + 1; });
-  const topSpecies = Object.entries(bySpecies).sort((a,b) => b[1]-a[1]).slice(0,3);
+  // Luckiest hunts (lowest count relative to odds)
+  const luckiestHunts = allLog
+    .filter(l => l.count > 0 && l.odds)
+    .map(l => ({ ...l, luckRatio: l.count / l.odds }))
+    .sort((a, b) => a.luckRatio - b.luckRatio)
+    .slice(0, 3);
 
   // Time estimate
   const timeByMethod = {};
@@ -2077,19 +2085,21 @@ function renderShinyStats() {
     { cls:'silver', rank:'🥈' },
     { cls:'bronze', rank:'🥉' },
   ];
-  document.getElementById('statsPodium').innerHTML = topSpecies.length
-    ? topSpecies.map(([sp, cnt], i) => {
-        const src = poke(sp, true);
+  document.getElementById('statsPodium').innerHTML = luckiestHunts.length
+    ? luckiestHunts.map((l, i) => {
+        const src = poke(l.species, true);
         const ps  = podiumStyles[i] || podiumStyles[2];
+        const pct = Math.round(l.luckRatio * 100);
+        const enc = l.count.toLocaleString();
         return `
         <div class="podium-card ${ps.cls}">
           <div class="podium-rank">${ps.rank}</div>
-          ${src ? `<img src="${src}" width="52" height="52" style="image-rendering:pixelated;filter:drop-shadow(0 0 6px #fde68a55)" onerror="this.style.display='none'"/>` : ''}
-          <div class="podium-name">${sp}</div>
-          <div class="podium-count">${cnt} hunt${cnt!==1?'s':''}</div>
+          ${src ? `<img src="${src}" width="52" height="52" style="image-rendering:pixelated;filter:drop-shadow(0 0 6px #86efac55)" onerror="this.style.display='none'"/>` : ''}
+          <div class="podium-name">${l.species}</div>
+          <div class="podium-count">${enc} enc · <span style="color:#86efac">${pct}% of odds</span></div>
         </div>`;
       }).join('')
-    : '<div style="color:#5b4690;font-size:12px;grid-column:1/-1">No completed hunts yet.</div>';
+    : '<div style="color:#5b4690;font-size:12px;grid-column:1/-1">No shinies logged yet.</div>';
 
   // ── Grudge stats ─────────────────────────────────────────────────────────────
   const grudgeRows = [
@@ -4326,4 +4336,12 @@ function renderPdexRecent() {
       `).join('')}
     </div>
   `;
+}
+
+// ── Delete shiny log entry ───────────────────────────────────────────────────
+function deleteShinyLog(id) {
+  if (!confirm('Remove this shiny from your log?')) return;
+  shinyLog = shinyLog.filter(l => l.id !== id);
+  lsSet(LSH.LOG, shinyLog);
+  renderShinyLog();
 }
