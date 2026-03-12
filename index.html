@@ -55,7 +55,7 @@
       <span class="mmd-icon">🥚</span><span class="mmd-label">Breeding</span>
     </div>
     <div class="mmd-item" id="mmd-competitive" onclick="goSection('competitive');closeMoreDrawer()">
-      <span class="mmd-icon">⚔️</span><span class="mmd-label">Competitive</span>
+      <span class="mmd-icon">🎯</span><span class="mmd-label">Tools</span>
     </div>
     <div class="mmd-item" id="mmd-progress" onclick="goSection('progress');closeMoreDrawer()">
       <span class="mmd-icon">🗺️</span><span class="mmd-label">Game Progress</span>
@@ -97,7 +97,7 @@
       <button class="sn-item" id="sn-livingdex" onclick="goSection('livingdex')"> <span class="sn-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><rect x="8"  y="8"  width="24" height="24" rx="4" stroke-width="5"/><rect x="38" y="8"  width="24" height="24" rx="4" stroke-width="5"/><rect x="68" y="8"  width="24" height="24" rx="4" stroke-width="5"/><rect x="8"  y="38" width="24" height="24" rx="4" stroke-width="5"/><rect x="38" y="38" width="24" height="24" rx="4" stroke-width="5"/><rect x="68" y="38" width="24" height="24" rx="4" stroke-width="5"/><rect x="8"  y="68" width="24" height="24" rx="4" stroke-width="5"/><rect x="38" y="68" width="24" height="24" rx="4" stroke-width="5"/><rect x="68" y="68" width="24" height="24" rx="4" stroke-width="5"/></svg></span><span class="sn-label">Living Dex</span></button>
       <button class="sn-item" id="sn-pokedex" onclick="goSection('pokedex')"><span class="sn-icon">📖</span><span class="sn-label">Pokédex</span></button>
       <button class="sn-item" id="sn-breeding"    onclick="goSection('breeding')">   <span class="sn-icon">🥚</span><span class="sn-label">Breeding</span></button>
-      <button class="sn-item" id="sn-competitive" onclick="goSection('competitive')"><span class="sn-icon">⚔️</span><span class="sn-label">Competitive</span></button>
+      <button class="sn-item" id="sn-competitive" onclick="goSection('competitive')"><span class="sn-icon">🎯</span><span class="sn-label">Tools</span></button>
       <button class="sn-item" id="sn-progress"  onclick="goSection('progress')">  <span class="sn-icon">🗺️</span><span class="sn-label">Game Progress</span></button>
       <button class="sn-item" id="sn-halloffame" onclick="goSection('halloffame')" style="display:none"><span class="sn-icon">🏆</span><span class="sn-label">Hall of Fame</span><span class="sn-badge sn-badge-gold" style="display:inline-flex">★</span></button>
       <button class="sn-item" onclick="openSettings()" style="margin-top:auto"><span class="sn-icon">⚙️</span><span class="sn-label">Settings</span></button>
@@ -561,12 +561,87 @@
       <!-- Competitive -->
       <div id="competitive-section" style="display:none">
         <div class="container">
-          <div class="coming-soon-card">
-            <div class="cs-icon">⚔️</div>
-            <div class="cinzel cs-title">Competitive Builder</div>
-            <div class="cs-sub">Build teams, plan EV spreads, save movesets and type matchup notes for your competitive squad.</div>
-            <div class="cs-badge">Coming Soon</div>
+
+          <!-- Tool tabs -->
+          <div style="display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;scrollbar-width:none">
+            <button class="ldex-gen-tab active" id="tool-tab-catchrate" onclick="toolTab('catchrate')">🎯 Catch Rate</button>
+            <button class="ldex-gen-tab" id="tool-tab-more" style="opacity:.4;cursor:default">More coming soon...</button>
           </div>
+
+          <!-- Catch Rate Calculator -->
+          <div id="tool-pane-catchrate">
+
+            <!-- Species -->
+            <div class="cr-field">
+              <div class="form-label">Pokémon</div>
+              <input class="form-input" id="cr-species" placeholder="e.g. Ralts" autocomplete="off" oninput="crSpeciesInput()"/>
+              <div id="cr-catch-rate-display" class="cr-base-rate"></div>
+            </div>
+
+            <!-- HP Slider -->
+            <div class="cr-field">
+              <div class="form-label">Current HP — <span id="cr-hp-label" style="color:#d4a8ff">50%</span></div>
+              <input type="range" id="cr-hp" min="1" max="100" value="50" class="cr-slider" oninput="crUpdate()"/>
+              <div class="cr-hp-bar-wrap"><div id="cr-hp-bar" class="cr-hp-bar" style="width:50%"></div></div>
+            </div>
+
+            <!-- Status -->
+            <div class="cr-field">
+              <div class="form-label">Status Condition</div>
+              <div class="cr-pills" id="cr-status-pills">
+                <button class="cr-pill active" data-val="none"    onclick="crPickStatus(this)">None</button>
+                <button class="cr-pill"        data-val="sleep"   onclick="crPickStatus(this)">😴 Sleep / Frozen</button>
+                <button class="cr-pill"        data-val="para"    onclick="crPickStatus(this)">⚡ Para / Burn / Poison</button>
+              </div>
+            </div>
+
+            <!-- Ball selector -->
+            <div class="cr-field">
+              <div class="form-label">Poké Ball</div>
+              <div class="cr-ball-grid" id="cr-ball-grid"></div>
+            </div>
+
+            <!-- Conditional inputs -->
+            <div id="cr-cond-turn" class="cr-cond" style="display:none">
+              <div class="form-label">Turn Number</div>
+              <input type="number" class="form-input" id="cr-turn" value="1" min="1" max="99" oninput="crUpdate()" style="width:120px"/>
+            </div>
+            <div id="cr-cond-dusk" class="cr-cond" style="display:none">
+              <div class="form-label">Environment</div>
+              <div class="cr-pills">
+                <button class="cr-pill active" data-val="0" onclick="crPickCond('dusk',this)">☀️ Daytime / Outside</button>
+                <button class="cr-pill"        data-val="1" onclick="crPickCond('dusk',this)">🌙 Night / Cave</button>
+              </div>
+            </div>
+            <div id="cr-cond-repeat" class="cr-cond" style="display:none">
+              <div class="form-label">Already caught this species?</div>
+              <div class="cr-pills">
+                <button class="cr-pill active" data-val="0" onclick="crPickCond('repeat',this)">No</button>
+                <button class="cr-pill"        data-val="1" onclick="crPickCond('repeat',this)">Yes — registered in Dex</button>
+              </div>
+            </div>
+            <div id="cr-cond-net" class="cr-cond" style="display:none">
+              <div class="cr-info-note">🌊 Net Ball bonus applies if the target is Water or Bug type — checking species data automatically.</div>
+            </div>
+            <div id="cr-cond-level" class="cr-cond" style="display:none">
+              <div class="form-label">Target Pokémon Level</div>
+              <input type="number" class="form-input" id="cr-level" value="30" min="1" max="100" oninput="crUpdate()" style="width:120px"/>
+            </div>
+
+            <!-- Result -->
+            <div id="cr-result" class="cr-result-card" style="display:none">
+              <div class="cr-result-pct" id="cr-result-pct"></div>
+              <div class="cr-result-label">catch probability</div>
+              <div class="cr-result-details" id="cr-result-details"></div>
+              <div class="cr-shake-row" id="cr-shake-row"></div>
+            </div>
+            <div id="cr-empty" class="cr-empty-state">
+              <div style="font-size:36px;margin-bottom:12px">🎯</div>
+              <div class="cinzel" style="color:#3d3070;font-size:14px">Enter a Pokémon to get started</div>
+              <div style="color:#2d2358;font-size:11px;margin-top:6px">Bzzt! Rotom will calculate your odds-zzzt!</div>
+            </div>
+
+          </div><!-- /tool-pane-catchrate -->
         </div>
       </div>
 

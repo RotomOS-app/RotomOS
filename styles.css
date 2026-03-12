@@ -2534,3 +2534,114 @@ body.theme-light .slc-phase-tag {
 .slc-delete:hover {
   color:#fda4af; background:#fda4af18;
 }
+
+/* ══ CATCH RATE CALCULATOR ══════════════════════════════════════════════════ */
+.cr-field { margin-bottom:20px; }
+.cr-cond  { margin-bottom:16px; }
+
+.cr-base-rate {
+  font-size:11px; color:#5b4690; margin-top:6px; font-weight:700;
+  min-height:16px;
+}
+
+/* HP Slider */
+.cr-slider {
+  width:100%; margin:10px 0 6px;
+  -webkit-appearance:none; appearance:none;
+  height:4px; border-radius:4px;
+  background:linear-gradient(90deg,#d4a8ff,#5b4690);
+  outline:none; cursor:pointer;
+}
+.cr-slider::-webkit-slider-thumb {
+  -webkit-appearance:none; width:20px; height:20px;
+  border-radius:50%; background:#d4a8ff;
+  box-shadow:0 0 8px #d4a8ff66; cursor:pointer;
+}
+.cr-hp-bar-wrap {
+  height:6px; background:#2f2358; border-radius:6px; overflow:hidden;
+}
+.cr-hp-bar {
+  height:100%; border-radius:6px;
+  transition:width .1s, background .1s;
+}
+
+/* Status / condition pills */
+.cr-pills { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+.cr-pill {
+  padding:6px 14px; border-radius:100px;
+  border:1.5px solid #5b469055; background:none;
+  color:#7c6fa0; font-size:12px; font-weight:700;
+  cursor:pointer; transition:all .15s;
+  font-family:'Nunito',sans-serif;
+}
+.cr-pill:hover  { border-color:#d4a8ff55; color:#ede9ff; }
+.cr-pill.active { border-color:#d4a8ff; background:#d4a8ff18; color:#ede9ff; }
+
+/* Info note */
+.cr-info-note {
+  font-size:11px; color:#7c6fa0; font-style:italic;
+  background:#2f2358; border-radius:10px; padding:8px 12px;
+  margin-top:8px;
+}
+
+/* Ball grid */
+.cr-ball-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(64px,1fr));
+  gap:8px; margin-top:8px;
+}
+.cr-ball-btn {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:8px 4px; border-radius:12px;
+  border:1.5px solid #5b469033; background:none;
+  color:#5b4690; font-size:9px; font-weight:800;
+  cursor:pointer; transition:all .15s;
+  font-family:'Nunito',sans-serif;
+}
+.cr-ball-btn:hover  { border-color:#d4a8ff44; color:#ede9ff; background:#d4a8ff0a; }
+.cr-ball-btn.active { border-color:#d4a8ff; background:#d4a8ff18; color:#ede9ff; box-shadow:0 0 8px #d4a8ff22; }
+
+/* Result card */
+.cr-result-card {
+  background:linear-gradient(135deg,#2f2358,#372962);
+  border:1.5px solid #5b469055; border-radius:20px;
+  padding:24px; text-align:center; margin-top:8px;
+  transition:border-color .3s;
+}
+.cr-result-pct {
+  font-family:'Cinzel',serif; font-size:52px; font-weight:900;
+  line-height:1; margin-bottom:4px;
+  transition:color .3s;
+}
+.cr-result-label { font-size:11px; color:#5b4690; text-transform:uppercase; letter-spacing:.1em; font-weight:800; margin-bottom:16px; }
+.cr-result-details { font-size:12px; color:#7c6fa0; line-height:1.8; margin-bottom:16px; }
+
+/* Shake checks */
+.cr-shake-row {
+  display:flex; justify-content:center; gap:12px; flex-wrap:wrap;
+}
+.cr-shake-check {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  font-size:10px; font-weight:800; color:#3d3070;
+}
+.cr-shake-dot {
+  width:10px; height:10px; border-radius:50%;
+  opacity:.3; transition:opacity .2s;
+}
+.cr-shake-check.good .cr-shake-dot { opacity:1; }
+.cr-shake-check.good { color:#ede9ff; }
+
+/* Empty state */
+.cr-empty-state {
+  text-align:center; padding:40px 20px;
+}
+
+/* Light mode */
+body.theme-light .cr-ball-btn        { border-color:#ccccff33; color:#7c6aaa; }
+body.theme-light .cr-ball-btn:hover  { background:#e6e0ff !important; color:#1e1535 !important; }
+body.theme-light .cr-ball-btn.active { background:#d4c8f8 !important; border-color:#9b7fe8 !important; color:#1e1535 !important; }
+body.theme-light .cr-result-card     { background:linear-gradient(135deg,#ede9ff,#e1d4fa) !important; border-color:#ccccff !important; }
+body.theme-light .cr-pill            { border-color:#ccccff55; color:#7c6aaa; }
+body.theme-light .cr-pill.active     { background:#d4c8f8 !important; border-color:#9b7fe8 !important; color:#1e1535 !important; }
+body.theme-light .cr-info-note       { background:#e6e0ff !important; color:#5b4690 !important; }
+body.theme-light .cr-hp-bar-wrap     { background:#d4c8f8 !important; }
