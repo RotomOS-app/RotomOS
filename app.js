@@ -1,4 +1,4 @@
-const BALLS={Friend:{accent:"#4CAF50",light:"#81C784",bg:"#3a2e6e"},Love:{accent:"#E91E8B",light:"#F48FB1",bg:"#2e1a24"},Lure:{accent:"#00BCD4",light:"#80DEEA",bg:"#1a2630"},Moon:{accent:"#7986CB",light:"#9FA8DA",bg:"#1a1c2e"},Dream:{accent:"#CE93D8",light:"#E1BEE7",bg:"#221a2e"},Beast:{accent:"#FF9800",light:"#FFCC80",bg:"#2e1f0a"},Fast:{accent:"#C6D82A",light:"#E6EE9C",bg:"#2a2060"},Heavy:{accent:"#90A4AE",light:"#B0BEC5",bg:"#1a1f22"},Level:{accent:"#FF5722",light:"#FFAB91",bg:"#3d1a40"},Safari:{accent:"#8BC34A",light:"#C5E1A5",bg:"#2a1f5a"},Sport:{accent:"#FFC107",light:"#FFE082",bg:"#2a2510"}};
+const BALLS={"Poké":{accent:"#EF4444",light:"#FCA5A5",bg:"#2e1a1a"},Friend:{accent:"#4CAF50",light:"#81C784",bg:"#3a2e6e"},Love:{accent:"#E91E8B",light:"#F48FB1",bg:"#2e1a24"},Lure:{accent:"#00BCD4",light:"#80DEEA",bg:"#1a2630"},Moon:{accent:"#7986CB",light:"#9FA8DA",bg:"#1a1c2e"},Dream:{accent:"#CE93D8",light:"#E1BEE7",bg:"#221a2e"},Beast:{accent:"#FF9800",light:"#FFCC80",bg:"#2e1f0a"},Fast:{accent:"#C6D82A",light:"#E6EE9C",bg:"#2a2060"},Heavy:{accent:"#90A4AE",light:"#B0BEC5",bg:"#1a1f22"},Level:{accent:"#FF5722",light:"#FFAB91",bg:"#3d1a40"},Safari:{accent:"#8BC34A",light:"#C5E1A5",bg:"#2a1f5a"},Sport:{accent:"#FFC107",light:"#FFE082",bg:"#2a2510"}};
 const BALL_NAMES=Object.keys(BALLS);
 const BADGE={available:{bg:"#1f2d5e",border:"#a78bfa",text:"#c084fc",label:"✓ Available"},keep:{bg:"#1f2d5e",border:"#a78bfa",text:"#e9d5ff",label:"♦ Keeping"},"trade-only":{bg:"#3d2040",border:"#fdba74",text:"#fdba74",label:"⇄ Trade Only"},wanted:{bg:"#3d1530",border:"#f47284",text:"#fca5a5",label:"✦ Wanted"}};
 const GAMES=[
@@ -64,7 +64,7 @@ let selBalls={};
 let currentDex=null;
 
 const poke=(n,s)=>{if(!n?.trim())return'';const x=n.toLowerCase().trim().replace(/\s+/g,'-').replace(/[.']/g,'').replace(/♀/g,'-f').replace(/♂/g,'-m');return s?`https://img.pokemondb.net/sprites/home/shiny/${x}.png`:`https://img.pokemondb.net/sprites/home/normal/${x}.png`;};
-const ballUrl=n=>`https://img.pokemondb.net/sprites/items/${n.toLowerCase()}-ball.png`;
+const ballUrl=n=>`https://img.pokemondb.net/sprites/items/${n.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}-ball.png`;
 const bImg=(n,sz=22,dim=false,sel=false)=>{const bc=BALLS[n]||BALLS.Moon;return`<img src="${ballUrl(n)}" width="${sz}" height="${sz}" style="image-rendering:pixelated;display:block;flex-shrink:0;opacity:${dim?.15:1};filter:${sel?`drop-shadow(0 0 5px ${bc.accent}aa)`:dim?'grayscale(1)':'none'};transition:all .15s" onerror="this.style.display='none'"/>`;};
 const spr=(sp,sh,sz=66,ac='#c084fc')=>{const src=poke(sp,sh);const glow=sh?'radial-gradient(circle,#FFD70025 0%,transparent 70%)':`radial-gradient(circle,${ac}18 0%,transparent 70%)`;const filt=sh?'drop-shadow(0 0 8px #FFD700aa)':`drop-shadow(0 2px 6px ${ac}44)`;return`<div style="position:absolute;inset:4px;border-radius:50%;filter:blur(6px);background:${glow}"></div>${src?`<img src="${src}" width="${sz}" height="${sz}" style="image-rendering:pixelated;position:relative;z-index:1;filter:${filt}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div style="width:${sz*.6}px;height:${sz*.6}px;border-radius:50%;border:2px dashed ${ac}33;display:none;align-items:center;justify-content:center;color:${ac}44;font-size:20px;position:relative;z-index:1">?</div>`:`<div style="width:${sz*.6}px;height:${sz*.6}px;border-radius:50%;border:2px dashed ${ac}33;display:flex;align-items:center;justify-content:center;color:${ac}44;font-size:20px;position:relative;z-index:1">?</div>`}${sh&&src?'<div class="shiny-star">★</div>':''}`;};
 const bdg=st=>{const b=BADGE[st]||BADGE.keep;return`<span class="badge" style="background:${b.bg};border-color:${b.border};color:${b.text}">${b.label}</span>`;};
@@ -1051,12 +1051,18 @@ function huntCard(h) {
         <span style="color:#5b4690">Total: ${h.count.toLocaleString()} encounters</span>
       </div>
       <div class="phase-chips">
-        ${phases.map((p, i) => `
-          <div class="phase-chip ${i === phases.length-1 ? 'current' : ''}">
+        ${phases.map((p, i) => {
+          const isCurrent = i === phases.length - 1;
+          const isLogged  = !isCurrent && !p.failedCatch;
+          const isFailed  = !isCurrent && p.failedCatch;
+          return `
+          <div class="phase-chip ${isCurrent ? 'current' : ''} ${isFailed ? 'phase-failed' : ''} ${isLogged ? 'phase-logged' : ''}">
             <span class="pc-num">P${i+1}</span>
-            <span class="pc-cnt">${p.count.toLocaleString()}</span>
-            ${p.species !== h.species ? `<span class="pc-poke">${p.species}</span>` : ''}
-          </div>`).join('')}
+            <span class="pc-cnt">${p.count.toLocaleString()} enc</span>
+            ${isLogged ? `<span class="pc-logged-note">★ ${p.species !== h.species ? p.species : h.species}</span>` : ''}
+            ${isFailed ? `<span class="pc-logged-note" style="color:#fda4af88">💔 fled</span>` : ''}
+          </div>`;
+        }).join('')}
       </div>
     </div>` : '';
 
@@ -1341,9 +1347,11 @@ function confirmPhase() {
     gender:  pGender,
     notes:   pNotes || `Phase ${h.phases.length - 1} of ${h.species} hunt`,
     date:    today(),
-    huntId:  h.id,
-    isPhase: true,
-    odds:    getOdds(h.method, false, h.game),
+    huntId:      h.id,
+    isPhase:     true,
+    phaseNum:    h.phases.length - 1,
+    huntSpecies: h.species,
+    odds:        getOdds(h.method, false, h.game),
   };
   shinyLog.unshift(logEntry);
   lsSet(LSH.LOG, shinyLog);
@@ -1528,6 +1536,7 @@ const SECTIONS = {
   competitive: { el:'competitive-section',name:'Competitive',   sub:'Build and plan teams',            action:null },
   progress:    { el:'progress-section',   name:'Game Progress', sub:'Track your journey',              action:null },
   halloffame:  { el:'halloffame-section', name:'Hall of Fame',  sub:'Legendary achievements unlocked',  action:null },
+  pokedex:     { el:'pokedex-section',    name:'Pokédex',       sub:'Look up any Pokémon',             action:null },
 };
 let currentSection = 'home';
 
@@ -1565,6 +1574,7 @@ function goSection(section) {
   if (section === 'livingdex') renderLivingDex();
   if (section === 'breeding')  renderBreeding();
   if (section === 'halloffame') renderHallOfFame();
+  if (section === 'pokedex')    initPdexPage();
 }
 
 function headerAction() {
@@ -1880,6 +1890,7 @@ function caughtCard(l) {
     ${luckHTML}
     ${l.date ? `<div class="slc-date">${l.date}</div>` : ''}
     ${l.fromCollection ? `<div class="slc-date" style="font-style:italic">collection</div>` : ''}
+    ${l.isPhase && l.phaseNum && l.huntSpecies ? `<div class="slc-phase-tag">Phase ${l.phaseNum} of ${l.huntSpecies} hunt</div>` : ''}
   </div>`;
 }
 
@@ -4232,4 +4243,87 @@ function dismissKofiBanner() {
   banner.classList.remove('banner-visible');
   banner.classList.add('banner-hiding');
   setTimeout(() => { banner.style.display = 'none'; banner.classList.remove('banner-hiding'); }, 400);
+}
+
+// ── Pokédex search page ──────────────────────────────────────────────────────
+const PDEX_RECENT_KEY = 'at_pdex_recent';
+const PDEX_PROMPTS = [
+  "Bzzt! Which Pokémon do you want to know about?",
+  "Bzzt-zzt! Who are we looking up today, {{name}}?",
+  "Scanning the database... who's the target, {{name}}?",
+  "Rotom's encyclopaedia is ready! Who do you want to look up?",
+  "Bzzt! Go ahead — I know everything about every Pokémon!",
+];
+
+let pdexTyperTimeout = null;
+
+function initPdexPage() {
+  // Pick a random prompt, personalise with trainer name if known
+  const name = trainerName || null;
+  let prompt = PDEX_PROMPTS[Math.floor(Math.random() * PDEX_PROMPTS.length)];
+  prompt = name ? prompt.replace('{{name}}', name) : prompt.replace(', {{name}}', '').replace('{{name}}', 'Trainer');
+
+  // Typewriter effect
+  const el = document.getElementById('pdex-rotom-prompt');
+  if (el) {
+    el.innerHTML = '';
+    let i = 0;
+    clearTimeout(pdexTyperTimeout);
+    function type() {
+      if (i <= prompt.length) {
+        el.innerHTML = prompt.slice(0, i) + '<span class="pdex-cursor"></span>';
+        i++;
+        pdexTyperTimeout = setTimeout(type, 28);
+      } else {
+        el.innerHTML = prompt; // remove cursor when done
+      }
+    }
+    type();
+  }
+
+  // Clear and re-init autocomplete
+  const input = document.getElementById('pdex-species-input');
+  if (input) {
+    input.value = '';
+    setTimeout(() => {
+      initSpeciesAC('pdex-species-input', (name) => {
+        pdexGoToDex(name);
+      });
+    }, 100);
+  }
+
+  renderPdexRecent();
+}
+
+function pdexInput() {
+  // handled by initSpeciesAC — this is here in case we need extra logic later
+}
+
+function pdexGoToDex(species) {
+  if (!species) return;
+  // Save to recent
+  let recent = JSON.parse(localStorage.getItem(PDEX_RECENT_KEY) || '[]');
+  recent = [species, ...recent.filter(r => r.toLowerCase() !== species.toLowerCase())].slice(0, 8);
+  localStorage.setItem(PDEX_RECENT_KEY, JSON.stringify(recent));
+  // Navigate to dex
+  loadDexPage(species);
+}
+
+function renderPdexRecent() {
+  const wrap = document.getElementById('pdex-recent');
+  if (!wrap) return;
+  const recent = JSON.parse(localStorage.getItem(PDEX_RECENT_KEY) || '[]');
+  if (!recent.length) { wrap.innerHTML = ''; return; }
+
+  wrap.innerHTML = `
+    <div class="pdex-recent-label">Recently viewed</div>
+    <div class="pdex-recent-chips">
+      ${recent.map(r => `
+        <div class="pdex-recent-chip" onclick="pdexGoToDex('${r}')">
+          <img src="${poke(r)}" onerror="this.style.display='none'" alt="">
+          ${r}
+        </div>
+      `).join('')}
+    </div>
+  `;
 }

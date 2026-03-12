@@ -2436,3 +2436,88 @@ body.theme-light #kofi-banner-inner {
 }
 body.theme-light #kofi-banner-text { color:#1e1535 !important; }
 body.theme-light #kofi-banner-close { color:#7c6aaa !important; }
+
+/* ── Pokédex search page ── */
+#pdex-search-wrap {
+  display:flex; flex-direction:column; align-items:center;
+  padding:48px 0 32px;
+  max-width:480px; margin:0 auto;
+}
+.pdex-prompt {
+  font-family:'Cinzel',serif; font-size:15px; font-weight:700;
+  color:#a898cc; text-align:center; margin-bottom:28px;
+  line-height:1.6; min-height:48px;
+}
+.pdex-prompt .pdex-cursor {
+  display:inline-block; width:2px; height:1em;
+  background:#d4a8ff; margin-left:2px;
+  animation:blink .7s step-end infinite;
+  vertical-align:text-bottom;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.pdex-search-row { width:100%; position:relative; }
+.pdex-input {
+  width:100%; padding:14px 20px;
+  background:var(--surface); border:1.5px solid var(--border);
+  border-radius:16px; color:var(--text);
+  font-family:'Nunito',sans-serif; font-size:16px; font-weight:700;
+  outline:none; transition:border-color .18s, box-shadow .18s;
+}
+.pdex-input:focus {
+  border-color:#d4a8ff;
+  box-shadow:0 0 0 3px #d4a8ff18;
+}
+.pdex-input::placeholder { color:#5b4690; font-weight:600; }
+
+/* Recent searches */
+.pdex-recent {
+  width:100%; margin-top:32px;
+}
+.pdex-recent-label {
+  font-size:10px; font-weight:800; letter-spacing:.12em;
+  text-transform:uppercase; color:#5b4690; margin-bottom:10px;
+}
+.pdex-recent-chips {
+  display:flex; flex-wrap:wrap; gap:8px;
+}
+.pdex-recent-chip {
+  display:flex; align-items:center; gap:6px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:100px; padding:6px 14px;
+  font-size:12px; font-weight:700; color:#a898cc;
+  cursor:pointer; transition:all .15s;
+}
+.pdex-recent-chip:hover {
+  border-color:#d4a8ff55; color:#ede9ff; background:var(--surface2);
+}
+.pdex-recent-chip img {
+  width:20px; height:20px; image-rendering:pixelated;
+}
+
+body.theme-light .pdex-prompt { color:#7c6aaa !important; }
+body.theme-light .pdex-input { background:#f0e8ff !important; border-color:#ccccff !important; color:#1e1535 !important; }
+body.theme-light .pdex-input::placeholder { color:#a898cc !important; }
+body.theme-light .pdex-recent-chip { background:#e6e6fa !important; border-color:#ccccff !important; color:#5b4690 !important; }
+body.theme-light .pdex-recent-chip:hover { background:#d4c8f8 !important; color:#1e1535 !important; }
+
+/* ── Phase chip logged/failed states ── */
+.phase-chip.phase-logged { border-color:#fde68a44; }
+.phase-chip.phase-failed { border-color:#fda4af33; opacity:.7; }
+.pc-logged-note {
+  font-size:9px; font-weight:800; color:#fde68a; 
+  letter-spacing:.04em; margin-top:1px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:72px;
+}
+
+/* ── Shiny log phase tag ── */
+.slc-phase-tag {
+  font-size:9px; font-weight:800; letter-spacing:.06em;
+  text-transform:uppercase;
+  background:#fde68a18; border:1px solid #fde68a33;
+  color:#fde68a; padding:2px 8px; border-radius:100px;
+  margin-top:2px; text-align:center;
+}
+body.theme-light .slc-phase-tag {
+  background:#fef9c3 !important; border-color:#fde68a66 !important; color:#92670a !important;
+}

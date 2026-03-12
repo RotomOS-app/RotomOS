@@ -48,6 +48,9 @@
 <div id="mobile-more-drawer">
   <div class="mmd-handle"></div>
   <div class="mmd-grid">
+    <div class="mmd-item" id="mmd-pokedex" onclick="goSection('pokedex');closeMoreDrawer()">
+      <span class="mmd-icon">📖</span><span class="mmd-label">Pokédex</span>
+    </div>
     <div class="mmd-item" id="mmd-breeding"    onclick="goSection('breeding');closeMoreDrawer()">
       <span class="mmd-icon">🥚</span><span class="mmd-label">Breeding</span>
     </div>
@@ -92,6 +95,7 @@
       <button class="sn-item" id="sn-shiny"     onclick="goSection('shiny')">     <span class="sn-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" width="20" height="20"><path d="M50 8 L56 42 L90 50 L56 58 L50 92 L44 58 L10 50 L44 42 Z"/></svg></span><span class="sn-label">Shiny Hunter</span><span id="shinyBadge" class="sn-badge sn-badge-gold" style="display:none"></span></button>
       <div class="sn-divider">Tracking</div>
       <button class="sn-item" id="sn-livingdex" onclick="goSection('livingdex')"> <span class="sn-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><rect x="8"  y="8"  width="24" height="24" rx="4" stroke-width="5"/><rect x="38" y="8"  width="24" height="24" rx="4" stroke-width="5"/><rect x="68" y="8"  width="24" height="24" rx="4" stroke-width="5"/><rect x="8"  y="38" width="24" height="24" rx="4" stroke-width="5"/><rect x="38" y="38" width="24" height="24" rx="4" stroke-width="5"/><rect x="68" y="38" width="24" height="24" rx="4" stroke-width="5"/><rect x="8"  y="68" width="24" height="24" rx="4" stroke-width="5"/><rect x="38" y="68" width="24" height="24" rx="4" stroke-width="5"/><rect x="68" y="68" width="24" height="24" rx="4" stroke-width="5"/></svg></span><span class="sn-label">Living Dex</span></button>
+      <button class="sn-item" id="sn-pokedex" onclick="goSection('pokedex')"><span class="sn-icon">📖</span><span class="sn-label">Pokédex</span></button>
       <button class="sn-item" id="sn-breeding"    onclick="goSection('breeding')">   <span class="sn-icon">🥚</span><span class="sn-label">Breeding</span></button>
       <button class="sn-item" id="sn-competitive" onclick="goSection('competitive')"><span class="sn-icon">⚔️</span><span class="sn-label">Competitive</span></button>
       <button class="sn-item" id="sn-progress"  onclick="goSection('progress')">  <span class="sn-icon">🗺️</span><span class="sn-label">Game Progress</span></button>
@@ -594,6 +598,18 @@
       </div>
 
       <!-- Hall of Fame — unlocked by Living Dex / Shiny Living Dex completion -->
+      <div id="pokedex-section" style="display:none">
+        <div class="container">
+          <div id="pdex-search-wrap">
+            <p id="pdex-rotom-prompt" class="pdex-prompt"></p>
+            <div class="pdex-search-row">
+              <input id="pdex-species-input" type="text" placeholder="Pokémon name..." autocomplete="off" class="pdex-input" oninput="pdexInput()" />
+            </div>
+            <div id="pdex-recent" class="pdex-recent"></div>
+          </div>
+        </div>
+      </div>
+
       <div id="halloffame-section" style="display:none">
         <div class="container" id="hof-content"></div>
       </div>
