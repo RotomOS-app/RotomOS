@@ -1,7 +1,39 @@
 const BALLS={Friend:{accent:"#4CAF50",light:"#81C784",bg:"#3a2e6e"},Love:{accent:"#E91E8B",light:"#F48FB1",bg:"#2e1a24"},Lure:{accent:"#00BCD4",light:"#80DEEA",bg:"#1a2630"},Moon:{accent:"#7986CB",light:"#9FA8DA",bg:"#1a1c2e"},Dream:{accent:"#CE93D8",light:"#E1BEE7",bg:"#221a2e"},Beast:{accent:"#FF9800",light:"#FFCC80",bg:"#2e1f0a"},Fast:{accent:"#C6D82A",light:"#E6EE9C",bg:"#2a2060"},Heavy:{accent:"#90A4AE",light:"#B0BEC5",bg:"#1a1f22"},Level:{accent:"#FF5722",light:"#FFAB91",bg:"#3d1a40"},Safari:{accent:"#8BC34A",light:"#C5E1A5",bg:"#2a1f5a"},Sport:{accent:"#FFC107",light:"#FFE082",bg:"#2a2510"}};
 const BALL_NAMES=Object.keys(BALLS);
 const BADGE={available:{bg:"#1f2d5e",border:"#a78bfa",text:"#c084fc",label:"✓ Available"},keep:{bg:"#1f2d5e",border:"#a78bfa",text:"#e9d5ff",label:"♦ Keeping"},"trade-only":{bg:"#3d2040",border:"#fdba74",text:"#fdba74",label:"⇄ Trade Only"},wanted:{bg:"#3d1530",border:"#f47284",text:"#fca5a5",label:"✦ Wanted"}};
-const GAMES=["Sword/Shield","Brilliant Diamond/Shining Pearl","Scarlet/Violet","Legends: Arceus","HOME"];
+const GAMES=[
+  // Gen 1 (8192)
+  "Red/Blue","Yellow",
+  // Gen 2 (8192)
+  "Gold/Silver","Crystal",
+  // Gen 3 (8192)
+  "Ruby/Sapphire","Emerald","FireRed/LeafGreen","Colosseum/XD",
+  // Gen 4 (8192)
+  "Diamond/Pearl","Platinum","HeartGold/SoulSilver",
+  // Gen 5 (8192)
+  "Black/White","Black 2/White 2",
+  // Gen 6+ (4096)
+  "X/Y","Omega Ruby/Alpha Sapphire",
+  "Sun/Moon","Ultra Sun/Ultra Moon",
+  "Let's Go Pikachu/Eevee",
+  "Sword/Shield",
+  "Brilliant Diamond/Shining Pearl",
+  "Legends: Arceus",
+  "Scarlet/Violet",
+  "HOME"
+];
+
+// Games that use old 1/8192 base odds (Gen 1–5)
+const OLD_ODDS_GAMES = new Set([
+  "Red/Blue","Yellow","Gold/Silver","Crystal",
+  "Ruby/Sapphire","Emerald","FireRed/LeafGreen","Colosseum/XD",
+  "Diamond/Pearl","Platinum","HeartGold/SoulSilver",
+  "Black/White","Black 2/White 2"
+]);
+
+function getBaseOddsForGame(game) {
+  return OLD_ODDS_GAMES.has(game) ? 8192 : 4096;
+}
 const EGG_METHODS=["Masuda Method","SOS Chaining","Poké Radar","Soft Reset","Random Encounter","Egg","Static","Outbreak","Dynamax Adventure","Other"];
 const LS={M:'at_mons',D:'at_dex',N:'at_nid'};
 const lsGet=(k,fb)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch{return fb;}};
@@ -936,10 +968,15 @@ const METHODS = {
   'GO / HOME Transfer': { base:4096, charm:4096, note:'Chance locked to original game' },
 };
 
-// Runtime odds (can chain-adjust)
-function getOdds(method, hasCharm) {
+// Runtime odds (accounts for game generation — Gen 1-5 use 1/8192, Gen 6+ use 1/4096)
+function getOdds(method, hasCharm, game) {
   const m = METHODS[method] || METHODS['Random Encounter'];
-  return hasCharm ? m.charm : m.base;
+  const baseOdds = hasCharm ? m.charm : m.base;
+  // Scale up for old-gen games (Gen 1-5 have double the base odds)
+  if (!hasCharm && OLD_ODDS_GAMES.has(game)) {
+    return baseOdds * 2; // 4096 → 8192, 683 → 1366, etc.
+  }
+  return baseOdds;
 }
 
 // Probability of having found at least one shiny in n attempts at 1/odds
@@ -997,7 +1034,7 @@ function renderHunts() {
 
 function huntCard(h) {
   const bc      = BALLS[h.ball] || BALLS.Moon;
-  const odds    = getOdds(h.method, h.hasCharm);
+  const odds    = getOdds(h.method, h.hasCharm, h.game);
   const prob    = probByNow(h.count, odds);
   // Bar fills by encounter count relative to odds — so "at odds" = bar full
   const pct      = Math.min(h.count / odds * 100, 100);
@@ -1134,7 +1171,7 @@ function setCount(id) {
 
 function refreshCardCounter(h) {
   // Fast path: just update the number and progress bar in-place
-  const odds   = getOdds(h.method, h.hasCharm);
+  const odds   = getOdds(h.method, h.hasCharm, h.game);
   const prob   = probByNow(h.count, odds);
   const pct    = Math.min(h.count / odds * 100, 100);
   const overOdds = h.count > odds;
@@ -1306,7 +1343,7 @@ function confirmPhase() {
     date:    today(),
     huntId:  h.id,
     isPhase: true,
-    odds:    METHODS[h.method]?.base || 4096,
+    odds:    getOdds(h.method, false, h.game),
   };
   shinyLog.unshift(logEntry);
   lsSet(LSH.LOG, shinyLog);
@@ -1357,7 +1394,7 @@ function confirmFound() {
   const nature = document.getElementById('found-nature').value;
   const gender = document.getElementById('found-gender').value;
   const notes  = document.getElementById('found-notes').value.trim();
-  const odds   = getOdds(h.method, h.hasCharm);
+  const odds   = getOdds(h.method, h.hasCharm, h.game);
   const prob   = probByNow(h.count, odds);
 
   // Mark hunt complete
@@ -1445,7 +1482,7 @@ function saveQuickLog() {
     gender:  document.getElementById('ql-gender').value,
     notes:   document.getElementById('ql-notes').value.trim(),
     date:    document.getElementById('ql-date').value,
-    odds:    METHODS[method]?.base || 4096,
+    odds:    getOdds(method, false, document.getElementById('ql-game').value),
   };
   shinyLog.unshift(entry);
   lsSet(LSH.LOG, shinyLog);
@@ -1926,7 +1963,7 @@ function renderShinyStats() {
   // Driest streak — most consecutive over-odds hunts
   let maxDry = 0, curDry = 0;
   [...done].sort((a,b) => new Date(a.endDate||0) - new Date(b.endDate||0)).forEach(h => {
-    const odds = h.hasCharm ? (METHODS[h.method]?.charm||4096) : (METHODS[h.method]?.base||4096);
+    const odds = getOdds(h.method, h.hasCharm, h.game);
     if (h.count > odds) { curDry++; maxDry = Math.max(maxDry, curDry); } else curDry = 0;
   });
 
