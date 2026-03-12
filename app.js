@@ -2679,6 +2679,45 @@ function emcPopulateParent(species, e) {
   }, 50);
 }
 
+function showEMCRouteToast(species, e) {
+  e?.stopPropagation();
+  // Remove any existing one
+  document.getElementById('emc-route-toast')?.remove();
+
+  const el = document.createElement('div');
+  el.id = 'emc-route-toast';
+  el.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1e1535;border:1px solid #c084fc44;border-radius:16px;padding:14px 16px;z-index:9999;font-size:12px;color:#ede9ff;display:flex;flex-direction:column;gap:10px;min-width:240px;max-width:88vw;box-shadow:0 8px 32px #00000099';
+
+  const sprite = `https://img.pokemondb.net/sprites/sword-shield/icon/${species.toLowerCase().replace(/\s/g,'-')}.png`;
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px">
+      <img src="${sprite}" width="32" height="24" style="image-rendering:pixelated" onerror="this.style.display='none'"/>
+      <div>
+        <div style="font-weight:800;color:#c084fc;font-size:11px">⚡ ${species}</div>
+        <div style="color:#9d8ec4;font-size:11px;margin-top:1px">Do you need to verify moves?</div>
+      </div>
+      <button onclick="document.getElementById('emc-route-toast')?.remove()"
+        style="margin-left:auto;background:none;border:none;color:#5b4690;font-size:14px;cursor:pointer;padding:0 2px">✕</button>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="document.getElementById('emc-route-toast')?.remove();openDex('${species}')"
+        style="flex:1;background:#c084fc22;border:1px solid #c084fc44;color:#c084fc;padding:8px 6px;border-radius:10px;cursor:pointer;font-weight:800;font-size:11px">
+        📖 Yes, check Dex
+      </button>
+      <button onclick="document.getElementById('emc-route-toast')?.remove();emcPopulateParent('${species}', null)"
+        style="flex:1;background:#86efac22;border:1px solid #86efac44;color:#86efac;padding:8px 6px;border-radius:10px;cursor:pointer;font-weight:800;font-size:11px">
+        ✓ No, use as parent
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(el);
+
+  // Auto-dismiss after 6s
+  el._t = setTimeout(() => el.remove(), 6000);
+}
+
 function showEMCToast(msg) {
   // Reuse the small inline feedback approach
   let el = document.getElementById('emc-populate-toast');
@@ -3602,13 +3641,13 @@ async function emcPickMove(moveName) {
     const chipHTML = (list, hl) => list.map(l => {
       const disp   = l.name.split('-').map(w => w[0].toUpperCase()+w.slice(1)).join(' ');
       const sprite = `https://img.pokemondb.net/sprites/sword-shield/icon/${l.name}.png`;
-      const clickHandler = hl ? `emcPopulateParent('${disp}', event)` : `openDex('${disp}')`;
+      const clickHandler = hl ? `showEMCRouteToast('${disp}', event)` : `openDex('${disp}')`;
       return `<div class="learner-chip ${hl?'owned':''}"
         onclick="${clickHandler}"
-        title="${disp}${hl ? ' · Tap to use as parent' : ''}">
+        title="${disp}${hl ? ' · Tap to verify moves or use as parent' : ' · Tap to check move method in Dex'}">
         <img src="${sprite}" width="40" height="30" style="image-rendering:pixelated" onerror="this.style.display='none'"/>
         <div class="learner-name">${disp}</div>
-        ${hl ? '<div style="font-size:8px;color:#86efac;font-weight:800;letter-spacing:.05em;margin-top:1px">USE ›</div>' : ''}
+        ${hl ? '<div style="font-size:8px;color:#86efac;font-weight:800;letter-spacing:.05em;margin-top:1px">USE ›</div>' : '<div style="font-size:8px;color:#5b4690;font-weight:800;letter-spacing:.05em;margin-top:1px">DEX ›</div>'}
       </div>`;
     }).join('');
 
@@ -3653,8 +3692,7 @@ async function emcPickMove(moveName) {
         <div style="margin-top:12px;padding:10px 12px;background:#1a1230;border:1px solid #86efac22;border-radius:10px;font-size:11px;color:#7c6fa0;line-height:1.6">
           <span style="color:#86efac;font-weight:800">✓ Egg group verified.</span>
           These Pokémon share an egg group with ${targetName} and can learn <strong style="color:#c084fc">${label}</strong>.
-          Note: learn method isn't confirmed — the parent may learn it via TM or level-up rather than as an egg move itself.
-          If you need <em>the move as an egg move specifically</em>, verify on Bulbapedia.
+          Learn method isn't confirmed — tap any Pokémon to open their Dex page and check how they learn it.
         </div>
       </div>`;
   } catch(e) {
@@ -4975,12 +5013,10 @@ async function crLoadSpecies(name) {
   const display = document.getElementById('cr-catch-rate-display');
   if (display) display.textContent = 'Loading...';
   try {
-    const [specRes, pokeRes] = await Promise.all([
+    const [specData, pokeData] = await Promise.all([
       pokeGet(`https://pokeapi.co/api/v2/pokemon-species/${name.toLowerCase().replace(' ','-')}`),
       pokeGet(`https://pokeapi.co/api/v2/pokemon/${name.toLowerCase().replace(' ','-')}`)
     ]);
-    const specData = await specRes.json();
-    const pokeData = await pokeRes.json();
 
     crState.catchRate = specData.capture_rate;
     crState.types     = pokeData.types.map(t => t.type.name);
