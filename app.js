@@ -3856,6 +3856,11 @@ function initSpeciesAC(inputId, onSelect) {
     input.parentElement.appendChild(dd);
   }
 
+  // Only update onSelect if already initialised for this input
+  if (acState[inputId]) {
+    acState[inputId].onSelect = onSelect;
+    return;
+  }
   acState[inputId] = { activeIdx: -1, matches: [], onSelect };
 
   input.addEventListener('input', () => acRefresh(inputId));
@@ -3911,8 +3916,6 @@ function acSelect(inputId, idx) {
   if (input) input.value = p.display;
   acClose(inputId);
   if (state.onSelect) state.onSelect(p.name, p.display, p.id);
-  // Trigger oninput handlers (preview updates etc)
-  input?.dispatchEvent(new Event('input', { bubbles:true }));
 }
 
 function acKeydown(e, inputId) {
