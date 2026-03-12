@@ -2598,7 +2598,6 @@ async function toggleEggLearners(moveName, rowId, panelId) {
   try {
     // Fetch move data to get learned_by_pokemon
     const data = await pokeGet('https://pokeapi.co/api/v2/move/' + moveName);
-      .then(r => r.ok ? r.json() : null);
 
     if (!data?.learned_by_pokemon?.length) {
       if (status) status.textContent = 'No learner data found.';
