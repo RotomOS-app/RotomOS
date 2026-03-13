@@ -5344,26 +5344,16 @@ const GP_ACTIVE   = 'at_gp_active';
 const BADGE_BASE  = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/badges/';
 const ROTOM_SPRITE= 'https://img.pokemondb.net/sprites/sword-shield/icon/rotom.png';
 
-const GP_BADGE_SVGS = {
-  boulder: `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><polygon points="20,4 31,8 36,20 31,32 20,36 9,32 4,20 9,8" fill="#9ca3af" stroke="#6b7280" stroke-width="1.5"/><polygon points="20,10 27,13 30,20 27,27 20,30 13,27 10,20 13,13" fill="#d1d5db"/></svg>`,
-  cascade: `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 4 C20 4 8 18 8 26 C8 33 13.5 37 20 37 C26.5 37 32 33 32 26 C32 18 20 4 20 4Z" fill="#60a5fa" stroke="#3b82f6" stroke-width="1.5"/><path d="M20 12 C20 12 13 22 13 27 C13 31 16 34 20 34" fill="none" stroke="#bfdbfe" stroke-width="1.5"/></svg>`,
-  thunder: `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><polygon points="20,3 23,14 34,11 26,20 34,29 23,26 20,37 17,26 6,29 14,20 6,11 17,14" fill="#fbbf24" stroke="#f59e0b" stroke-width="1.5"/><polygon points="20,10 22,17 29,15 24,20 29,25 22,23 20,30 18,23 11,25 16,20 11,15 18,17" fill="#fde68a"/></svg>`,
-  rainbow: `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><ellipse cx="20" cy="20" rx="5" ry="5" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1"/><ellipse cx="20" cy="8"  rx="4" ry="5.5" fill="#ef4444"/><ellipse cx="29.5" cy="11.5" rx="4" ry="5.5" fill="#f97316" transform="rotate(45 29.5 11.5)"/><ellipse cx="32" cy="20" rx="4" ry="5.5" fill="#eab308" transform="rotate(90 32 20)"/><ellipse cx="29.5" cy="28.5" rx="4" ry="5.5" fill="#22c55e" transform="rotate(135 29.5 28.5)"/><ellipse cx="20" cy="32" rx="4" ry="5.5" fill="#3b82f6" transform="rotate(180 20 32)"/><ellipse cx="10.5" cy="28.5" rx="4" ry="5.5" fill="#8b5cf6" transform="rotate(225 10.5 28.5)"/><ellipse cx="8" cy="20" rx="4" ry="5.5" fill="#ec4899" transform="rotate(270 8 20)"/><ellipse cx="10.5" cy="11.5" rx="4" ry="5.5" fill="#06b6d4" transform="rotate(315 10.5 11.5)"/></svg>`,
-  soul: `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 34 C20 34 5 24 5 15 C5 9 10 5 15 7 C17 8 19 10 20 12 C21 10 23 8 25 7 C30 5 35 9 35 15 C35 24 20 34 20 34Z" fill="#ec4899" stroke="#db2777" stroke-width="1.5"/><path d="M20 28 C20 28 10 21 10 15 C10 12 12.5 10 15 11" fill="none" stroke="#fbcfe8" stroke-width="1.5"/></svg>`,
-  marsh: `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="16" fill="none" stroke="#fbbf24" stroke-width="3.5"/><circle cx="20" cy="20" r="9"  fill="none" stroke="#fbbf24" stroke-width="3.5"/><circle cx="20" cy="20" r="3"  fill="#fbbf24"/></svg>`,
-  volcano: `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 5 C17 10 10 14 8 20 C7 25 9 30 14 33 C17 35 20 36 20 36 C20 36 23 35 26 33 C31 30 33 25 32 20 C30 14 23 10 20 5Z" fill="#ef4444" stroke="#dc2626" stroke-width="1.5"/><path d="M20 14 C18 17 15 19 15 22 C15 25 17 27 20 28 C23 27 25 25 25 22 C25 19 22 17 20 14Z" fill="#fca5a5"/><polygon points="20,19 21.5,23 20,22 18.5,23" fill="#fde68a" stroke="#fbbf24" stroke-width="0.5"/></svg>`,
-  earth: `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><line x1="20" y1="5"  x2="20" y2="35" stroke="#4ade80" stroke-width="3" stroke-linecap="round"/><line x1="20" y1="13" x2="10" y2="20" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="13" x2="30" y2="20" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="22" x2="9"  y2="30" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="22" x2="31" y2="30" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/></svg>`,
-};
 
-const GP_BADGE_SVG = {
-  boulder: `<svg viewBox="0 0 40 40" width="34" height="34"><circle cx="20" cy="20" r="16" fill="#a87850" stroke="#6b4c2a" stroke-width="2"/><circle cx="14" cy="16" r="5" fill="#c8a878" stroke="#6b4c2a" stroke-width="1.5"/><circle cx="25" cy="14" r="4" fill="#b89060" stroke="#6b4c2a" stroke-width="1.5"/><circle cx="22" cy="24" r="6" fill="#c8a878" stroke="#6b4c2a" stroke-width="1.5"/></svg>`,
-  cascade: `<svg viewBox="0 0 40 40" width="34" height="34"><polygon points="20,4 36,12 36,28 20,36 4,28 4,12" fill="#60b8e0" stroke="#2878a8" stroke-width="2"/><path d="M14 16 Q20 12 26 16 Q22 22 20 26 Q18 22 14 16Z" fill="#a0d8f8" stroke="#2878a8" stroke-width="1"/></svg>`,
-  thunder: `<svg viewBox="0 0 40 40" width="34" height="34"><polygon points="20,4 36,20 24,20 28,36 4,20 16,20" fill="#f8d840" stroke="#c8a800" stroke-width="2"/></svg>`,
-  rainbow: `<svg viewBox="0 0 40 40" width="34" height="34"><circle cx="20" cy="20" r="16" fill="#e8a0d8" stroke="#a060a0" stroke-width="2"/><path d="M10 22 Q20 10 30 22" fill="none" stroke="#f8d040" stroke-width="3" stroke-linecap="round"/><path d="M12 25 Q20 15 28 25" fill="none" stroke="#a0e870" stroke-width="2.5" stroke-linecap="round"/></svg>`,
-  soul:    `<svg viewBox="0 0 40 40" width="34" height="34"><path d="M20 6 C10 6 4 13 4 20 C4 30 12 36 20 36 C28 36 36 30 36 20 C36 13 30 6 20 6Z" fill="#9858c8" stroke="#6030a0" stroke-width="2"/><path d="M14 16 Q20 26 26 16" fill="#c090f0" stroke="#6030a0" stroke-width="1.5"/></svg>`,
-  marsh:   `<svg viewBox="0 0 40 40" width="34" height="34"><rect x="6" y="6" width="28" height="28" rx="6" fill="#f8c8e8" stroke="#d080b0" stroke-width="2"/><circle cx="20" cy="20" r="7" fill="#f0a0d0" stroke="#d080b0" stroke-width="1.5"/><circle cx="20" cy="20" r="3" fill="#e87ab8"/></svg>`,
-  volcano: `<svg viewBox="0 0 40 40" width="34" height="34"><polygon points="20,4 36,34 4,34" fill="#e85020" stroke="#a82800" stroke-width="2"/><polygon points="20,10 30,30 10,30" fill="#f87040" stroke="#a82800" stroke-width="1"/><circle cx="20" cy="22" r="4" fill="#ffd060" stroke="#a82800" stroke-width="1"/></svg>`,
-  earth:   `<svg viewBox="0 0 40 40" width="34" height="34"><circle cx="20" cy="20" r="16" fill="#80a840" stroke="#486018" stroke-width="2"/><ellipse cx="20" cy="20" rx="16" ry="8" fill="none" stroke="#486018" stroke-width="1.5"/><ellipse cx="20" cy="20" rx="7" ry="16" fill="none" stroke="#486018" stroke-width="1.5"/></svg>`,
+const GP_BADGE_IMG = {
+  boulder: 'https://archives.bulbagarden.net/media/upload/thumb/d/dd/Boulder_Badge.png/50px-Boulder_Badge.png',
+  cascade: 'https://archives.bulbagarden.net/media/upload/thumb/9/9c/Cascade_Badge.png/50px-Cascade_Badge.png',
+  thunder: 'https://archives.bulbagarden.net/media/upload/thumb/a/a6/Thunder_Badge.png/50px-Thunder_Badge.png',
+  rainbow: 'https://archives.bulbagarden.net/media/upload/thumb/b/b5/Rainbow_Badge.png/50px-Rainbow_Badge.png',
+  soul:    'https://archives.bulbagarden.net/media/upload/thumb/7/7d/Soul_Badge.png/50px-Soul_Badge.png',
+  marsh:   'https://archives.bulbagarden.net/media/upload/thumb/6/6b/Marsh_Badge.png/50px-Marsh_Badge.png',
+  volcano: 'https://archives.bulbagarden.net/media/upload/thumb/1/12/Volcano_Badge.png/50px-Volcano_Badge.png',
+  earth:   'https://archives.bulbagarden.net/media/upload/thumb/7/78/Earth_Badge.png/50px-Earth_Badge.png',
 };
 
 const GP_BADGES = [
@@ -5511,7 +5501,7 @@ function gpRenderBadges(save) {
     slot.title = isEarned ? b.name + ' Badge — earned!' : 'Defeat ' + b.gym + ' to earn this badge';
     slot.innerHTML = `
       <div class="gp-badge-circle ${isEarned ? 'earned' : 'unearned'}" onclick="gpToggleBadge('${b.id}')">
-        ${GP_BADGE_SVG[b.id] || ''}
+        ${GP_BADGE_IMG[b.id] ? `<img class="gp-badge-img" src="${GP_BADGE_IMG[b.id]}" alt="${b.name}" width="34" height="34" style="image-rendering:auto">` : `<span style="font-size:11px;color:#ede9ff88">${b.name.slice(0,3)}</span>`}
       </div>
       <div class="gp-badge-name ${isEarned ? 'earned' : ''}">${b.name}</div>
     `;
