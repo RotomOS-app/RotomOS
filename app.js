@@ -5485,6 +5485,7 @@ function gpRenderAll(id) {
   gpRenderE4(save);
   gpRenderLocations(save);
   gpRenderTeam(save);
+  gpRenderDex(save, 'all');
   gpRenderNotes(save);
 }
 
@@ -5701,6 +5702,9 @@ function gpOpenTeamModal(slotIdx, mon) {
   document.getElementById('gp-team-nickname').value = mon ? (mon.nickname || '') : '';
   document.getElementById('gp-team-level').value    = mon ? (mon.level   || '') : '';
   document.getElementById('gp-team-modal').style.display = 'flex';
+  setTimeout(() => initSpeciesAC('gp-team-species', (name) => {
+    document.getElementById('gp-team-species').value = name;
+  }), 50);
 }
 
 function gpCloseTeamModal() {
@@ -5847,8 +5851,196 @@ function gpSwitchTab(tab) {
   }
 }
 
-/* ── New Save modal ── */
-let gpSelectedGame = 'firered';
+function gpSwitchTab(tab) {
+  ['journey','team','dex','notes'].forEach(t => {
+    document.getElementById('gp-' + t + '-tab').style.display = t === tab ? 'block' : 'none';
+    const btn = document.getElementById('gptab-' + t);
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'notes') {
+    const id   = gpGetActive();
+    const save = gpGetSave(id);
+    if (save) gpRenderNotes(save);
+    setTimeout(() => {
+      const thread = document.getElementById('gp-notes-thread');
+      if (thread) thread.scrollTop = thread.scrollHeight;
+    }, 50);
+  }
+  if (tab === 'dex') {
+    const id   = gpGetActive();
+    const save = gpGetSave(id);
+    if (save) gpRenderDex(save, 'all');
+  }
+}
+
+/* ── Pokédex tab ── */
+
+// Full Kanto 151 with version exclusives flagged
+const GP_KANTO_DEX = [
+  {id:1,  name:'Bulbasaur'}, {id:2,  name:'Ivysaur'},    {id:3,  name:'Venusaur'},
+  {id:4,  name:'Charmander'},{id:5,  name:'Charmeleon'}, {id:6,  name:'Charizard'},
+  {id:7,  name:'Squirtle'},  {id:8,  name:'Wartortle'},  {id:9,  name:'Blastoise'},
+  {id:10, name:'Caterpie'},  {id:11, name:'Metapod'},    {id:12, name:'Butterfree'},
+  {id:13, name:'Weedle'},    {id:14, name:'Kakuna'},     {id:15, name:'Beedrill'},
+  {id:16, name:'Pidgey'},    {id:17, name:'Pidgeotto'},  {id:18, name:'Pidgeot'},
+  {id:19, name:'Rattata'},   {id:20, name:'Raticate'},   {id:21, name:'Spearow'},
+  {id:22, name:'Fearow'},    {id:23, name:'Ekans',   fr:true}, {id:24, name:'Arbok', fr:true},
+  {id:25, name:'Pikachu'},   {id:26, name:'Raichu'},
+  {id:27, name:'Sandshrew', lg:true}, {id:28, name:'Sandslash', lg:true},
+  {id:29, name:'Nidoran♀'}, {id:30, name:'Nidorina'},   {id:31, name:'Nidoqueen'},
+  {id:32, name:'Nidoran♂'}, {id:33, name:'Nidorino'},   {id:34, name:'Nidoking'},
+  {id:35, name:'Clefairy'},  {id:36, name:'Clefable'},
+  {id:37, name:'Vulpix', lg:true},    {id:38, name:'Ninetales', lg:true},
+  {id:39, name:'Jigglypuff'},{id:40, name:'Wigglytuff'},
+  {id:41, name:'Zubat'},     {id:42, name:'Golbat'},
+  {id:43, name:'Oddish', fr:true},    {id:44, name:'Gloom', fr:true},    {id:45, name:'Vileplume', fr:true},
+  {id:46, name:'Paras'},     {id:47, name:'Parasect'},
+  {id:48, name:'Venonat'},   {id:49, name:'Venomoth'},
+  {id:50, name:'Diglett'},   {id:51, name:'Dugtrio'},
+  {id:52, name:'Meowth'},    {id:53, name:'Persian'},
+  {id:54, name:'Psyduck', fr:true},   {id:55, name:'Golduck', fr:true},
+  {id:56, name:'Mankey'},    {id:57, name:'Primeape'},
+  {id:58, name:'Growlithe', fr:true}, {id:59, name:'Arcanine', fr:true},
+  {id:60, name:'Poliwag'},   {id:61, name:'Poliwhirl'},  {id:62, name:'Poliwrath'},
+  {id:63, name:'Abra'},      {id:64, name:'Kadabra'},    {id:65, name:'Alakazam'},
+  {id:66, name:'Machop'},    {id:67, name:'Machoke'},    {id:68, name:'Machamp'},
+  {id:69, name:'Bellsprout', lg:true},{id:70, name:'Weepinbell', lg:true},{id:71, name:'Victreebel', lg:true},
+  {id:72, name:'Tentacool'}, {id:73, name:'Tentacruel'},
+  {id:74, name:'Geodude'},   {id:75, name:'Graveler'},   {id:76, name:'Golem'},
+  {id:77, name:'Ponyta'},    {id:78, name:'Rapidash'},
+  {id:79, name:'Slowpoke', lg:true},  {id:80, name:'Slowbro', lg:true},
+  {id:81, name:'Magnemite', lg:true}, {id:82, name:'Magneton', lg:true},
+  {id:83, name:'Farfetch\'d'},{id:84, name:'Doduo'},     {id:85, name:'Dodrio'},
+  {id:86, name:'Seel'},      {id:87, name:'Dewgong'},
+  {id:88, name:'Grimer'},    {id:89, name:'Muk'},
+  {id:90, name:'Shellder', fr:true},  {id:91, name:'Cloyster', fr:true},
+  {id:92, name:'Gastly'},    {id:93, name:'Haunter'},    {id:94, name:'Gengar'},
+  {id:95, name:'Onix'},
+  {id:96, name:'Drowzee'},   {id:97, name:'Hypno'},
+  {id:98, name:'Krabby', lg:true},    {id:99, name:'Kingler', lg:true},
+  {id:100,name:'Voltorb'},   {id:101,name:'Electrode'},
+  {id:102,name:'Exeggcute'}, {id:103,name:'Exeggutor'},
+  {id:104,name:'Cubone'},    {id:105,name:'Marowak'},
+  {id:106,name:'Hitmonlee'}, {id:107,name:'Hitmonchan'},
+  {id:108,name:'Lickitung'},
+  {id:109,name:'Koffing'},   {id:110,name:'Weezing', fr:true},
+  {id:111,name:'Rhyhorn'},   {id:112,name:'Rhydon'},
+  {id:113,name:'Chansey'},
+  {id:114,name:'Tangela'},
+  {id:115,name:'Kangaskhan'},
+  {id:116,name:'Horsea', fr:true},    {id:117,name:'Seadra', fr:true},
+  {id:118,name:'Goldeen'},   {id:119,name:'Seaking'},
+  {id:120,name:'Staryu', lg:true},    {id:121,name:'Starmie', lg:true},
+  {id:122,name:'Mr. Mime'},
+  {id:123,name:'Scyther', fr:true},
+  {id:124,name:'Jynx', lg:true},
+  {id:125,name:'Electabuzz', fr:true},
+  {id:126,name:'Magmar', lg:true},
+  {id:127,name:'Pinsir', lg:true},
+  {id:128,name:'Tauros'},
+  {id:129,name:'Magikarp'},  {id:130,name:'Gyarados'},
+  {id:131,name:'Lapras'},
+  {id:132,name:'Ditto'},
+  {id:133,name:'Eevee'},
+  {id:134,name:'Vaporeon'},  {id:135,name:'Jolteon'},   {id:136,name:'Flareon'},
+  {id:137,name:'Porygon'},
+  {id:138,name:'Omanyte'},   {id:139,name:'Omastar'},
+  {id:140,name:'Kabuto'},    {id:141,name:'Kabutops'},
+  {id:142,name:'Aerodactyl'},
+  {id:143,name:'Snorlax'},
+  {id:144,name:'Articuno'},  {id:145,name:'Zapdos'},    {id:146,name:'Moltres'},
+  {id:147,name:'Dratini'},   {id:148,name:'Dragonair'}, {id:149,name:'Dragonite'},
+  {id:150,name:'Mewtwo'},    {id:151,name:'Mew'},
+];
+
+let gpDexCurrentFilter = 'all';
+
+function gpRenderDex(save, filter) {
+  gpDexCurrentFilter = filter || 'all';
+  const dexData  = save.dex || {};
+  const version  = save.game;
+  const grid     = document.getElementById('gp-dex-grid');
+  if (!grid) return;
+
+  // Update filter buttons
+  ['all','caught','seen','unseen'].forEach(f => {
+    const btn = document.getElementById('gpdf-' + f);
+    if (btn) btn.classList.toggle('active', f === gpDexCurrentFilter);
+  });
+
+  // Stats
+  let caughtCount = 0, seenCount = 0;
+  GP_KANTO_DEX.forEach(p => {
+    const state = dexData[p.id] || 'unseen';
+    if (state === 'caught') caughtCount++;
+    else if (state === 'seen') seenCount++;
+  });
+
+  const fillPct = Math.round(caughtCount / 151 * 100);
+  document.getElementById('gp-dex-fill').style.width = fillPct + '%';
+  document.getElementById('gp-dex-caught-label').textContent = caughtCount + ' / 151 caught';
+  document.getElementById('gp-dex-seen-label').textContent   = (seenCount + caughtCount) + ' seen';
+
+  // Filter
+  const filtered = GP_KANTO_DEX.filter(p => {
+    const state = dexData[p.id] || 'unseen';
+    if (gpDexCurrentFilter === 'caught') return state === 'caught';
+    if (gpDexCurrentFilter === 'seen')   return state === 'seen';
+    if (gpDexCurrentFilter === 'unseen') return state === 'unseen';
+    return true;
+  });
+
+  grid.innerHTML = '';
+  filtered.forEach(p => {
+    const state   = dexData[p.id] || 'unseen';
+    const isVersionExclusive = (p.fr && version === 'leafgreen') || (p.lg && version === 'firered');
+    const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`;
+
+    const entry = document.createElement('div');
+    entry.className = `gp-dex-entry state-${state}${isVersionExclusive ? ' version-exclusive' : ''}`;
+    entry.title = isVersionExclusive
+      ? `${p.name} — ${p.fr ? 'FireRed' : 'LeafGreen'} exclusive (trade required)`
+      : p.name;
+    entry.onclick = () => gpCycleDexState(p.id, save);
+
+    const dotHtml = state !== 'unseen'
+      ? `<div class="gp-dex-state-dot ${state}"></div>` : '';
+
+    entry.innerHTML = `
+      ${dotHtml}
+      <img class="gp-dex-sprite ${state}" src="${spriteUrl}" alt="${p.name}" width="40" height="40" onerror="this.style.opacity='.2'">
+      <div class="gp-dex-num">#${String(p.id).padStart(3,'0')}</div>
+      <div class="gp-dex-name">${p.name}</div>
+    `;
+    grid.appendChild(entry);
+  });
+}
+
+function gpCycleDexState(pokemonId, save) {
+  if (!save.dex) save.dex = {};
+  const current = save.dex[pokemonId] || 'unseen';
+  const next = current === 'unseen' ? 'seen' : current === 'seen' ? 'caught' : 'unseen';
+  save.dex[pokemonId] = next;
+  gpUpdateSave(save);
+  gpRenderDex(save, gpDexCurrentFilter);
+
+  // Rotom milestones
+  if (next === 'caught') {
+    const caughtCount = Object.values(save.dex).filter(s => s === 'caught').length;
+    const milestones = { 50:'Bzzt! 50 Pokémon caught Trainer-zzzt — you\'re on a roll ⚡', 100:'Bzzt! 100 Pokémon caught-zzzt! The end is in sight Trainer ⚡', 151:'Bzzt! 151 out of 151 Trainer-zzzt — YOU CAUGHT THEM ALL! ⚡⚡⚡' };
+    if (milestones[caughtCount]) {
+      setTimeout(() => gpAddRotomNote(save, milestones[caughtCount], gpGetActive()), 300);
+    }
+  }
+}
+
+function gpDexFilter(filter) {
+  const id   = gpGetActive();
+  const save = gpGetSave(id);
+  if (save) gpRenderDex(save, filter);
+}
+
+
 
 function gpOpenNewSave() {
   gpSelectedGame = 'firered';

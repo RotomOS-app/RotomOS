@@ -82,6 +82,10 @@ input,select,textarea,button{font-family:'Nunito',monospace}
   border:none;color:#fff;
   font-family:'Cinzel',serif;font-size:13px;font-weight:700;
   box-shadow:0 2px 12px #c084fc44;
+  padding:9px 20px;
+  border-radius:10px;
+  cursor:pointer;
+  transition:box-shadow .2s, transform .15s;
 }
 .btn-primary:hover{box-shadow:0 4px 20px #c084fc66;transform:translateY(-1px)}
 .btn-danger{background:#4a1a2e;border:1px solid #fda4af40;color:#fda4af}
@@ -3537,3 +3541,107 @@ body.theme-light .field-label   { color: #6d3cb5 !important; }
 body.theme-light .field-input   { background: #ede9ff !important; color: #1e1535 !important; border-color: #ccccff !important; }
 body.theme-light .btn-secondary { color: #7c6aaa !important; border-color: #ccccff !important; }
 body.theme-light .btn-secondary:hover { background: #e6e0f8 !important; }
+
+/* ── Game Progress: Pokédex tab ── */
+.gp-dex-progress-wrap { margin-bottom: 4px; }
+.gp-dex-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #ede9ff66;
+  margin-top: 5px;
+}
+.gp-dex-filter-row {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 12px;
+  flex-wrap: wrap;
+}
+.gp-dex-filter {
+  font-size: 12px;
+  padding: 5px 14px;
+  border-radius: 99px;
+  border: 1px solid #5b469055;
+  background: #2b1f4e;
+  color: #ede9ff88;
+  cursor: pointer;
+  transition: all .15s;
+}
+.gp-dex-filter:hover { background: #3a2d6e; color: #ede9ff; }
+.gp-dex-filter.active {
+  background: #3a2d6e;
+  border-color: #d4a8ff;
+  color: #d4a8ff;
+  font-weight: 600;
+}
+.gp-dex-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 6px;
+  padding: 0 16px 24px;
+}
+.gp-dex-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 4px 6px;
+  border-radius: 10px;
+  border: 1px solid #5b469033;
+  background: #2b1f4e;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+  position: relative;
+}
+.gp-dex-entry:hover { background: #3a2d6e; border-color: #5b469088; }
+.gp-dex-entry.state-seen {
+  background: #1e2d40;
+  border-color: #60a8d055;
+}
+.gp-dex-entry.state-caught {
+  background: #1e3d2a;
+  border-color: #4ade8055;
+}
+.gp-dex-entry.version-exclusive {
+  opacity: .45;
+}
+.gp-dex-entry.version-exclusive:hover { opacity: 1; }
+.gp-dex-sprite {
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+}
+.gp-dex-sprite.unseen { filter: brightness(0) opacity(.25); }
+.gp-dex-sprite.seen   { filter: grayscale(.6) opacity(.7); }
+.gp-dex-num {
+  font-size: 9px;
+  color: #ede9ff44;
+}
+.gp-dex-name {
+  font-size: 9px;
+  color: #ede9ffaa;
+  text-align: center;
+  max-width: 68px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gp-dex-state-dot {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.gp-dex-state-dot.seen   { background: #60a8d0; }
+.gp-dex-state-dot.caught { background: #4ade80; }
+
+/* Light mode */
+body.theme-light .gp-dex-filter       { background: #e6e0f8 !important; color: #7c6aaa !important; border-color: #ccccff !important; }
+body.theme-light .gp-dex-filter.active{ background: #d4c6f5 !important; color: #6d3cb5 !important; border-color: #9b7fe8 !important; }
+body.theme-light .gp-dex-entry        { background: #e6e0f8 !important; border-color: #ccccff44 !important; }
+body.theme-light .gp-dex-entry.state-seen   { background: #d4eaf5 !important; }
+body.theme-light .gp-dex-entry.state-caught { background: #d4f5e6 !important; }
+body.theme-light .gp-dex-num  { color: #9b8ec0 !important; }
+body.theme-light .gp-dex-name { color: #4a3d6e !important; }

@@ -716,6 +716,7 @@
           <div class="section-subtabs" id="gp-tabs">
             <button class="section-subtab active" id="gptab-journey"  onclick="gpSwitchTab('journey')">🏅 Journey</button>
             <button class="section-subtab"        id="gptab-team"     onclick="gpSwitchTab('team')">👾 My Team</button>
+            <button class="section-subtab"        id="gptab-dex"      onclick="gpSwitchTab('dex')">📖 Pokédex</button>
             <button class="section-subtab"        id="gptab-notes"    onclick="gpSwitchTab('notes')">⚡ Rotom's Notes</button>
           </div>
 
@@ -753,6 +754,27 @@
               <div class="gp-card-sub">Up to 6 Pokémon — tap a slot to edit</div>
               <div class="gp-team-grid" id="gp-team-grid"></div>
             </div>
+          </div>
+
+          <!-- ── Pokédex tab ── -->
+          <div id="gp-dex-tab" class="container" style="display:none">
+            <div class="gp-card">
+              <div class="gp-card-title">Kanto Pokédex</div>
+              <div class="gp-dex-progress-wrap">
+                <div class="gp-progress-track"><div class="gp-progress-fill" id="gp-dex-fill"></div></div>
+                <div class="gp-dex-progress-labels">
+                  <span id="gp-dex-caught-label">0 caught</span>
+                  <span id="gp-dex-seen-label">0 seen</span>
+                </div>
+              </div>
+            </div>
+            <div class="gp-dex-filter-row">
+              <button class="gp-dex-filter active" id="gpdf-all"    onclick="gpDexFilter('all')">All</button>
+              <button class="gp-dex-filter"        id="gpdf-caught" onclick="gpDexFilter('caught')">Caught</button>
+              <button class="gp-dex-filter"        id="gpdf-seen"   onclick="gpDexFilter('seen')">Seen</button>
+              <button class="gp-dex-filter"        id="gpdf-unseen" onclick="gpDexFilter('unseen')">Not seen</button>
+            </div>
+            <div class="gp-dex-grid" id="gp-dex-grid"></div>
           </div>
 
           <!-- ── Rotom's Notes tab ── -->
