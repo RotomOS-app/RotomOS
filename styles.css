@@ -1199,7 +1199,7 @@ body{display:flex;flex-direction:column}
 /* Pokémon grid */
 .ldex-poke-grid {
   display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(64px, 1fr));
+  grid-template-columns:repeat(auto-fill, minmax(110px, 1fr));
   gap:6px; margin-bottom:24px;
 }
 
@@ -2364,19 +2364,19 @@ body.theme-light #emc-step3 [style*="color:#86efac"] { color:#166534 !important;
 /* ── Living Dex — desktop larger cells ── */
 @media (min-width: 769px) {
   .ldex-poke-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
   }
   .ldex-cell {
-    padding: 16px 10px 14px;
+    padding: 14px 8px 12px;
     border-radius: 16px;
   }
   .ldex-cell img {
-    width: 108px !important;
-    height: 108px !important;
+    width: 96px !important;
+    height: 96px !important;
   }
-  .ldex-num  { font-size: 13px; }
-  .ldex-name { font-size: 13px; }
+  .ldex-num  { font-size: 12px; }
+  .ldex-name { font-size: 12px; }
   .ldex-dot  { bottom: 8px; }
   .ldex-dot-n,
   .ldex-dot-s { width: 8px; height: 8px; }
@@ -3576,17 +3576,17 @@ body.theme-light .btn-secondary:hover { background: #e6e0f8 !important; }
 }
 .gp-dex-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-  gap: 6px;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
   padding: 0 16px 24px;
 }
 .gp-dex-entry {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 8px 4px 6px;
-  border-radius: 10px;
+  gap: 4px;
+  padding: 12px 6px 10px;
+  border-radius: 12px;
   border: 1px solid #5b469033;
   background: #2b1f4e;
   cursor: pointer;
@@ -3607,21 +3607,21 @@ body.theme-light .btn-secondary:hover { background: #e6e0f8 !important; }
 }
 .gp-dex-entry.version-exclusive:hover { opacity: 1; }
 .gp-dex-sprite {
-  width: 40px;
-  height: 40px;
+  width: 64px;
+  height: 64px;
   image-rendering: pixelated;
 }
 .gp-dex-sprite.unseen { filter: brightness(0) opacity(.25); }
 .gp-dex-sprite.seen   { filter: grayscale(.6) opacity(.7); }
 .gp-dex-num {
-  font-size: 9px;
+  font-size: 11px;
   color: #ede9ff44;
 }
 .gp-dex-name {
-  font-size: 9px;
+  font-size: 11px;
   color: #ede9ffaa;
   text-align: center;
-  max-width: 68px;
+  max-width: 92px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
