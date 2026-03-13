@@ -2364,22 +2364,22 @@ body.theme-light #emc-step3 [style*="color:#86efac"] { color:#166534 !important;
 /* ── Living Dex — desktop larger cells ── */
 @media (min-width: 769px) {
   .ldex-poke-grid {
-    grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
   }
   .ldex-cell {
-    padding: 12px 8px 10px;
+    padding: 16px 10px 14px;
     border-radius: 16px;
   }
   .ldex-cell img {
-    width: 80px !important;
-    height: 80px !important;
+    width: 108px !important;
+    height: 108px !important;
   }
-  .ldex-num  { font-size: 11px; }
-  .ldex-name { font-size: 11px; }
-  .ldex-dot  { bottom: 6px; }
+  .ldex-num  { font-size: 13px; }
+  .ldex-name { font-size: 13px; }
+  .ldex-dot  { bottom: 8px; }
   .ldex-dot-n,
-  .ldex-dot-s { width: 7px; height: 7px; }
+  .ldex-dot-s { width: 8px; height: 8px; }
 }
 
 
