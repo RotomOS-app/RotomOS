@@ -3134,6 +3134,10 @@ body.theme-light #about-content > div:last-child { color: #9b8ec0 !important; }
   justify-content: center;
   transition: border-color .2s, transform .15s, background .2s;
 }
+.gp-badge-circle svg {
+  width: 34px;
+  height: 34px;
+}
 .gp-badge-circle.earned {
   border-color: #d4a8ff;
   background: #3a2d6e;
@@ -3443,3 +3447,93 @@ body.theme-light .gp-notes-input     { background: #ede9ff !important; color: #1
 body.theme-light #gp-save-bar        { background: #e6e0f8 !important; border-color: #ccccff44 !important; }
 body.theme-light #gp-save-select     { background: #ede9ff !important; color: #1e1535 !important; }
 body.theme-light .gp-icon-btn        { background: #ede9ff !important; color: #6d3cb5 !important; }
+
+/* ── Game Progress modal base styles ── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: #0d082099;
+  backdrop-filter: blur(6px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.modal-sheet {
+  background: #2f2358;
+  border: 1px solid #5b469055;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ede9ff;
+}
+.modal-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+}
+.modal-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+.field-label {
+  display: block !important;
+  width: 100%;
+  font-size: 12px;
+  font-weight: 600;
+  color: #d4a8ff;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-top: 14px;
+  margin-bottom: 6px;
+}
+.field-input {
+  display: block !important;
+  width: 100% !important;
+  background: #2b1f4e;
+  border: 1px solid #5b469055;
+  border-radius: 10px;
+  padding: 9px 12px;
+  color: #ede9ff;
+  font-size: 14px;
+  box-sizing: border-box !important;
+  font-family: inherit;
+}
+.field-input::placeholder { color: #ede9ff44; }
+.field-input:focus { outline: none; border-color: #d4a8ff88; }
+.btn-secondary {
+  display: inline-flex !important;
+  align-items: center;
+  background: transparent !important;
+  border: 1px solid #5b469088 !important;
+  border-radius: 10px !important;
+  color: #ede9ffaa !important;
+  padding: 9px 18px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: background .15s;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+.btn-secondary:hover { background: #3a2d6e !important; }
+.btn-secondary.gp-danger { color: #fda4af !important; }
+.btn-secondary.gp-danger:hover { background: #3a1020 !important; border-color: #fda4af55 !important; }
+
+/* Light mode */
+body.theme-light .modal-sheet   { background: #f0eeff !important; border-color: #ccccff !important; }
+body.theme-light .modal-title   { color: #1e1535 !important; }
+body.theme-light .field-label   { color: #6d3cb5 !important; }
+body.theme-light .field-input   { background: #ede9ff !important; color: #1e1535 !important; border-color: #ccccff !important; }
+body.theme-light .btn-secondary { color: #7c6aaa !important; border-color: #ccccff !important; }
+body.theme-light .btn-secondary:hover { background: #e6e0f8 !important; }
