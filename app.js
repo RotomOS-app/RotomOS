@@ -4599,6 +4599,7 @@ checkLivingDexComplete();
 applyGoldTheme();
 applyShinyRotom();
 applyLightMode();
+let ballLegality = null; // { "Bulbasaur": ["Moon","Dream",...], ... }
 ensureLegality(); // preload in background
 
 // Boot greeting — show onboarding first if new user, else greet by name
@@ -5161,8 +5162,6 @@ const LEGALITY_CACHE_KEY = 'at_ball_legality';
 const LEGALITY_CACHE_TS  = 'at_ball_legality_ts';
 const LEGALITY_TTL       = 7 * 24 * 60 * 60 * 1000; // 1 week
 const APRI_BALLS         = new Set(['Fast','Friend','Heavy','Level','Love','Lure','Moon','Dream','Beast','Safari','Sport']);
-
-let ballLegality = null; // { "Bulbasaur": ["Moon","Dream",...], ... }
 
 async function ensureLegality() {
   if (ballLegality) return ballLegality;
