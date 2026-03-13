@@ -5334,3 +5334,563 @@ function renderAbout() {
     </div>
   `;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   GAME PROGRESS — FRLG
+   ═══════════════════════════════════════════════════════════ */
+
+const GP_LS       = 'at_gp_saves';
+const GP_ACTIVE   = 'at_gp_active';
+const BADGE_BASE  = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/badges/';
+const ROTOM_SPRITE= 'https://img.pokemondb.net/sprites/sword-shield/icon/rotom.png';
+
+const GP_BADGES = [
+  { id:'boulder',  name:'Boulder',  gym:'Brock',    type:'rock',     sprite:'boulder-badge',  aceLevel:14 },
+  { id:'cascade',  name:'Cascade',  gym:'Misty',    type:'water',    sprite:'cascade-badge',  aceLevel:21 },
+  { id:'thunder',  name:'Thunder',  gym:'Lt. Surge',type:'electric', sprite:'thunder-badge',  aceLevel:28 },
+  { id:'rainbow',  name:'Rainbow',  gym:'Erika',    type:'grass',    sprite:'rainbow-badge',  aceLevel:29 },
+  { id:'soul',     name:'Soul',     gym:'Koga',     type:'poison',   sprite:'soul-badge',     aceLevel:43 },
+  { id:'marsh',    name:'Marsh',    gym:'Sabrina',  type:'psychic',  sprite:'marsh-badge',    aceLevel:50 },
+  { id:'volcano',  name:'Volcano',  gym:'Blaine',   type:'fire',     sprite:'volcano-badge',  aceLevel:54 },
+  { id:'earth',    name:'Earth',    gym:'Giovanni', type:'ground',   sprite:'earth-badge',    aceLevel:50 },
+];
+
+const GP_E4 = [
+  { id:'lorelei',  name:'Lorelei',  emoji:'🧊', aceLevel:54 },
+  { id:'bruno',    name:'Bruno',    emoji:'🥊', aceLevel:58 },
+  { id:'agatha',   name:'Agatha',   emoji:'👻', aceLevel:58 },
+  { id:'lance',    name:'Lance',    emoji:'🐉', aceLevel:60 },
+  { id:'blue',     name:'Blue',     emoji:'🏆', aceLevel:63 },
+];
+
+// Super-effective type matchups (attacker type → gym types it covers)
+const GP_SUPER_EFFECTIVE = {
+  fire:     ['grass','ice','bug','steel'],
+  water:    ['fire','ground','rock'],
+  electric: ['water','flying'],
+  grass:    ['water','ground','rock'],
+  ice:      ['grass','ground','flying','dragon'],
+  fighting: ['normal','ice','rock','dark','steel'],
+  poison:   ['grass','fairy'],
+  ground:   ['fire','electric','poison','rock','steel'],
+  flying:   ['grass','fighting','bug'],
+  psychic:  ['fighting','poison'],
+  bug:      ['grass','psychic','dark'],
+  rock:     ['fire','ice','flying','bug'],
+  ghost:    ['psychic','ghost'],
+  dragon:   ['dragon'],
+  dark:     ['psychic','ghost'],
+  steel:    ['ice','rock','fairy'],
+  fairy:    ['fighting','dragon','dark'],
+  normal:   [],
+};
+
+// Kanto locations in order for the location tracker
+const GP_KANTO_LOCATIONS = [
+  'Pallet Town','Route 1','Viridian City','Route 2','Viridian Forest',
+  'Pewter City','Route 3','Mt. Moon','Route 4','Cerulean City',
+  'Route 24','Route 25','Route 5','Route 6','Vermilion City',
+  'Diglett\'s Cave','Route 11','Route 12','Route 13','Route 14',
+  'Route 15','Lavender Town','Route 7','Route 8','Celadon City',
+  'Route 16','Route 17','Route 18','Route 9','Route 10',
+  'Rock Tunnel','Pokémon Tower','Silph Co.','Saffron City',
+  'Route 19','Route 20','Seafoam Islands','Route 21','Cinnabar Island',
+  'Route 22','Route 23','Victory Road','Indigo Plateau',
+];
+
+/* ── Storage helpers ── */
+function gpLoadSaves() {
+  try { return JSON.parse(localStorage.getItem(GP_LS)) || []; } catch { return []; }
+}
+function gpSaveSaves(saves) {
+  localStorage.setItem(GP_LS, JSON.stringify(saves));
+}
+function gpGetActive() {
+  return localStorage.getItem(GP_ACTIVE) || null;
+}
+function gpSetActive(id) {
+  localStorage.setItem(GP_ACTIVE, id);
+}
+function gpGetSave(id) {
+  return gpLoadSaves().find(s => s.id === id) || null;
+}
+function gpUpdateSave(updated) {
+  const saves = gpLoadSaves();
+  const idx = saves.findIndex(s => s.id === updated.id);
+  if (idx >= 0) saves[idx] = updated;
+  gpSaveSaves(saves);
+}
+
+/* ── Section entry ── */
+function initGameProgress() {
+  const saves = gpLoadSaves();
+  if (!saves.length) {
+    document.getElementById('gp-no-save').style.display = 'block';
+    document.getElementById('gp-main').style.display    = 'none';
+    return;
+  }
+  document.getElementById('gp-no-save').style.display = 'none';
+  document.getElementById('gp-main').style.display    = 'block';
+
+  // Ensure active is valid
+  let activeId = gpGetActive();
+  if (!saves.find(s => s.id === activeId)) {
+    activeId = saves[0].id;
+    gpSetActive(activeId);
+  }
+
+  gpPopulateSaveSelect(saves, activeId);
+  gpRenderAll(activeId);
+}
+
+function gpPopulateSaveSelect(saves, activeId) {
+  const sel = document.getElementById('gp-save-select');
+  sel.innerHTML = '';
+  saves.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = (s.nickname || 'Playthrough') + ' · ' + (s.game === 'firered' ? '🔴 FireRed' : '🍃 LeafGreen');
+    if (s.id === activeId) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function gpSwitchSave(id) {
+  gpSetActive(id);
+  gpRenderAll(id);
+}
+
+function gpRenderAll(id) {
+  const save = gpGetSave(id);
+  if (!save) return;
+
+  // Version badge
+  const vb = document.getElementById('gp-version-badge');
+  vb.textContent = save.game === 'firered' ? '🔴 Pokémon FireRed' : '🍃 Pokémon LeafGreen';
+  vb.className = 'gp-version-badge ' + save.game;
+
+  gpRenderBadges(save);
+  gpRenderE4(save);
+  gpRenderLocations(save);
+  gpRenderTeam(save);
+  gpRenderNotes(save);
+}
+
+/* ── Journey: Badges ── */
+function gpRenderBadges(save) {
+  const earned = new Set(save.badges || []);
+  const grid   = document.getElementById('gp-badge-grid');
+  grid.innerHTML = '';
+
+  GP_BADGES.forEach(b => {
+    const isEarned = earned.has(b.id);
+    const slot = document.createElement('div');
+    slot.className = 'gp-badge-slot';
+    slot.title = isEarned ? b.name + ' Badge — earned!' : 'Defeat ' + b.gym + ' to earn this badge';
+    slot.innerHTML = `
+      <div class="gp-badge-circle ${isEarned ? 'earned' : 'unearned'}" onclick="gpToggleBadge('${b.id}')">
+        <img class="gp-badge-img" src="${BADGE_BASE}${b.sprite}.png" alt="${b.name}" onerror="this.style.opacity='.4'">
+      </div>
+      <div class="gp-badge-name ${isEarned ? 'earned' : ''}">${b.name}</div>
+    `;
+    grid.appendChild(slot);
+  });
+
+  const count = earned.size;
+  document.getElementById('gp-badge-fill').style.width = (count / 8 * 100) + '%';
+  document.getElementById('gp-badge-label').textContent = count + ' / 8 badges';
+}
+
+function gpToggleBadge(badgeId) {
+  const id   = gpGetActive();
+  const save = gpGetSave(id);
+  if (!save) return;
+  if (!save.badges) save.badges = [];
+  const idx = save.badges.indexOf(badgeId);
+  const wasEarned = idx >= 0;
+  if (wasEarned) save.badges.splice(idx, 1);
+  else           save.badges.push(badgeId);
+  gpUpdateSave(save);
+  gpRenderBadges(save);
+
+  // Rotom reacts
+  if (!wasEarned) {
+    const b = GP_BADGES.find(x => x.id === badgeId);
+    gpAddRotomNote(save, `Bzzt! ${b.name} Badge get — ${b.gym} is no match for you Trainer-zzzt! ⚡`, id);
+    // Check team level vs next unearned gym
+    setTimeout(() => gpCheckNextGym(save, id), 600);
+  }
+}
+
+/* ── Journey: Elite Four ── */
+function gpRenderE4(save) {
+  const beaten = new Set(save.e4 || []);
+  const grid   = document.getElementById('gp-e4-grid');
+  grid.innerHTML = '';
+  GP_E4.forEach(e => {
+    const isBeaten = beaten.has(e.id);
+    const slot = document.createElement('div');
+    slot.className = 'gp-e4-slot';
+    slot.innerHTML = `
+      <div class="gp-e4-circle ${isBeaten ? 'beaten' : 'unbeaten'}" onclick="gpToggleE4('${e.id}')">
+        ${e.emoji}
+      </div>
+      <div class="gp-e4-name ${isBeaten ? 'beaten' : ''}">${e.name}</div>
+    `;
+    grid.appendChild(slot);
+  });
+}
+
+function gpToggleE4(e4Id) {
+  const id   = gpGetActive();
+  const save = gpGetSave(id);
+  if (!save) return;
+  if (!save.e4) save.e4 = [];
+  const idx = save.e4.indexOf(e4Id);
+  const wasBeaten = idx >= 0;
+  if (wasBeaten) save.e4.splice(idx, 1);
+  else           save.e4.push(e4Id);
+  gpUpdateSave(save);
+  gpRenderE4(save);
+
+  if (!wasBeaten) {
+    const e = GP_E4.find(x => x.id === e4Id);
+    const msg = e.id === 'blue'
+      ? `Bzzt! You're the Champion Trainer-zzzt! CHAMPION! ⚡⚡⚡`
+      : `Bzzt! ${e.name} defeated — one step closer to the Championship-zzzt ⚡`;
+    gpAddRotomNote(save, msg, id);
+  }
+}
+
+/* ── Journey: Locations ── */
+function gpRenderLocations(save) {
+  const visited = new Set(save.locations || []);
+  const grid    = document.getElementById('gp-location-grid');
+  grid.innerHTML = '';
+  GP_KANTO_LOCATIONS.forEach(loc => {
+    const chip = document.createElement('div');
+    chip.className = 'gp-loc-chip' + (visited.has(loc) ? ' visited' : '');
+    chip.textContent = (visited.has(loc) ? '✓ ' : '') + loc;
+    chip.onclick = () => gpToggleLocation(loc);
+    grid.appendChild(chip);
+  });
+}
+
+function gpToggleLocation(loc) {
+  const id   = gpGetActive();
+  const save = gpGetSave(id);
+  if (!save) return;
+  if (!save.locations) save.locations = [];
+  const idx = save.locations.indexOf(loc);
+  const wasVisited = idx >= 0;
+  if (wasVisited) save.locations.splice(idx, 1);
+  else            save.locations.push(loc);
+  gpUpdateSave(save);
+  gpRenderLocations(save);
+
+  // Check if this location triggers a gym warning
+  if (!wasVisited) gpCheckGymTrigger(save, loc, id);
+}
+
+/* ── Gym warning logic ── */
+const GP_GYM_TRIGGERS = {
+  'Viridian Forest':   0,  // → Brock (rock)
+  'Mt. Moon':          1,  // → Misty (water)
+  'Route 6':           2,  // → Lt. Surge (electric)
+  'Route 8':           3,  // → Erika (grass)
+  'Route 15':          4,  // → Koga (poison)
+  'Silph Co.':         5,  // → Sabrina (psychic)
+  'Seafoam Islands':   6,  // → Blaine (fire)
+  'Victory Road':      7,  // → Giovanni (ground)
+};
+
+function gpCheckGymTrigger(save, loc, saveId) {
+  const gymIdx = GP_GYM_TRIGGERS[loc];
+  if (gymIdx === undefined) return;
+  const gym = GP_BADGES[gymIdx];
+  if ((save.badges || []).includes(gym.id)) return; // already beaten
+
+  const team = (save.team || []).filter(Boolean);
+  if (!team.length) return;
+
+  // Level check
+  const avgLevel = Math.round(team.reduce((s, p) => s + (p.level || 1), 0) / team.length);
+  const aceLevel = gym.aceLevel;
+  const levelDiff = aceLevel - avgLevel;
+
+  let messages = [];
+
+  if (levelDiff >= 10) {
+    messages.push(`Bzzt! Rotom is worried Trainer-zzzt — ${gym.gym}'s ace is level ${aceLevel} and your team averages level ${avgLevel}. Some serious training is needed-zzzt ⚡`);
+  } else if (levelDiff >= 5) {
+    messages.push(`Bzzt! ${gym.gym}'s ace is level ${aceLevel}-zzzt — your team average is level ${avgLevel}. A little more training wouldn't hurt ⚡`);
+  } else {
+    // Levels good — check type coverage
+    const teamTypes = team.flatMap(p => p.types || []);
+    const coversGym = teamTypes.some(t => (GP_SUPER_EFFECTIVE[t] || []).includes(gym.type));
+    if (!coversGym) {
+      // Find effective types
+      const effectiveTypes = Object.entries(GP_SUPER_EFFECTIVE)
+        .filter(([,covers]) => covers.includes(gym.type))
+        .map(([t]) => t);
+      messages.push(`Bzzt! ${gym.gym} uses ${gym.type} types Trainer-zzzt — your team is missing super effective coverage! You'll want a ${effectiveTypes.slice(0,2).join(' or ')} type ⚡`);
+    }
+  }
+
+  messages.forEach((msg, i) => {
+    setTimeout(() => gpAddRotomNote(save, msg, saveId), i * 800);
+  });
+}
+
+function gpCheckNextGym(save, saveId) {
+  // Find the next unearned badge and check if the previous location was its trigger
+  const earned = new Set(save.badges || []);
+  const nextGymIdx = GP_BADGES.findIndex(b => !earned.has(b.id));
+  if (nextGymIdx < 0) {
+    gpAddRotomNote(save, `Bzzt! All 8 badges collected Trainer-zzzt! The Elite Four awaits-zzzt ⚡`, saveId);
+  }
+}
+
+/* ── My Team ── */
+let gpEditingSlot = null;
+
+function gpRenderTeam(save) {
+  const team = save.team || Array(6).fill(null);
+  const grid = document.getElementById('gp-team-grid');
+  grid.innerHTML = '';
+
+  for (let i = 0; i < 6; i++) {
+    const mon  = team[i] || null;
+    const slot = document.createElement('div');
+    slot.className = 'gp-team-slot' + (mon ? ' filled' : '');
+    slot.onclick = () => gpOpenTeamModal(i, mon);
+
+    if (mon) {
+      const spriteUrl = `https://img.pokemondb.net/sprites/sword-shield/icon/${mon.species.toLowerCase()}.png`;
+      slot.innerHTML = `
+        <img class="gp-team-sprite" src="${spriteUrl}" alt="${mon.species}" onerror="this.style.display='none'">
+        <div class="gp-team-name">${mon.nickname || mon.species}</div>
+        <div class="gp-team-level">Lv. ${mon.level || '?'}</div>
+      `;
+    } else {
+      slot.innerHTML = `
+        <div class="gp-team-sprite-empty">+</div>
+        <div class="gp-team-empty-label">Empty</div>
+      `;
+    }
+    grid.appendChild(slot);
+  }
+}
+
+function gpOpenTeamModal(slotIdx, mon) {
+  gpEditingSlot = slotIdx;
+  document.getElementById('gp-team-modal-title').textContent = `Team Slot ${slotIdx + 1}`;
+  document.getElementById('gp-team-species').value  = mon ? mon.species  : '';
+  document.getElementById('gp-team-nickname').value = mon ? (mon.nickname || '') : '';
+  document.getElementById('gp-team-level').value    = mon ? (mon.level   || '') : '';
+  document.getElementById('gp-team-modal').style.display = 'flex';
+}
+
+function gpCloseTeamModal() {
+  document.getElementById('gp-team-modal').style.display = 'none';
+  gpEditingSlot = null;
+}
+
+function gpSaveTeamSlot() {
+  if (gpEditingSlot === null) return;
+  const species  = document.getElementById('gp-team-species').value.trim();
+  const nickname = document.getElementById('gp-team-nickname').value.trim();
+  const level    = parseInt(document.getElementById('gp-team-level').value) || null;
+  if (!species) { gpCloseTeamModal(); return; }
+
+  const id   = gpGetActive();
+  const save = gpGetSave(id);
+  if (!save) return;
+  if (!save.team) save.team = Array(6).fill(null);
+
+  // Derive rough types from a simple lookup (for gym checking)
+  save.team[gpEditingSlot] = { species, nickname, level, types: [] };
+  gpUpdateSave(save);
+  gpCloseTeamModal();
+  gpRenderTeam(save);
+}
+
+function gpClearTeamSlot() {
+  if (gpEditingSlot === null) return;
+  const id   = gpGetActive();
+  const save = gpGetSave(id);
+  if (!save) return;
+  if (!save.team) save.team = Array(6).fill(null);
+  save.team[gpEditingSlot] = null;
+  gpUpdateSave(save);
+  gpCloseTeamModal();
+  gpRenderTeam(save);
+}
+
+/* ── Rotom's Notes ── */
+function gpRenderNotes(save) {
+  const thread  = document.getElementById('gp-notes-thread');
+  const notes   = save.notes || [];
+  thread.innerHTML = '';
+
+  if (!notes.length) {
+    // Welcome message
+    const welcome = save.game === 'firered'
+      ? `Bzzt! Welcome to RotomOS Game Progress Trainer-zzzt! I'll be tracking your FireRed adventure and sending you tips along the way ⚡`
+      : `Bzzt! Welcome to RotomOS Game Progress Trainer-zzzt! I'll be tracking your LeafGreen adventure and sending you tips along the way ⚡`;
+    thread.innerHTML = `
+      <div class="gp-note-rotom">
+        <img class="gp-note-rotom-sprite" src="${ROTOM_SPRITE}" alt="Rotom">
+        <div>
+          <div class="gp-note-rotom-bubble">${welcome}</div>
+          <div class="gp-note-time">Rotom</div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  notes.forEach(n => {
+    const el = document.createElement('div');
+    if (n.from === 'rotom') {
+      el.className = 'gp-note-rotom';
+      el.innerHTML = `
+        <img class="gp-note-rotom-sprite" src="${ROTOM_SPRITE}" alt="Rotom">
+        <div>
+          <div class="gp-note-rotom-bubble">${n.text}</div>
+          <div class="gp-note-time">${n.time || 'Rotom'}</div>
+        </div>
+      `;
+    } else {
+      el.className = 'gp-note-user';
+      el.innerHTML = `
+        <div>
+          <div class="gp-note-user-bubble">${n.text}</div>
+          <div class="gp-note-time" style="text-align:right">${n.time || 'You'}</div>
+        </div>
+      `;
+    }
+    thread.appendChild(el);
+  });
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function gpAddRotomNote(save, text, saveId) {
+  if (!save.notes) save.notes = [];
+  save.notes.push({ from:'rotom', text, time: gpTimeString() });
+  gpUpdateSave(save);
+  // Live update if notes tab is visible
+  const notesTab = document.getElementById('gp-notes-tab');
+  if (notesTab && notesTab.style.display !== 'none') gpRenderNotes(save);
+}
+
+function gpSendNote() {
+  const input = document.getElementById('gp-notes-input');
+  const text  = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const id   = gpGetActive();
+  const save = gpGetSave(id);
+  if (!save) return;
+  if (!save.notes) save.notes = [];
+  save.notes.push({ from:'trainer', text, time: gpTimeString() });
+  gpUpdateSave(save);
+  gpRenderNotes(save);
+
+  // Simple Rotom reply
+  setTimeout(() => {
+    const replies = [
+      `Bzzt! Got it Trainer-zzzt ⚡`,
+      `Bzzt! Rotom has noted that-zzzt ⚡`,
+      `Bzzt! Roger that Trainer-zzzt ⚡`,
+      `Bzzt! Interesting Trainer-zzzt — keep going ⚡`,
+    ];
+    const reply = replies[Math.floor(Math.random() * replies.length)];
+    const updated = gpGetSave(id);
+    gpAddRotomNote(updated, reply, id);
+  }, 1000);
+}
+
+function gpTimeString() {
+  const now = new Date();
+  return now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+}
+
+/* ── Tab switching ── */
+function gpSwitchTab(tab) {
+  ['journey','team','notes'].forEach(t => {
+    document.getElementById('gp-' + t + '-tab').style.display = t === tab ? 'block' : 'none';
+    const btn = document.getElementById('gptab-' + t);
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'notes') {
+    const id   = gpGetActive();
+    const save = gpGetSave(id);
+    if (save) gpRenderNotes(save);
+    setTimeout(() => {
+      const thread = document.getElementById('gp-notes-thread');
+      if (thread) thread.scrollTop = thread.scrollHeight;
+    }, 50);
+  }
+}
+
+/* ── New Save modal ── */
+let gpSelectedGame = 'firered';
+
+function gpOpenNewSave() {
+  gpSelectedGame = 'firered';
+  document.getElementById('gp-new-nickname').value = '';
+  document.querySelectorAll('.gp-game-opt').forEach(el => {
+    el.classList.toggle('selected', el.dataset.game === 'firered');
+  });
+  document.querySelectorAll('.gp-game-opt').forEach(el => {
+    el.onclick = () => {
+      gpSelectedGame = el.dataset.game;
+      document.querySelectorAll('.gp-game-opt').forEach(e => e.classList.remove('selected'));
+      el.classList.add('selected');
+    };
+  });
+  document.getElementById('gp-new-save-modal').style.display = 'flex';
+}
+
+function gpCloseNewSave() {
+  document.getElementById('gp-new-save-modal').style.display = 'none';
+}
+
+function gpCreateSave() {
+  const nickname = document.getElementById('gp-new-nickname').value.trim();
+  const id = 'gp_' + Date.now();
+  const save = {
+    id, game: gpSelectedGame, nickname,
+    badges: [], e4: [], team: Array(6).fill(null),
+    locations: [], notes: [],
+    created: new Date().toISOString()
+  };
+  const saves = gpLoadSaves();
+  saves.push(save);
+  gpSaveSaves(saves);
+  gpSetActive(id);
+  gpCloseNewSave();
+  initGameProgress();
+}
+
+/* ── Delete save ── */
+function gpConfirmDelete() {
+  const id   = gpGetActive();
+  const save = gpGetSave(id);
+  if (!save) return;
+  const label = (save.nickname || 'this playthrough');
+  if (!confirm(`Delete "${label}"? This cannot be undone.`)) return;
+  const saves = gpLoadSaves().filter(s => s.id !== id);
+  gpSaveSaves(saves);
+  localStorage.removeItem(GP_ACTIVE);
+  initGameProgress();
+}
+
+/* ── Hook into goSection ── */
+const _gpGoSectionOrig = goSection;
+goSection = function(section) {
+  _gpGoSectionOrig(section);
+  if (section === 'progress') initGameProgress();
+};

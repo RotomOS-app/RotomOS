@@ -1,0 +1,3633 @@
+{
+  "firered-leafgreen": {
+    "name": "FireRed / LeafGreen",
+    "generation": 3,
+    "short": "FRLG",
+    "starters": [
+      "bulbasaur",
+      "charmander",
+      "squirtle"
+    ],
+    "gyms": [
+      {
+        "id": 1,
+        "leader": "Brock",
+        "city": "Pewter City",
+        "badge": "Boulder Badge",
+        "badge_sprite": "boulder",
+        "type": "rock",
+        "ace": "onix",
+        "ace_level": 14,
+        "trainer_level_range": [
+          10,
+          14
+        ],
+        "weak_to": [
+          "water",
+          "grass",
+          "fighting",
+          "ground",
+          "steel"
+        ],
+        "routes_before": [
+          "route-1",
+          "route-2",
+          "viridian-forest"
+        ],
+        "story_milestone": "Defeated Brock and earned the Boulder Badge!",
+        "ace_types": [
+          "rock",
+          "ground"
+        ]
+      },
+      {
+        "id": 2,
+        "leader": "Misty",
+        "city": "Cerulean City",
+        "badge": "Cascade Badge",
+        "badge_sprite": "cascade",
+        "type": "water",
+        "ace": "starmie",
+        "ace_level": 21,
+        "trainer_level_range": [
+          18,
+          21
+        ],
+        "weak_to": [
+          "electric",
+          "grass"
+        ],
+        "routes_before": [
+          "route-3",
+          "route-4",
+          "mt-moon"
+        ],
+        "story_milestone": "Defeated Misty and earned the Cascade Badge!",
+        "ace_types": [
+          "water",
+          "psychic"
+        ]
+      },
+      {
+        "id": 3,
+        "leader": "Lt. Surge",
+        "city": "Vermilion City",
+        "badge": "Thunder Badge",
+        "badge_sprite": "thunder",
+        "type": "electric",
+        "ace": "raichu",
+        "ace_level": 28,
+        "trainer_level_range": [
+          21,
+          28
+        ],
+        "weak_to": [
+          "ground"
+        ],
+        "routes_before": [
+          "route-5",
+          "route-6",
+          "vermilion-city"
+        ],
+        "story_milestone": "Defeated Lt. Surge and earned the Thunder Badge!",
+        "ace_types": [
+          "electric"
+        ]
+      },
+      {
+        "id": 4,
+        "leader": "Erika",
+        "city": "Celadon City",
+        "badge": "Rainbow Badge",
+        "badge_sprite": "rainbow",
+        "type": "grass",
+        "ace": "vileplume",
+        "ace_level": 29,
+        "trainer_level_range": [
+          24,
+          29
+        ],
+        "weak_to": [
+          "fire",
+          "ice",
+          "poison",
+          "flying",
+          "bug"
+        ],
+        "routes_before": [
+          "route-7",
+          "route-8",
+          "celadon-city"
+        ],
+        "story_milestone": "Defeated Erika and earned the Rainbow Badge!",
+        "ace_types": [
+          "grass",
+          "poison"
+        ]
+      },
+      {
+        "id": 5,
+        "leader": "Koga",
+        "city": "Fuchsia City",
+        "badge": "Soul Badge",
+        "badge_sprite": "soul",
+        "type": "poison",
+        "ace": "weezing",
+        "ace_level": 43,
+        "trainer_level_range": [
+          37,
+          43
+        ],
+        "weak_to": [
+          "ground",
+          "psychic"
+        ],
+        "routes_before": [
+          "route-12",
+          "route-13",
+          "route-14",
+          "route-15",
+          "safari-zone"
+        ],
+        "story_milestone": "Defeated Koga and earned the Soul Badge!",
+        "full_team": [
+          {
+            "pokemon": "koffing",
+            "level": 37
+          },
+          {
+            "pokemon": "muk",
+            "level": 39
+          },
+          {
+            "pokemon": "koffing",
+            "level": 37
+          },
+          {
+            "pokemon": "weezing",
+            "level": 43
+          }
+        ],
+        "ace_types": [
+          "poison"
+        ]
+      },
+      {
+        "id": 6,
+        "leader": "Sabrina",
+        "city": "Saffron City",
+        "badge": "Marsh Badge",
+        "badge_sprite": "marsh",
+        "type": "psychic",
+        "ace": "alakazam",
+        "ace_level": 50,
+        "trainer_level_range": [
+          38,
+          50
+        ],
+        "weak_to": [
+          "bug",
+          "ghost",
+          "dark"
+        ],
+        "routes_before": [
+          "route-8",
+          "saffron-city"
+        ],
+        "story_milestone": "Defeated Sabrina and earned the Marsh Badge!",
+        "ace_types": [
+          "psychic"
+        ]
+      },
+      {
+        "id": 7,
+        "leader": "Blaine",
+        "city": "Cinnabar Island",
+        "badge": "Volcano Badge",
+        "badge_sprite": "volcano",
+        "type": "fire",
+        "ace": "arcanine",
+        "ace_level": 54,
+        "trainer_level_range": [
+          42,
+          54
+        ],
+        "weak_to": [
+          "water",
+          "rock",
+          "ground"
+        ],
+        "routes_before": [
+          "route-19",
+          "route-20",
+          "route-21",
+          "seafoam-islands"
+        ],
+        "story_milestone": "Defeated Blaine and earned the Volcano Badge!",
+        "ace_types": [
+          "fire"
+        ]
+      },
+      {
+        "id": 8,
+        "leader": "Giovanni",
+        "city": "Viridian City",
+        "badge": "Earth Badge",
+        "badge_sprite": "earth",
+        "type": "ground",
+        "ace": "rhyhorn",
+        "ace_level": 50,
+        "trainer_level_range": [
+          42,
+          50
+        ],
+        "weak_to": [
+          "water",
+          "grass",
+          "ice"
+        ],
+        "routes_before": [
+          "route-22",
+          "route-23",
+          "victory-road"
+        ],
+        "story_milestone": "Defeated Giovanni and earned the Earth Badge!",
+        "full_team": [
+          {
+            "pokemon": "rhyhorn",
+            "level": 45
+          },
+          {
+            "pokemon": "dugtrio",
+            "level": 42
+          },
+          {
+            "pokemon": "nidoqueen",
+            "level": 44
+          },
+          {
+            "pokemon": "nidoking",
+            "level": 45
+          },
+          {
+            "pokemon": "rhyhorn",
+            "level": 50
+          }
+        ],
+        "ace_types": [
+          "ground",
+          "rock"
+        ]
+      }
+    ],
+    "elite_four": [
+      {
+        "id": 9,
+        "leader": "Lorelei",
+        "type": "ice",
+        "ace": "lapras",
+        "ace_level": 54,
+        "trainer_level_range": [
+          52,
+          54
+        ],
+        "weak_to": [
+          "electric",
+          "fighting",
+          "rock",
+          "steel"
+        ],
+        "story_milestone": "Defeated Lorelei of the Elite Four!",
+        "ace_types": [
+          "water",
+          "ice"
+        ]
+      },
+      {
+        "id": 10,
+        "leader": "Bruno",
+        "type": "fighting",
+        "ace": "machamp",
+        "ace_level": 58,
+        "trainer_level_range": [
+          53,
+          58
+        ],
+        "weak_to": [
+          "flying",
+          "psychic",
+          "fairy"
+        ],
+        "story_milestone": "Defeated Bruno of the Elite Four!",
+        "ace_types": [
+          "fighting"
+        ]
+      },
+      {
+        "id": 11,
+        "leader": "Agatha",
+        "type": "ghost",
+        "ace": "gengar",
+        "ace_level": 58,
+        "trainer_level_range": [
+          54,
+          58
+        ],
+        "weak_to": [
+          "ghost",
+          "dark"
+        ],
+        "story_milestone": "Defeated Agatha of the Elite Four!",
+        "ace_types": [
+          "ghost",
+          "poison"
+        ]
+      },
+      {
+        "id": 12,
+        "leader": "Lance",
+        "type": "dragon",
+        "ace": "dragonite",
+        "ace_level": 60,
+        "trainer_level_range": [
+          56,
+          60
+        ],
+        "weak_to": [
+          "ice",
+          "dragon",
+          "fairy"
+        ],
+        "story_milestone": "Defeated Lance of the Elite Four!",
+        "ace_types": [
+          "dragon",
+          "flying"
+        ]
+      },
+      {
+        "id": 13,
+        "leader": "Blue",
+        "city": "Champion",
+        "type": "mixed",
+        "ace_by_starter": {
+          "bulbasaur": "charizard",
+          "charmander": "blastoise",
+          "squirtle": "venusaur"
+        },
+        "ace_level": 63,
+        "trainer_level_range": [
+          57,
+          63
+        ],
+        "weak_to": [],
+        "story_milestone": "Became the Pok\u00e9mon Champion of Kanto! \u26a1\ud83c\udfc6",
+        "note": "Rematch levels are higher. Team varies based on your starter choice.",
+        "ace_types_by_starter": {
+          "bulbasaur": [
+            "fire",
+            "flying"
+          ],
+          "charmander": [
+            "water"
+          ],
+          "squirtle": [
+            "grass",
+            "poison"
+          ]
+        }
+      }
+    ],
+    "encounters": {
+      "route-1": {
+        "label": "Route 1",
+        "level_range": [
+          2,
+          5
+        ],
+        "pokemon": [
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "rattata"
+          }
+        ]
+      },
+      "route-2": {
+        "label": "Route 2",
+        "level_range": [
+          3,
+          5
+        ],
+        "pokemon": [
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "rattata"
+          },
+          {
+            "name": "caterpie"
+          },
+          {
+            "name": "weedle"
+          }
+        ],
+        "npc_trades": [
+          {
+            "give": "abra",
+            "receive": "mr-mime",
+            "note": "Trade your Abra for a Mr. Mime in the gatehouse on Route 2",
+            "one_time": true
+          }
+        ]
+      },
+      "viridian-forest": {
+        "label": "Viridian Forest",
+        "level_range": [
+          3,
+          7
+        ],
+        "pokemon": [
+          {
+            "name": "caterpie"
+          },
+          {
+            "name": "metapod"
+          },
+          {
+            "name": "weedle"
+          },
+          {
+            "name": "kakuna"
+          },
+          {
+            "name": "pikachu"
+          }
+        ]
+      },
+      "route-3": {
+        "label": "Route 3",
+        "level_range": [
+          6,
+          12
+        ],
+        "pokemon": [
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "rattata"
+          },
+          {
+            "name": "jigglypuff"
+          },
+          {
+            "name": "mankey"
+          },
+          {
+            "name": "spearow"
+          },
+          {
+            "name": "nidoran-f"
+          },
+          {
+            "name": "nidoran-m"
+          }
+        ]
+      },
+      "route-4": {
+        "label": "Route 4",
+        "level_range": [
+          10,
+          16
+        ],
+        "pokemon": [
+          {
+            "name": "rattata"
+          },
+          {
+            "name": "spearow"
+          },
+          {
+            "name": "ekans",
+            "version": "firered"
+          },
+          {
+            "name": "sandshrew",
+            "version": "leafgreen"
+          },
+          {
+            "name": "mankey"
+          }
+        ],
+        "surfing": [
+          {
+            "name": "tentacool",
+            "level_range": [
+              5,
+              40
+            ]
+          }
+        ],
+        "fishing": {
+          "old_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                5
+              ]
+            }
+          ],
+          "good_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "leafgreen"
+            }
+          ],
+          "super_rod": [
+            {
+              "name": "gyarados",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "psyduck",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "slowpoke",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            }
+          ]
+        }
+      },
+      "mt-moon": {
+        "label": "Mt. Moon",
+        "level_range": [
+          8,
+          15
+        ],
+        "pokemon": [
+          {
+            "name": "zubat"
+          },
+          {
+            "name": "geodude"
+          },
+          {
+            "name": "paras"
+          },
+          {
+            "name": "clefairy"
+          }
+        ],
+        "key_items": [
+          {
+            "name": "dome-fossil",
+            "label": "Dome Fossil",
+            "from": "Defeat Super Nerd Miguel on B2F of Mt. Moon",
+            "note": "Choice between Dome Fossil (Kabuto) or Helix Fossil (Omanyte) \u2014 pick one only!",
+            "choice": "helix-fossil"
+          },
+          {
+            "name": "helix-fossil",
+            "label": "Helix Fossil",
+            "from": "Defeat Super Nerd Miguel on B2F of Mt. Moon",
+            "note": "Choice between Helix Fossil (Omanyte) or Dome Fossil (Kabuto) \u2014 pick one only!",
+            "choice": "dome-fossil"
+          }
+        ]
+      },
+      "route-5": {
+        "label": "Route 5",
+        "level_range": [
+          13,
+          18
+        ],
+        "pokemon": [
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "meowth"
+          },
+          {
+            "name": "oddish",
+            "version": "firered"
+          },
+          {
+            "name": "bellsprout",
+            "version": "leafgreen"
+          }
+        ],
+        "npc_trades": [
+          {
+            "give": "nidoran-m",
+            "receive": "nidoran-f",
+            "note": "Trade your Nidoran\u2642 for a Nidoran\u2640 in the gatehouse on Route 5",
+            "one_time": true
+          }
+        ]
+      },
+      "route-6": {
+        "label": "Route 6",
+        "level_range": [
+          13,
+          18
+        ],
+        "pokemon": [
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "meowth"
+          },
+          {
+            "name": "mankey"
+          },
+          {
+            "name": "oddish",
+            "version": "firered"
+          },
+          {
+            "name": "bellsprout",
+            "version": "leafgreen"
+          }
+        ]
+      },
+      "route-7": {
+        "label": "Route 7",
+        "level_range": [
+          18,
+          22
+        ],
+        "pokemon": [
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "meowth"
+          },
+          {
+            "name": "growlithe",
+            "version": "firered"
+          },
+          {
+            "name": "vulpix",
+            "version": "leafgreen"
+          },
+          {
+            "name": "oddish",
+            "version": "firered"
+          },
+          {
+            "name": "bellsprout",
+            "version": "leafgreen"
+          }
+        ]
+      },
+      "route-8": {
+        "label": "Route 8",
+        "level_range": [
+          18,
+          22
+        ],
+        "pokemon": [
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "meowth"
+          },
+          {
+            "name": "ekans",
+            "version": "firered"
+          },
+          {
+            "name": "growlithe",
+            "version": "firered"
+          },
+          {
+            "name": "sandshrew",
+            "version": "leafgreen"
+          },
+          {
+            "name": "vulpix",
+            "version": "leafgreen"
+          }
+        ]
+      },
+      "route-12": {
+        "label": "Route 12",
+        "level_range": [
+          20,
+          30
+        ],
+        "pokemon": [
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "venonat"
+          },
+          {
+            "name": "oddish",
+            "version": "firered"
+          },
+          {
+            "name": "gloom",
+            "version": "firered"
+          },
+          {
+            "name": "bellsprout",
+            "version": "leafgreen"
+          },
+          {
+            "name": "weepinbell",
+            "version": "leafgreen"
+          }
+        ],
+        "key_items": [
+          {
+            "name": "super-rod",
+            "label": "Super Rod",
+            "from": "Fisherman in the house on Route 12",
+            "note": "Allows fishing for rare high level Pok\u00e9mon"
+          }
+        ],
+        "surfing": [
+          {
+            "name": "tentacool",
+            "level_range": [
+              5,
+              40
+            ]
+          }
+        ],
+        "fishing": {
+          "old_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                5
+              ]
+            }
+          ],
+          "good_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "leafgreen"
+            }
+          ],
+          "super_rod": [
+            {
+              "name": "gyarados",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "psyduck",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "slowpoke",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            }
+          ]
+        }
+      },
+      "route-13": {
+        "label": "Route 13",
+        "level_range": [
+          20,
+          30
+        ],
+        "pokemon": [
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "pidgeotto"
+          },
+          {
+            "name": "venonat"
+          },
+          {
+            "name": "ditto"
+          },
+          {
+            "name": "oddish",
+            "version": "firered"
+          },
+          {
+            "name": "gloom",
+            "version": "firered"
+          },
+          {
+            "name": "bellsprout",
+            "version": "leafgreen"
+          },
+          {
+            "name": "weepinbell",
+            "version": "leafgreen"
+          }
+        ],
+        "surfing": [
+          {
+            "name": "tentacool",
+            "level_range": [
+              5,
+              40
+            ]
+          }
+        ],
+        "fishing": {
+          "old_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                5
+              ]
+            }
+          ],
+          "good_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "leafgreen"
+            }
+          ],
+          "super_rod": [
+            {
+              "name": "gyarados",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "psyduck",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "slowpoke",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            }
+          ]
+        }
+      },
+      "route-14": {
+        "label": "Route 14",
+        "level_range": [
+          25,
+          32
+        ],
+        "pokemon": [
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "oddish",
+            "version": "firered"
+          },
+          {
+            "name": "bellsprout",
+            "version": "leafgreen"
+          },
+          {
+            "name": "venonat"
+          },
+          {
+            "name": "ditto"
+          },
+          {
+            "name": "gloom",
+            "version": "firered"
+          },
+          {
+            "name": "weepinbell",
+            "version": "leafgreen"
+          },
+          {
+            "name": "pidgeotto"
+          }
+        ]
+      },
+      "route-15": {
+        "label": "Route 15",
+        "level_range": [
+          25,
+          32
+        ],
+        "pokemon": [
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "oddish",
+            "version": "firered"
+          },
+          {
+            "name": "bellsprout",
+            "version": "leafgreen"
+          },
+          {
+            "name": "venonat"
+          },
+          {
+            "name": "ditto"
+          },
+          {
+            "name": "gloom",
+            "version": "firered"
+          },
+          {
+            "name": "weepinbell",
+            "version": "leafgreen"
+          },
+          {
+            "name": "pidgeotto"
+          }
+        ]
+      },
+      "safari-zone": {
+        "label": "Safari Zone",
+        "level_range": [
+          22,
+          30
+        ],
+        "areas": [
+          {
+            "label": "Area 1",
+            "pokemon": [
+              {
+                "name": "nidoran-m"
+              },
+              {
+                "name": "nidorino"
+              },
+              {
+                "name": "nidoran-f"
+              },
+              {
+                "name": "nidorina"
+              },
+              {
+                "name": "exeggcute"
+              },
+              {
+                "name": "rhyhorn"
+              },
+              {
+                "name": "venonat"
+              },
+              {
+                "name": "parasect"
+              },
+              {
+                "name": "chansey"
+              },
+              {
+                "name": "scyther",
+                "version": "firered"
+              },
+              {
+                "name": "pinsir",
+                "version": "leafgreen"
+              }
+            ]
+          },
+          {
+            "label": "Area 2",
+            "pokemon": [
+              {
+                "name": "nidoran-m"
+              },
+              {
+                "name": "nidorino"
+              },
+              {
+                "name": "nidoran-f"
+              },
+              {
+                "name": "doduo"
+              },
+              {
+                "name": "exeggcute"
+              },
+              {
+                "name": "paras"
+              },
+              {
+                "name": "parasect"
+              },
+              {
+                "name": "kangaskhan"
+              },
+              {
+                "name": "scyther",
+                "version": "firered"
+              },
+              {
+                "name": "pinsir",
+                "version": "leafgreen"
+              }
+            ]
+          },
+          {
+            "label": "Area 3",
+            "pokemon": [
+              {
+                "name": "nidoran-m"
+              },
+              {
+                "name": "nidorino"
+              },
+              {
+                "name": "nidorina"
+              },
+              {
+                "name": "exeggcute"
+              },
+              {
+                "name": "rhyhorn"
+              },
+              {
+                "name": "paras"
+              },
+              {
+                "name": "venomoth"
+              },
+              {
+                "name": "chansey"
+              },
+              {
+                "name": "tauros"
+              }
+            ],
+            "key_items": [
+              {
+                "name": "gold-teeth",
+                "label": "Gold Teeth",
+                "from": "Found on the ground in Area 3",
+                "note": "Give to the Safari Zone Warden to receive HM Strength"
+              }
+            ]
+          },
+          {
+            "label": "Area 4",
+            "pokemon": [
+              {
+                "name": "nidoran-m"
+              },
+              {
+                "name": "nidorino"
+              },
+              {
+                "name": "nidoran-f"
+              },
+              {
+                "name": "doduo"
+              },
+              {
+                "name": "exeggcute"
+              },
+              {
+                "name": "venonat"
+              },
+              {
+                "name": "venomoth"
+              },
+              {
+                "name": "tauros"
+              },
+              {
+                "name": "kangaskhan"
+              }
+            ]
+          }
+        ],
+        "fishing": {
+          "super_rod": [
+            {
+              "name": "dratini",
+              "level_range": [
+                15,
+                35
+              ],
+              "rate": "15%",
+              "note": "Rare but worth it!"
+            },
+            {
+              "name": "dragonair",
+              "level_range": [
+                15,
+                35
+              ],
+              "rate": "1%",
+              "note": "Extremely rare!"
+            }
+          ]
+        },
+        "note": "Bzzt! Any area with Super Rod can yield Dratini (15%) or the extremely rare Dragonair (1%) Trainer-zzzt \u26a1"
+      },
+      "route-19": {
+        "label": "Route 19",
+        "level_range": [
+          25,
+          35
+        ],
+        "pokemon": [
+          {
+            "name": "tentacool"
+          },
+          {
+            "name": "tentacruel"
+          }
+        ]
+      },
+      "route-20": {
+        "label": "Route 20",
+        "level_range": [
+          25,
+          35
+        ],
+        "pokemon": [
+          {
+            "name": "tentacool"
+          },
+          {
+            "name": "tentacruel"
+          }
+        ]
+      },
+      "route-21": {
+        "label": "Route 21",
+        "level_range": [
+          25,
+          35
+        ],
+        "pokemon": [
+          {
+            "name": "tangela"
+          },
+          {
+            "name": "rattata"
+          },
+          {
+            "name": "raticate"
+          },
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "pidgeot"
+          }
+        ]
+      },
+      "seafoam-islands": {
+        "label": "Seafoam Islands",
+        "level_range": [
+          28,
+          35
+        ],
+        "pokemon": [
+          {
+            "name": "zubat"
+          },
+          {
+            "name": "golbat"
+          },
+          {
+            "name": "seel"
+          },
+          {
+            "name": "dewgong"
+          },
+          {
+            "name": "psyduck",
+            "version": "firered"
+          },
+          {
+            "name": "slowpoke",
+            "version": "leafgreen"
+          },
+          {
+            "name": "horsea"
+          },
+          {
+            "name": "golduck",
+            "version": "firered"
+          },
+          {
+            "name": "slowbro",
+            "version": "leafgreen"
+          }
+        ],
+        "interactables": [
+          {
+            "name": "articuno",
+            "level": 50,
+            "note": "Legendary \u2014 one encounter only. Save before approaching!",
+            "legendary": true,
+            "one_time": true
+          }
+        ]
+      },
+      "route-22": {
+        "label": "Route 22",
+        "level_range": [
+          2,
+          45
+        ],
+        "pokemon": [
+          {
+            "name": "rattata"
+          },
+          {
+            "name": "mankey"
+          },
+          {
+            "name": "spearow"
+          }
+        ]
+      },
+      "route-23": {
+        "label": "Route 23",
+        "level_range": [
+          35,
+          45
+        ],
+        "pokemon": [
+          {
+            "name": "mankey"
+          },
+          {
+            "name": "primeape"
+          },
+          {
+            "name": "fearow"
+          },
+          {
+            "name": "spearow"
+          },
+          {
+            "name": "ekans",
+            "version": "firered"
+          },
+          {
+            "name": "arbok",
+            "version": "firered"
+          },
+          {
+            "name": "sandshrew",
+            "version": "leafgreen"
+          },
+          {
+            "name": "sandslash",
+            "version": "leafgreen"
+          }
+        ]
+      },
+      "victory-road": {
+        "label": "Victory Road",
+        "level_range": [
+          36,
+          46
+        ],
+        "pokemon": [
+          {
+            "name": "zubat"
+          },
+          {
+            "name": "golbat"
+          },
+          {
+            "name": "geodude"
+          },
+          {
+            "name": "onix"
+          },
+          {
+            "name": "machop"
+          },
+          {
+            "name": "machoke"
+          },
+          {
+            "name": "marowak"
+          },
+          {
+            "name": "arbok",
+            "version": "firered"
+          },
+          {
+            "name": "sandslash",
+            "version": "leafgreen"
+          }
+        ]
+      },
+      "route-9": {
+        "label": "Route 9",
+        "level_range": [
+          11,
+          17
+        ],
+        "pokemon": [
+          {
+            "name": "rattata"
+          },
+          {
+            "name": "spearow"
+          },
+          {
+            "name": "ekans",
+            "version": "firered"
+          },
+          {
+            "name": "sandshrew",
+            "version": "leafgreen"
+          }
+        ]
+      },
+      "route-10": {
+        "label": "Route 10",
+        "level_range": [
+          11,
+          17
+        ],
+        "pokemon": [
+          {
+            "name": "voltorb"
+          },
+          {
+            "name": "spearow"
+          },
+          {
+            "name": "ekans",
+            "version": "firered"
+          },
+          {
+            "name": "sandshrew",
+            "version": "leafgreen"
+          }
+        ],
+        "fishing": {
+          "old_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                5
+              ]
+            }
+          ],
+          "good_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "leafgreen"
+            }
+          ],
+          "super_rod": [
+            {
+              "name": "gyarados",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "psyduck",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "slowpoke",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            }
+          ]
+        },
+        "surfing": [
+          {
+            "name": "tentacool",
+            "level_range": [
+              5,
+              40
+            ]
+          }
+        ]
+      },
+      "route-11": {
+        "label": "Route 11",
+        "level_range": [
+          12,
+          17
+        ],
+        "pokemon": [
+          {
+            "name": "drowzee"
+          },
+          {
+            "name": "spearow"
+          },
+          {
+            "name": "ekans",
+            "version": "firered"
+          },
+          {
+            "name": "sandshrew",
+            "version": "leafgreen"
+          }
+        ],
+        "fishing": {
+          "old_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                5
+              ]
+            }
+          ],
+          "good_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "leafgreen"
+            }
+          ],
+          "super_rod": [
+            {
+              "name": "gyarados",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "psyduck",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "slowpoke",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            }
+          ]
+        },
+        "surfing": [
+          {
+            "name": "tentacool",
+            "level_range": [
+              5,
+              40
+            ]
+          }
+        ],
+        "npc_trades": [
+          {
+            "give": "nidorino",
+            "receive": "nidorina",
+            "note": "Trainer on Route 11 will trade their Nidorina for your Nidorino"
+          }
+        ],
+        "key_items": [
+          {
+            "name": "itemfinder",
+            "label": "Itemfinder",
+            "from": "Professor Oak's aide in the Route 11 gate",
+            "requires_dex": 30,
+            "note": "Need 30 or more Pok\u00e9mon registered in your Pok\u00e9dex to receive this"
+          }
+        ]
+      },
+      "route-16": {
+        "label": "Route 16",
+        "level_range": [
+          18,
+          25
+        ],
+        "pokemon": [
+          {
+            "name": "doduo"
+          },
+          {
+            "name": "rattata"
+          },
+          {
+            "name": "spearow"
+          },
+          {
+            "name": "raticate"
+          }
+        ],
+        "interactables": [
+          {
+            "name": "snorlax",
+            "level": 30,
+            "requires": "poke-flute",
+            "note": "Blocking the road \u2014 wake with the Pok\u00e9 Flute. One time only!",
+            "legendary": false,
+            "one_time": true
+          }
+        ]
+      },
+      "route-17": {
+        "label": "Route 17 (Cycling Road)",
+        "level_range": [
+          20,
+          29
+        ],
+        "pokemon": [
+          {
+            "name": "doduo"
+          },
+          {
+            "name": "spearow"
+          },
+          {
+            "name": "raticate"
+          },
+          {
+            "name": "rattata"
+          },
+          {
+            "name": "fearow"
+          }
+        ]
+      },
+      "route-18": {
+        "label": "Route 18",
+        "level_range": [
+          20,
+          29
+        ],
+        "pokemon": [
+          {
+            "name": "doduo"
+          },
+          {
+            "name": "spearow"
+          },
+          {
+            "name": "raticate"
+          },
+          {
+            "name": "fearow"
+          },
+          {
+            "name": "rattata"
+          }
+        ],
+        "npc_trades": [
+          {
+            "give": "golduck",
+            "receive": "lickitung",
+            "note": "Trainer on Route 18 will trade their Lickitung for your Golduck"
+          }
+        ]
+      },
+      "route-24": {
+        "label": "Route 24 (Nugget Bridge)",
+        "level_range": [
+          7,
+          14
+        ],
+        "pokemon": [
+          {
+            "name": "oddish",
+            "version": "firered"
+          },
+          {
+            "name": "bellsprout",
+            "version": "leafgreen"
+          },
+          {
+            "name": "caterpie"
+          },
+          {
+            "name": "weedle"
+          },
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "abra"
+          },
+          {
+            "name": "kakuna",
+            "note": "4% FR / 1% LG"
+          },
+          {
+            "name": "metapod",
+            "note": "4% LG / 1% FR"
+          }
+        ],
+        "fishing": {
+          "old_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                5
+              ]
+            }
+          ],
+          "good_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "leafgreen"
+            }
+          ],
+          "super_rod": [
+            {
+              "name": "gyarados",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "psyduck",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "slowpoke",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            }
+          ]
+        },
+        "surfing": [
+          {
+            "name": "tentacool",
+            "level_range": [
+              5,
+              40
+            ]
+          }
+        ]
+      },
+      "route-25": {
+        "label": "Route 25 (Bill's Path)",
+        "level_range": [
+          7,
+          14
+        ],
+        "pokemon": [
+          {
+            "name": "oddish",
+            "version": "firered"
+          },
+          {
+            "name": "bellsprout",
+            "version": "leafgreen"
+          },
+          {
+            "name": "caterpie"
+          },
+          {
+            "name": "weedle"
+          },
+          {
+            "name": "pidgey"
+          },
+          {
+            "name": "abra"
+          },
+          {
+            "name": "kakuna",
+            "note": "4% FR / 1% LG"
+          },
+          {
+            "name": "metapod",
+            "note": "4% LG / 1% FR"
+          }
+        ],
+        "surfing": [
+          {
+            "name": "psyduck",
+            "level_range": [
+              20,
+              40
+            ],
+            "version": "firered"
+          },
+          {
+            "name": "slowpoke",
+            "level_range": [
+              20,
+              40
+            ],
+            "version": "leafgreen"
+          }
+        ],
+        "fishing": {
+          "old_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                5
+              ]
+            }
+          ],
+          "good_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "poliwag",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "goldeen",
+              "level_range": [
+                5,
+                15
+              ]
+            }
+          ],
+          "super_rod": [
+            {
+              "name": "gyarados",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "poliwag",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "poliwhirl",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "psyduck",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "slowpoke",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            }
+          ]
+        },
+        "key_items": [
+          {
+            "name": "ss-ticket",
+            "label": "S.S. Ticket",
+            "from": "Bill at his Sea Cottage on Route 25 after turning him back to normal",
+            "note": "Required to board the S.S. Anne in Vermilion City"
+          }
+        ]
+      },
+      "rock-tunnel": {
+        "label": "Rock Tunnel",
+        "level_range": [
+          15,
+          17
+        ],
+        "pokemon": [
+          {
+            "name": "geodude"
+          },
+          {
+            "name": "zubat"
+          },
+          {
+            "name": "mankey"
+          },
+          {
+            "name": "machop"
+          },
+          {
+            "name": "onix"
+          }
+        ],
+        "requires": "flash",
+        "note": "Dark cave \u2014 Flash makes navigation easier"
+      },
+      "pokemon-tower": {
+        "label": "Pok\u00e9mon Tower",
+        "level_range": [
+          13,
+          25
+        ],
+        "floors": [
+          {
+            "label": "Floors 3-5",
+            "level_range": [
+              13,
+              20
+            ],
+            "pokemon": [
+              {
+                "name": "gastly"
+              },
+              {
+                "name": "cubone"
+              },
+              {
+                "name": "haunter"
+              }
+            ]
+          },
+          {
+            "label": "Floor 6",
+            "level_range": [
+              14,
+              23
+            ],
+            "pokemon": [
+              {
+                "name": "gastly"
+              },
+              {
+                "name": "cubone"
+              },
+              {
+                "name": "haunter"
+              }
+            ]
+          },
+          {
+            "label": "Floor 7",
+            "level_range": [
+              15,
+              25
+            ],
+            "pokemon": [
+              {
+                "name": "gastly"
+              },
+              {
+                "name": "cubone"
+              },
+              {
+                "name": "haunter"
+              }
+            ]
+          }
+        ],
+        "requires": "silph-scope",
+        "note": "Ghost types appear as undefined spirits without the Silph Scope"
+      },
+      "power-plant": {
+        "label": "Power Plant",
+        "level_range": [
+          22,
+          35
+        ],
+        "pokemon": [
+          {
+            "name": "magnemite"
+          },
+          {
+            "name": "voltorb"
+          },
+          {
+            "name": "pikachu"
+          },
+          {
+            "name": "magneton"
+          },
+          {
+            "name": "electabuzz",
+            "version": "firered"
+          }
+        ],
+        "interactables": [
+          {
+            "name": "zapdos",
+            "level": 50,
+            "note": "Legendary \u2014 one encounter only. Save before approaching!",
+            "legendary": true
+          }
+        ],
+        "requires": "surf",
+        "note": "Accessible via Surf from Route 10"
+      },
+      "pokemon-mansion": {
+        "label": "Pok\u00e9mon Mansion",
+        "level_range": [
+          26,
+          38
+        ],
+        "floors": [
+          {
+            "label": "Floors 1-3",
+            "level_range": [
+              26,
+              36
+            ],
+            "pokemon": [
+              {
+                "name": "raticate"
+              },
+              {
+                "name": "koffing"
+              },
+              {
+                "name": "rattata"
+              },
+              {
+                "name": "growlithe",
+                "version": "firered"
+              },
+              {
+                "name": "vulpix",
+                "version": "leafgreen"
+              },
+              {
+                "name": "grimer"
+              },
+              {
+                "name": "weezing",
+                "version": "firered"
+              },
+              {
+                "name": "muk",
+                "version": "leafgreen"
+              }
+            ]
+          },
+          {
+            "label": "B1F",
+            "level_range": [
+              26,
+              38
+            ],
+            "pokemon": [
+              {
+                "name": "raticate"
+              },
+              {
+                "name": "koffing"
+              },
+              {
+                "name": "rattata"
+              },
+              {
+                "name": "growlithe",
+                "version": "firered"
+              },
+              {
+                "name": "vulpix",
+                "version": "leafgreen"
+              },
+              {
+                "name": "ditto"
+              },
+              {
+                "name": "grimer"
+              },
+              {
+                "name": "weezing",
+                "version": "firered"
+              },
+              {
+                "name": "muk",
+                "version": "leafgreen"
+              }
+            ]
+          }
+        ],
+        "note": "Ditto only appears in B1F \u2014 useful for breeding!",
+        "key_items": [
+          {
+            "name": "secret-key",
+            "label": "Secret Key",
+            "from": "Pok\u00e9mon Mansion Basement",
+            "note": "Opens the locked door to the Cinnabar Island Gym"
+          }
+        ]
+      },
+      "cerulean-city": {
+        "label": "Cerulean City",
+        "level_range": null,
+        "pokemon": [],
+        "npc_trades": [
+          {
+            "give": "poliwhirl",
+            "receive": "jynx",
+            "note": "Trade your Poliwhirl for a Jynx inside a house in Cerulean City"
+          }
+        ],
+        "surfing": [
+          {
+            "name": "tentacool",
+            "level_range": [
+              5,
+              40
+            ]
+          }
+        ],
+        "fishing": {
+          "old_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                5
+              ]
+            }
+          ],
+          "good_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "leafgreen"
+            }
+          ],
+          "super_rod": [
+            {
+              "name": "gyarados",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "psyduck",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "slowpoke",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            }
+          ]
+        },
+        "key_items": [
+          {
+            "name": "powder-jar",
+            "label": "Powder Jar",
+            "from": "Old man in the house next to the Gym Badge man's house",
+            "note": "Used for Berry Powder blending"
+          }
+        ]
+      },
+      "vermilion-city": {
+        "label": "Vermilion City",
+        "level_range": null,
+        "pokemon": [],
+        "surfing": [
+          {
+            "name": "tentacool",
+            "level_range": [
+              5,
+              40
+            ]
+          }
+        ],
+        "fishing": {
+          "old_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                5
+              ]
+            }
+          ],
+          "good_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "leafgreen"
+            }
+          ],
+          "super_rod": [
+            {
+              "name": "gyarados",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "psyduck",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "slowpoke",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "shellder",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "staryu",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            }
+          ]
+        },
+        "npc_trades": [
+          {
+            "give": "spearow",
+            "receive": "farfetchd",
+            "note": "Trader in Vermilion City will swap their Farfetch'd for your Spearow"
+          }
+        ],
+        "key_items": [
+          {
+            "name": "old-rod",
+            "label": "Old Rod",
+            "from": "Fishing Guru in Vermilion City",
+            "note": "Basic fishing rod \u2014 catches Magikarp"
+          },
+          {
+            "name": "bike-voucher",
+            "label": "Bike Voucher",
+            "from": "Chairman of the Pok\u00e9mon Fan Club in Vermilion City",
+            "note": "Exchange at Cerulean City Bike Shop for a free Bicycle"
+          },
+          {
+            "name": "vs-seeker",
+            "label": "VS. Seeker",
+            "from": "Girl next to the counter in Vermilion City Pok\u00e9mon Center",
+            "note": "Allows rematches with trainers"
+          }
+        ]
+      },
+      "vermilion-harbor": {
+        "label": "Vermilion Harbor",
+        "level_range": null,
+        "pokemon": [],
+        "surfing": [
+          {
+            "name": "tentacool",
+            "level_range": [
+              5,
+              40
+            ]
+          }
+        ],
+        "fishing": {
+          "old_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                5
+              ]
+            }
+          ],
+          "good_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "leafgreen"
+            }
+          ],
+          "super_rod": [
+            {
+              "name": "gyarados",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "psyduck",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "slowpoke",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "shellder",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "staryu",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            }
+          ]
+        }
+      },
+      "celadon-city": {
+        "label": "Celadon City",
+        "level_range": null,
+        "pokemon": [
+          {
+            "name": "koffing"
+          }
+        ],
+        "surfing": [
+          {
+            "name": "psyduck",
+            "level_range": [
+              5,
+              40
+            ],
+            "version": "firered"
+          },
+          {
+            "name": "slowpoke",
+            "level_range": [
+              5,
+              40
+            ],
+            "version": "leafgreen"
+          }
+        ],
+        "fishing": {
+          "old_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                5
+              ]
+            }
+          ],
+          "good_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                15
+              ]
+            }
+          ],
+          "super_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "grimer",
+              "level_range": [
+                15,
+                35
+              ]
+            }
+          ]
+        },
+        "gift_pokemon": [
+          {
+            "name": "eevee",
+            "note": "Given by a man on the top floor of Celadon Mansion \u2014 one time only",
+            "one_time": true
+          }
+        ],
+        "game_corner": [
+          {
+            "name": "abra",
+            "coins": {
+              "firered": 180,
+              "leafgreen": 120
+            }
+          },
+          {
+            "name": "clefairy",
+            "coins": {
+              "firered": 500,
+              "leafgreen": 750
+            }
+          },
+          {
+            "name": "dratini",
+            "coins": {
+              "firered": 2800,
+              "leafgreen": 4600
+            }
+          },
+          {
+            "name": "scyther",
+            "coins": {
+              "firered": 5500
+            },
+            "version": "firered"
+          },
+          {
+            "name": "pinsir",
+            "coins": {
+              "leafgreen": 2500
+            },
+            "version": "leafgreen"
+          },
+          {
+            "name": "porygon",
+            "coins": {
+              "firered": 9999,
+              "leafgreen": 6500
+            }
+          }
+        ],
+        "key_items": [
+          {
+            "name": "coin-case",
+            "label": "Coin Case",
+            "from": "Man in the Celadon City restaurant",
+            "note": "Required to play the Game Corner and redeem prizes"
+          },
+          {
+            "name": "tea",
+            "label": "Tea",
+            "from": "Old lady in Celadon Mansion",
+            "note": "Give to the Saffron City gate guards to gain access to Saffron City"
+          },
+          {
+            "name": "silph-scope",
+            "label": "Silph Scope",
+            "from": "Rocket Hideout B4F after defeating Giovanni",
+            "note": "Required to identify Ghost types in Pok\u00e9mon Tower"
+          }
+        ]
+      },
+      "fuchsia-city": {
+        "label": "Fuchsia City",
+        "level_range": null,
+        "pokemon": [],
+        "surfing": [
+          {
+            "name": "psyduck",
+            "level_range": [
+              5,
+              40
+            ],
+            "version": "firered"
+          },
+          {
+            "name": "slowpoke",
+            "level_range": [
+              5,
+              40
+            ],
+            "version": "leafgreen"
+          }
+        ],
+        "fishing": {
+          "old_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                5
+              ]
+            }
+          ],
+          "good_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "poliwag",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "goldeen",
+              "level_range": [
+                5,
+                15
+              ]
+            }
+          ],
+          "super_rod": [
+            {
+              "name": "psyduck",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "slowpoke",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "poliwag",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "goldeen",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "gyarados",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "seaking",
+              "level_range": [
+                15,
+                35
+              ]
+            }
+          ]
+        },
+        "key_items": [
+          {
+            "name": "good-rod",
+            "label": "Good Rod",
+            "from": "Fishing Guru in a house next to the Safari Zone Warden's house",
+            "note": "Allows fishing for mid level Pok\u00e9mon"
+          }
+        ]
+      },
+      "pewter-city": {
+        "label": "Pewter City",
+        "level_range": null,
+        "pokemon": [],
+        "key_items": [
+          {
+            "name": "old-amber",
+            "label": "Old Amber",
+            "from": "Pewter Museum of Science Laboratory",
+            "note": "Revive into Aerodactyl at the Cinnabar Island Lab"
+          }
+        ]
+      },
+      "lavender-town": {
+        "label": "Lavender Town",
+        "level_range": null,
+        "pokemon": [],
+        "key_items": [
+          {
+            "name": "poke-flute",
+            "label": "Pok\u00e9 Flute",
+            "from": "Mr. Fuji \u2014 given as thanks after saving him and Pok\u00e9mon Tower from Team Rocket",
+            "note": "Wakes the Snorlax blocking Routes 12 and 16"
+          }
+        ]
+      },
+      "saffron-city": {
+        "label": "Saffron City",
+        "level_range": null,
+        "pokemon": [],
+        "key_items": [
+          {
+            "name": "card-key",
+            "label": "Card Key",
+            "from": "Silph Co. 5F",
+            "note": "Opens locked doors throughout Silph Co."
+          }
+        ],
+        "gift_pokemon": [
+          {
+            "name": "hitmonlee",
+            "choice": "hitmonchan",
+            "from": "Fighting Dojo in Saffron City \u2014 defeat the dojo master",
+            "note": "Choose between Hitmonlee or Hitmonchan \u2014 one time only!",
+            "one_time": true
+          },
+          {
+            "name": "hitmonchan",
+            "choice": "hitmonlee",
+            "from": "Fighting Dojo in Saffron City \u2014 defeat the dojo master",
+            "note": "Choose between Hitmonchan or Hitmonlee \u2014 one time only!",
+            "one_time": true
+          }
+        ]
+      },
+      "cinnabar-island": {
+        "label": "Cinnabar Island",
+        "level_range": null,
+        "pokemon": [],
+        "surfing": [
+          {
+            "name": "tentacool",
+            "level_range": [
+              5,
+              40
+            ]
+          }
+        ],
+        "fishing": {
+          "old_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                5
+              ]
+            }
+          ],
+          "good_rod": [
+            {
+              "name": "magikarp",
+              "level_range": [
+                5,
+                15
+              ]
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                5,
+                15
+              ],
+              "version": "leafgreen"
+            }
+          ],
+          "super_rod": [
+            {
+              "name": "gyarados",
+              "level_range": [
+                15,
+                35
+              ]
+            },
+            {
+              "name": "psyduck",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "slowpoke",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "horsea",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "krabby",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "shellder",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "staryu",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            },
+            {
+              "name": "seadra",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "firered"
+            },
+            {
+              "name": "slowbro",
+              "level_range": [
+                15,
+                35
+              ],
+              "version": "leafgreen"
+            }
+          ]
+        },
+        "npc_trades": [
+          {
+            "give": "raichu",
+            "receive": "voltorb",
+            "note": "Trade your Raichu for a Voltorb at the Pok\u00e9mon Lab"
+          },
+          {
+            "give": "venonat",
+            "receive": "tangela",
+            "note": "Trade your Venonat for a Tangela at the Pok\u00e9mon Lab"
+          },
+          {
+            "give": "ponyta",
+            "receive": "seel",
+            "note": "Trade your Ponyta for a Seel at the Pok\u00e9mon Lab"
+          }
+        ],
+        "fossil_revival": {
+          "note": "Bring your fossils to the Cinnabar Island Pok\u00e9mon Lab to revive them",
+          "fossils": [
+            {
+              "fossil": "dome-fossil",
+              "revives": "kabuto"
+            },
+            {
+              "fossil": "helix-fossil",
+              "revives": "omanyte"
+            },
+            {
+              "fossil": "old-amber",
+              "revives": "aerodactyl"
+            }
+          ]
+        }
+      },
+      "silph-co": {
+        "label": "Silph Co.",
+        "level_range": null,
+        "pokemon": [],
+        "gift_pokemon": [
+          {
+            "name": "lapras",
+            "from": "Employee on Floor 6 of Silph Co.",
+            "note": "One time only \u2014 given after liberating Silph Co. from Team Rocket",
+            "one_time": true
+          }
+        ]
+      },
+      "digletts-cave": {
+        "label": "Diglett's Cave",
+        "level_range": [
+          15,
+          31
+        ],
+        "pokemon": [
+          {
+            "name": "diglett"
+          },
+          {
+            "name": "dugtrio"
+          }
+        ]
+      },
+      "cerulean-cave": {
+        "label": "Cerulean Cave",
+        "level_range": [
+          46,
+          70
+        ],
+        "requires": "national-dex",
+        "note": "Only accessible after obtaining the National Pok\u00e9dex",
+        "floors": [
+          {
+            "label": "1F",
+            "pokemon": [
+              {
+                "name": "parasect"
+              },
+              {
+                "name": "magneton"
+              },
+              {
+                "name": "golbat"
+              },
+              {
+                "name": "primeape"
+              },
+              {
+                "name": "ditto"
+              },
+              {
+                "name": "machoke"
+              },
+              {
+                "name": "electrode"
+              },
+              {
+                "name": "wobbuffet"
+              }
+            ],
+            "rock_smash": [
+              {
+                "name": "geodude"
+              },
+              {
+                "name": "graveler"
+              }
+            ],
+            "surfing": [
+              {
+                "name": "psyduck",
+                "level_range": [
+                  5,
+                  40
+                ],
+                "version": "firered"
+              },
+              {
+                "name": "golduck",
+                "level_range": [
+                  5,
+                  40
+                ],
+                "version": "firered"
+              },
+              {
+                "name": "slowpoke",
+                "level_range": [
+                  5,
+                  40
+                ],
+                "version": "leafgreen"
+              },
+              {
+                "name": "slowbro",
+                "level_range": [
+                  5,
+                  40
+                ],
+                "version": "leafgreen"
+              }
+            ],
+            "fishing": {
+              "old_rod": [
+                {
+                  "name": "magikarp",
+                  "level_range": [
+                    5,
+                    5
+                  ]
+                }
+              ],
+              "good_rod": [
+                {
+                  "name": "magikarp",
+                  "level_range": [
+                    5,
+                    15
+                  ]
+                },
+                {
+                  "name": "poliwag",
+                  "level_range": [
+                    5,
+                    15
+                  ]
+                },
+                {
+                  "name": "goldeen",
+                  "level_range": [
+                    5,
+                    15
+                  ]
+                }
+              ],
+              "super_rod": [
+                {
+                  "name": "poliwag",
+                  "level_range": [
+                    15,
+                    35
+                  ]
+                },
+                {
+                  "name": "poliwhirl",
+                  "level_range": [
+                    15,
+                    35
+                  ]
+                },
+                {
+                  "name": "gyarados",
+                  "level_range": [
+                    15,
+                    35
+                  ]
+                },
+                {
+                  "name": "psyduck",
+                  "level_range": [
+                    15,
+                    35
+                  ],
+                  "version": "firered"
+                },
+                {
+                  "name": "slowpoke",
+                  "level_range": [
+                    15,
+                    35
+                  ],
+                  "version": "leafgreen"
+                }
+              ]
+            }
+          },
+          {
+            "label": "2F",
+            "pokemon": [
+              {
+                "name": "golbat"
+              },
+              {
+                "name": "machoke"
+              },
+              {
+                "name": "parasect"
+              },
+              {
+                "name": "kadabra"
+              },
+              {
+                "name": "ditto"
+              },
+              {
+                "name": "magneton"
+              },
+              {
+                "name": "wobbuffet"
+              },
+              {
+                "name": "electrode"
+              }
+            ],
+            "rock_smash": [
+              {
+                "name": "geodude"
+              },
+              {
+                "name": "graveler"
+              }
+            ]
+          },
+          {
+            "label": "B1F",
+            "pokemon": [
+              {
+                "name": "kadabra"
+              },
+              {
+                "name": "ditto"
+              },
+              {
+                "name": "parasect"
+              },
+              {
+                "name": "golbat"
+              },
+              {
+                "name": "machoke"
+              },
+              {
+                "name": "magneton"
+              },
+              {
+                "name": "electrode"
+              },
+              {
+                "name": "wobbuffet"
+              }
+            ],
+            "rock_smash": [
+              {
+                "name": "geodude"
+              },
+              {
+                "name": "graveler"
+              }
+            ],
+            "surfing": [
+              {
+                "name": "psyduck",
+                "level_range": [
+                  5,
+                  40
+                ],
+                "version": "firered"
+              },
+              {
+                "name": "golduck",
+                "level_range": [
+                  5,
+                  40
+                ],
+                "version": "firered"
+              },
+              {
+                "name": "slowpoke",
+                "level_range": [
+                  5,
+                  40
+                ],
+                "version": "leafgreen"
+              },
+              {
+                "name": "slowbro",
+                "level_range": [
+                  5,
+                  40
+                ],
+                "version": "leafgreen"
+              }
+            ],
+            "fishing": {
+              "old_rod": [
+                {
+                  "name": "magikarp",
+                  "level_range": [
+                    5,
+                    5
+                  ]
+                }
+              ],
+              "good_rod": [
+                {
+                  "name": "magikarp",
+                  "level_range": [
+                    5,
+                    15
+                  ]
+                },
+                {
+                  "name": "poliwag",
+                  "level_range": [
+                    5,
+                    15
+                  ]
+                },
+                {
+                  "name": "goldeen",
+                  "level_range": [
+                    5,
+                    15
+                  ]
+                }
+              ],
+              "super_rod": [
+                {
+                  "name": "poliwag",
+                  "level_range": [
+                    15,
+                    35
+                  ]
+                },
+                {
+                  "name": "poliwhirl",
+                  "level_range": [
+                    15,
+                    35
+                  ]
+                },
+                {
+                  "name": "gyarados",
+                  "level_range": [
+                    15,
+                    35
+                  ]
+                },
+                {
+                  "name": "psyduck",
+                  "level_range": [
+                    15,
+                    35
+                  ],
+                  "version": "firered"
+                },
+                {
+                  "name": "slowpoke",
+                  "level_range": [
+                    15,
+                    35
+                  ],
+                  "version": "leafgreen"
+                }
+              ]
+            },
+            "interactables": [
+              {
+                "name": "mewtwo",
+                "level": 70,
+                "note": "Legendary \u2014 one encounter only. Save before approaching!",
+                "legendary": true,
+                "one_time": true
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "milestones": [
+      {
+        "id": "oak-starter",
+        "label": "Got your starter from Prof. Oak",
+        "order": 1
+      },
+      {
+        "id": "viridian-pokedex",
+        "label": "Delivered Oak's Parcel",
+        "order": 2
+      },
+      {
+        "id": "badge-1",
+        "label": "Boulder Badge",
+        "order": 3,
+        "gym_id": 1
+      },
+      {
+        "id": "badge-2",
+        "label": "Cascade Badge",
+        "order": 4,
+        "gym_id": 2
+      },
+      {
+        "id": "nugget-bridge",
+        "label": "Crossed Nugget Bridge",
+        "order": 5
+      },
+      {
+        "id": "badge-3",
+        "label": "Thunder Badge",
+        "order": 6,
+        "gym_id": 3
+      },
+      {
+        "id": "ss-anne",
+        "label": "Got HM Cut from SS Anne",
+        "order": 7
+      },
+      {
+        "id": "badge-4",
+        "label": "Rainbow Badge",
+        "order": 8,
+        "gym_id": 4
+      },
+      {
+        "id": "silph-scope",
+        "label": "Got the Silph Scope",
+        "order": 9
+      },
+      {
+        "id": "badge-5",
+        "label": "Soul Badge",
+        "order": 10,
+        "gym_id": 5
+      },
+      {
+        "id": "silph-co",
+        "label": "Defeated Team Rocket at Silph Co.",
+        "order": 11
+      },
+      {
+        "id": "badge-6",
+        "label": "Marsh Badge",
+        "order": 12,
+        "gym_id": 6
+      },
+      {
+        "id": "badge-7",
+        "label": "Volcano Badge",
+        "order": 13,
+        "gym_id": 7
+      },
+      {
+        "id": "badge-8",
+        "label": "Earth Badge",
+        "order": 14,
+        "gym_id": 8
+      },
+      {
+        "id": "elite-1",
+        "label": "Defeated Lorelei",
+        "order": 15,
+        "gym_id": 9
+      },
+      {
+        "id": "elite-2",
+        "label": "Defeated Bruno",
+        "order": 16,
+        "gym_id": 10
+      },
+      {
+        "id": "elite-3",
+        "label": "Defeated Agatha",
+        "order": 17,
+        "gym_id": 11
+      },
+      {
+        "id": "elite-4",
+        "label": "Defeated Lance",
+        "order": 18,
+        "gym_id": 12
+      },
+      {
+        "id": "champion",
+        "label": "Became Champion!",
+        "order": 19,
+        "gym_id": 13
+      }
+    ],
+    "version_exclusives": {
+      "firered": [
+        "ekans",
+        "arbok",
+        "oddish",
+        "gloom",
+        "vileplume",
+        "psyduck",
+        "golduck",
+        "growlithe",
+        "arcanine",
+        "shellder",
+        "cloyster",
+        "electabuzz",
+        "scyther"
+      ],
+      "leafgreen": [
+        "sandshrew",
+        "sandslash",
+        "bellsprout",
+        "weepinbell",
+        "victreebel",
+        "slowpoke",
+        "slowbro",
+        "staryu",
+        "starmie",
+        "magnemite",
+        "magneton",
+        "pinsir",
+        "jynx"
+      ],
+      "leafgreen_sevii_pending": [
+        "magmar"
+      ]
+    },
+    "sevii_key_items_pending": [
+      {
+        "name": "meteorite",
+        "label": "Meteorite",
+        "from": "Bill at the Pok\u00e9mon Network Center on One Island",
+        "note": "Sevii Islands item \u2014 add when One Island data is built"
+      },
+      {
+        "name": "ruby",
+        "label": "Ruby",
+        "from": "Post-National Pok\u00e9dex area on Mt. Ember",
+        "note": "Sevii Islands \u2014 add when Mt. Ember data is built"
+      },
+      {
+        "name": "sapphire",
+        "label": "Sapphire",
+        "from": "Rocket Warehouse on Five Island",
+        "note": "Sevii Islands \u2014 add when Five Island data is built"
+      }
+    ]
+  }
+}

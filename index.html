@@ -684,14 +684,133 @@
 
       <!-- Game Progress -->
       <div id="progress-section" style="display:none">
-        <div class="container">
+
+        <!-- No save file yet -->
+        <div id="gp-no-save" class="container" style="display:none">
           <div class="coming-soon-card">
             <div class="cs-icon">🗺️</div>
             <div class="cinzel cs-title">Game Progress</div>
-            <div class="cs-sub">Track badges, story milestones, and completion percentage for each game in your collection.</div>
-            <div class="cs-badge">Coming Soon</div>
+            <div class="cs-sub">Start tracking your playthrough — Rotom will guide you every step of the way.</div>
+            <button class="gp-new-save-btn" onclick="gpOpenNewSave()">+ Start a new playthrough</button>
           </div>
         </div>
+
+        <!-- Active save UI -->
+        <div id="gp-main" style="display:none">
+
+          <!-- Save selector bar -->
+          <div id="gp-save-bar">
+            <div id="gp-save-bar-inner">
+              <select id="gp-save-select" onchange="gpSwitchSave(this.value)"></select>
+              <button class="gp-icon-btn" onclick="gpOpenNewSave()" title="New playthrough">+</button>
+              <button class="gp-icon-btn gp-danger" onclick="gpConfirmDelete()" title="Delete save">🗑</button>
+            </div>
+          </div>
+
+          <!-- Version badge -->
+          <div id="gp-version-badge-wrap">
+            <span id="gp-version-badge" class="gp-version-badge"></span>
+          </div>
+
+          <!-- Tabs -->
+          <div class="section-subtabs" id="gp-tabs">
+            <button class="section-subtab active" id="gptab-journey"  onclick="gpSwitchTab('journey')">🏅 Journey</button>
+            <button class="section-subtab"        id="gptab-team"     onclick="gpSwitchTab('team')">👾 My Team</button>
+            <button class="section-subtab"        id="gptab-notes"    onclick="gpSwitchTab('notes')">⚡ Rotom's Notes</button>
+          </div>
+
+          <!-- ── Journey tab ── -->
+          <div id="gp-journey-tab" class="container">
+
+            <div class="gp-card">
+              <div class="gp-card-title">Kanto Badge Case</div>
+              <div class="gp-badge-grid" id="gp-badge-grid"></div>
+              <div class="gp-progress-wrap">
+                <div class="gp-progress-track"><div class="gp-progress-fill" id="gp-badge-fill"></div></div>
+                <div class="gp-progress-label" id="gp-badge-label">0 / 8 badges</div>
+              </div>
+            </div>
+
+            <div class="gp-card" id="gp-e4-card">
+              <div class="gp-card-title">Elite Four &amp; Champion</div>
+              <div class="gp-e4-grid" id="gp-e4-grid"></div>
+            </div>
+
+            <div class="gp-card">
+              <div class="gp-card-title">Locations Visited</div>
+              <div id="gp-locations-wrap">
+                <div class="gp-location-hint">Mark locations as you visit them — Rotom will track your journey.</div>
+                <div class="gp-location-grid" id="gp-location-grid"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ── My Team tab ── -->
+          <div id="gp-team-tab" class="container" style="display:none">
+            <div class="gp-card">
+              <div class="gp-card-title">Your Team</div>
+              <div class="gp-card-sub">Up to 6 Pokémon — tap a slot to edit</div>
+              <div class="gp-team-grid" id="gp-team-grid"></div>
+            </div>
+          </div>
+
+          <!-- ── Rotom's Notes tab ── -->
+          <div id="gp-notes-tab" class="container" style="display:none">
+            <div class="gp-notes-thread" id="gp-notes-thread"></div>
+            <div class="gp-notes-input-wrap">
+              <input id="gp-notes-input" class="gp-notes-input" type="text" placeholder="Tell Rotom what you're doing..." autocomplete="off" onkeydown="if(event.key==='Enter')gpSendNote()"/>
+              <button class="gp-notes-send" onclick="gpSendNote()">Send</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- New Save Modal -->
+        <div id="gp-new-save-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this)gpCloseNewSave()">
+          <div class="modal-sheet">
+            <div class="modal-header">
+              <div class="modal-title">New Playthrough</div>
+              <button class="modal-close" onclick="gpCloseNewSave()">×</button>
+            </div>
+            <div class="modal-body">
+              <label class="field-label">Nickname (optional)</label>
+              <input id="gp-new-nickname" class="field-input" type="text" placeholder="e.g. Nuzlocke Run, Ash's Journey..." maxlength="30"/>
+              <label class="field-label">Game</label>
+              <div class="gp-game-picker" id="gp-game-picker">
+                <div class="gp-game-opt selected" data-game="firered">🔴 FireRed</div>
+                <div class="gp-game-opt" data-game="leafgreen">🍃 LeafGreen</div>
+              </div>
+              <div class="modal-actions">
+                <button class="btn-secondary" onclick="gpCloseNewSave()">Cancel</button>
+                <button class="btn-primary" onclick="gpCreateSave()">Start Journey</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team slot edit modal -->
+        <div id="gp-team-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this)gpCloseTeamModal()">
+          <div class="modal-sheet">
+            <div class="modal-header">
+              <div class="modal-title" id="gp-team-modal-title">Edit Team Slot</div>
+              <button class="modal-close" onclick="gpCloseTeamModal()">×</button>
+            </div>
+            <div class="modal-body">
+              <label class="field-label">Pokémon</label>
+              <input id="gp-team-species" class="field-input" type="text" placeholder="e.g. Charizard" autocomplete="off"/>
+              <label class="field-label">Nickname (optional)</label>
+              <input id="gp-team-nickname" class="field-input" type="text" placeholder="e.g. Ember" maxlength="12"/>
+              <label class="field-label">Level</label>
+              <input id="gp-team-level" class="field-input" type="number" placeholder="1–100" min="1" max="100"/>
+              <div class="modal-actions">
+                <button class="btn-secondary gp-danger" onclick="gpClearTeamSlot()">Clear slot</button>
+                <button class="btn-primary" onclick="gpSaveTeamSlot()">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- Hall of Fame — unlocked by Living Dex / Shiny Living Dex completion -->
