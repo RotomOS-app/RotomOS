@@ -5345,14 +5345,14 @@ const BADGE_BASE  = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sp
 const ROTOM_SPRITE= 'https://img.pokemondb.net/sprites/sword-shield/icon/rotom.png';
 
 const GP_BADGES = [
-  { id:'boulder',  name:'Boulder',  gym:'Brock',    type:'rock',     sprite:'boulder-badge',  aceLevel:14 },
-  { id:'cascade',  name:'Cascade',  gym:'Misty',    type:'water',    sprite:'cascade-badge',  aceLevel:21 },
-  { id:'thunder',  name:'Thunder',  gym:'Lt. Surge',type:'electric', sprite:'thunder-badge',  aceLevel:28 },
-  { id:'rainbow',  name:'Rainbow',  gym:'Erika',    type:'grass',    sprite:'rainbow-badge',  aceLevel:29 },
-  { id:'soul',     name:'Soul',     gym:'Koga',     type:'poison',   sprite:'soul-badge',     aceLevel:43 },
-  { id:'marsh',    name:'Marsh',    gym:'Sabrina',  type:'psychic',  sprite:'marsh-badge',    aceLevel:50 },
-  { id:'volcano',  name:'Volcano',  gym:'Blaine',   type:'fire',     sprite:'volcano-badge',  aceLevel:54 },
-  { id:'earth',    name:'Earth',    gym:'Giovanni', type:'ground',   sprite:'earth-badge',    aceLevel:50 },
+  { id:'boulder',  name:'Boulder',  gym:'Brock',    type:'rock',     sprite:'https://archives.bulbagarden.net/media/upload/2/28/Boulderbadge.png',  aceLevel:14 },
+  { id:'cascade',  name:'Cascade',  gym:'Misty',    type:'water',    sprite:'https://archives.bulbagarden.net/media/upload/8/80/Cascadebadge.png',  aceLevel:21 },
+  { id:'thunder',  name:'Thunder',  gym:'Lt. Surge',type:'electric', sprite:'https://archives.bulbagarden.net/media/upload/a/a6/Thunderbadge.png',  aceLevel:28 },
+  { id:'rainbow',  name:'Rainbow',  gym:'Erika',    type:'grass',    sprite:'https://archives.bulbagarden.net/media/upload/d/dd/Rainbowbadge.png',  aceLevel:29 },
+  { id:'soul',     name:'Soul',     gym:'Koga',     type:'poison',   sprite:'https://archives.bulbagarden.net/media/upload/6/6f/Soulbadge.png',     aceLevel:43 },
+  { id:'marsh',    name:'Marsh',    gym:'Sabrina',  type:'psychic',  sprite:'https://archives.bulbagarden.net/media/upload/1/19/Marshbadge.png',    aceLevel:50 },
+  { id:'volcano',  name:'Volcano',  gym:'Blaine',   type:'fire',     sprite:'https://archives.bulbagarden.net/media/upload/8/83/Volcanobadge.png',  aceLevel:54 },
+  { id:'earth',    name:'Earth',    gym:'Giovanni', type:'ground',   sprite:'https://archives.bulbagarden.net/media/upload/6/62/Earthbadge.png',    aceLevel:50 },
 ];
 
 const GP_E4 = [
@@ -5489,7 +5489,7 @@ function gpRenderBadges(save) {
     slot.title = isEarned ? b.name + ' Badge — earned!' : 'Defeat ' + b.gym + ' to earn this badge';
     slot.innerHTML = `
       <div class="gp-badge-circle ${isEarned ? 'earned' : 'unearned'}" onclick="gpToggleBadge('${b.id}')">
-        <img class="gp-badge-img" src="${BADGE_BASE}${b.sprite}.png" alt="${b.name}" onerror="this.style.opacity='.4'">
+        <img class="gp-badge-img" src="${b.sprite}" alt="${b.name}" onerror="this.style.opacity='.4'">
       </div>
       <div class="gp-badge-name ${isEarned ? 'earned' : ''}">${b.name}</div>
     `;
