@@ -1183,13 +1183,7 @@ function switchTab(tab) {
   if (tab === 'shiny') { renderHuntStats(); renderHunts(); }
 }
 
-function headerAction() {
-  if (currentTab === 'shiny') { openQuickLogModal(); return; }
-  openAddModal();
-  if (currentTab === 'wants') {
-    setTimeout(() => { document.getElementById('fStatus').value = 'wanted'; }, 0);
-  }
-}
+// headerAction defined below in navigation section
 
 function renderWants() {
   const wanted = mons.filter(m => m.tradeStatus === 'wanted');
@@ -4035,6 +4029,10 @@ function rotomSay(key, force) {
   const toast  = document.getElementById('rotom-toast');
   const textEl = document.getElementById('rotom-toast-text');
   if (!toast || !textEl) return;
+
+  // Check if any modal is open — suppress non-forced toasts
+  const anyModalOpen = document.querySelector('[id$="Modal"][style*="flex"]');
+  if (anyModalOpen && !force) return;
 
   if (rotomToastTimer) clearTimeout(rotomToastTimer);
 
