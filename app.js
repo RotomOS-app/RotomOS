@@ -3233,7 +3233,7 @@ function bfToggleGoal(goal) {
   // Update Rotom bubble
   const bubble = document.getElementById('bf-rotom-bubble');
   if (bfState.goals.has('shiny') && bfState.goals.has('stats')) {
-    bubble.textContent = 'Shiny AND stats?! KZZZZRRT?! You really don't do things by halves — Rotom loves it! ⚡';
+    bubble.textContent = "Shiny AND stats?! KZZZZRRT?! You really don't do things by halves — Rotom loves it! ⚡";
   } else if (bfState.goals.has('shiny')) {
     bubble.textContent = 'Oooh, chasing sparklies?! My circuits are tingling already, bucko-zzzt! ✨';
   } else if (bfState.goals.has('stats')) {
