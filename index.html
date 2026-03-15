@@ -309,18 +309,51 @@
 
       <div>
         <div class="form-label">Game</div>
-        <select class="form-select" id="nh-game">
-          <option>Scarlet / Violet</option>
-          <option>Sword / Shield</option>
-          <option>Brilliant Diamond / Shining Pearl</option>
-          <option>Legends: Arceus</option>
-          <option>Sun / Moon</option>
-          <option>Ultra Sun / Ultra Moon</option>
-          <option>X / Y</option>
-          <option>Omega Ruby / Alpha Sapphire</option>
-          <option>Black 2 / White 2</option>
-          <option>HeartGold / SoulSilver</option>
-          <option>Other</option>
+        <select class="form-select" id="nh-game" onchange="nhPreview()">
+          <optgroup label="Generation IX">
+            <option>Scarlet/Violet</option>
+          </optgroup>
+          <optgroup label="Generation VIII">
+            <option>Sword/Shield</option>
+            <option>Brilliant Diamond/Shining Pearl</option>
+            <option>Legends: Arceus</option>
+          </optgroup>
+          <optgroup label="Generation VII">
+            <option>Sun/Moon</option>
+            <option>Ultra Sun/Ultra Moon</option>
+            <option>Let's Go Pikachu/Eevee</option>
+          </optgroup>
+          <optgroup label="Generation VI">
+            <option>X/Y</option>
+            <option>Omega Ruby/Alpha Sapphire</option>
+          </optgroup>
+          <optgroup label="Generation V (1/8192)">
+            <option>Black/White</option>
+            <option>Black 2/White 2</option>
+          </optgroup>
+          <optgroup label="Generation IV (1/8192)">
+            <option>Diamond/Pearl</option>
+            <option>Platinum</option>
+            <option>HeartGold/SoulSilver</option>
+          </optgroup>
+          <optgroup label="Generation III (1/8192)">
+            <option>Ruby/Sapphire</option>
+            <option>Emerald</option>
+            <option>FireRed/LeafGreen</option>
+            <option>Colosseum/XD</option>
+          </optgroup>
+          <optgroup label="Generation II (1/8192)">
+            <option>Gold/Silver</option>
+            <option>Crystal</option>
+          </optgroup>
+          <optgroup label="Generation I (1/8192)">
+            <option>Red/Blue</option>
+            <option>Yellow</option>
+          </optgroup>
+          <optgroup label="Other">
+            <option>HOME</option>
+            <option>Other</option>
+          </optgroup>
         </select>
       </div>
 
