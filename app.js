@@ -1183,7 +1183,13 @@ function switchTab(tab) {
   if (tab === 'shiny') { renderHuntStats(); renderHunts(); }
 }
 
-// headerAction defined below in navigation section
+function headerAction() {
+  if (currentTab === 'shiny') { openQuickLogModal(); return; }
+  openAddModal();
+  if (currentTab === 'wants') {
+    setTimeout(() => { document.getElementById('fStatus').value = 'wanted'; }, 0);
+  }
+}
 
 function renderWants() {
   const wanted = mons.filter(m => m.tradeStatus === 'wanted');
@@ -4030,10 +4036,6 @@ function rotomSay(key, force) {
   const textEl = document.getElementById('rotom-toast-text');
   if (!toast || !textEl) return;
 
-  // Check if any modal is open — suppress non-forced toasts
-  const anyModalOpen = document.querySelector('[id$="Modal"][style*="flex"]');
-  if (anyModalOpen && !force) return;
-
   if (rotomToastTimer) clearTimeout(rotomToastTimer);
 
   textEl.textContent = text;
@@ -6007,9 +6009,45 @@ function gpRenderNotes(save) {
   thread.scrollTop = thread.scrollHeight;
 }
 
+
+// ── Rotom Notes unread badge ──────────────────────────────────────────────────
+let gpUnreadNotes = 0;
+
+function gpMarkNoteUnread() {
+  gpUnreadNotes++;
+  const badge = document.getElementById('gp-notes-unread');
+  if (!badge) return;
+  badge.textContent = gpUnreadNotes > 9 ? '9+' : gpUnreadNotes;
+  badge.style.display = 'inline-flex';
+  // Re-trigger pop animation
+  badge.style.animation = 'none';
+  void badge.offsetWidth;
+  badge.style.animation = 'notes-badge-pop .3s cubic-bezier(.34,1.56,.64,1)';
+  // Shake the latest Rotom sprite in the thread
+  setTimeout(() => {
+    const sprites = document.querySelectorAll('.gp-note-rotom-sprite');
+    const last = sprites[sprites.length - 1];
+    if (last) {
+      last.classList.remove('shake');
+      void last.offsetWidth;
+      last.classList.add('shake');
+      last.addEventListener('animationend', () => last.classList.remove('shake'), { once: true });
+    }
+  }, 100);
+}
+
+function gpClearUnreadNotes() {
+  gpUnreadNotes = 0;
+  const badge = document.getElementById('gp-notes-unread');
+  if (badge) badge.style.display = 'none';
+}
+
 function gpAddRotomNote(save, text, saveId) {
   if (!save.notes) save.notes = [];
   save.notes.push({ from:'rotom', text, time: gpTimeString() });
+  // Mark unread unless the notes tab is currently open
+  const notesTabVisible = document.getElementById('gp-notes-tab')?.style.display !== 'none';
+  if (!notesTabVisible) gpMarkNoteUnread();
   gpUpdateSave(save);
   // Live update if notes tab is visible
   const notesTab = document.getElementById('gp-notes-tab');
@@ -6077,6 +6115,7 @@ function gpSwitchTab(tab) {
     const id   = gpGetActive();
     const save = gpGetSave(id);
     if (save) gpRenderNotes(save);
+    gpClearUnreadNotes();
     setTimeout(() => {
       const thread = document.getElementById('gp-notes-thread');
       if (thread) thread.scrollTop = thread.scrollHeight;

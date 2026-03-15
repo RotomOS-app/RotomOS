@@ -3694,3 +3694,47 @@ body.theme-light .gp-dex-name { color: #4a3d6e !important; }
   background: #3a1f5e;
   box-shadow: 0 0 8px color-mix(in srgb, var(--chip-accent) 30%, transparent);
 }
+
+/* ── Rotom Notes — unread badge + shake ─────────────────────────────────────── */
+#gptab-notes {
+  position: relative;
+}
+#gp-notes-unread {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  background: #c084fc;
+  border: 2px solid #1a1230;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 900;
+  color: #fff;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+  box-shadow: 0 0 8px #c084fc88;
+  animation: notes-badge-pop .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes notes-badge-pop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+/* Shake animation for Rotom sprite in notes */
+@keyframes rotom-note-shake {
+  0%   { transform: rotate(0deg)   translateX(0); }
+  15%  { transform: rotate(-8deg)  translateX(-3px); }
+  30%  { transform: rotate(8deg)   translateX(3px); }
+  45%  { transform: rotate(-6deg)  translateX(-2px); }
+  60%  { transform: rotate(6deg)   translateX(2px); }
+  75%  { transform: rotate(-3deg)  translateX(-1px); }
+  90%  { transform: rotate(3deg)   translateX(1px); }
+  100% { transform: rotate(0deg)   translateX(0); }
+}
+.gp-note-rotom-sprite.shake {
+  animation: rotom-note-shake .5s ease-in-out;
+}
