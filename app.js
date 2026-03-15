@@ -1299,8 +1299,14 @@ function shinyTab(tab) {
 function renderHuntStats() {
   const active  = hunts.filter(h => h.status === 'active');
   const allDone = shinyLog;
-  const totalEnc = hunts.reduce((s, h) => s + h.count, 0);
-  const longest  = hunts.reduce((max, h) => h.count > max ? h.count : max, 0);
+  // Total = active hunt counts + completed hunt counts stored in the log
+  const activeEnc   = hunts.reduce((s, h) => s + (h.count || 0), 0);
+  const completedEnc= shinyLog.reduce((s, l) => s + (l.count || 0), 0);
+  const totalEnc    = activeEnc + completedEnc;
+  // Longest = max across active hunts and log entries
+  const longestActive = hunts.reduce((max, h) => h.count > max ? h.count : max, 0);
+  const longestLog    = shinyLog.reduce((max, l) => (l.count||0) > max ? l.count : max, 0);
+  const longest       = Math.max(longestActive, longestLog);
 
   const stats = [
     { v: active.length,               l: 'Active Hunts',      c: '#c4b5fd' },
@@ -2250,7 +2256,9 @@ function renderShinyStats() {
   const uniqueSpecies  = new Set(allLog.map(l => l.species.toLowerCase())).size;
   const uniqueBalls    = new Set(allLog.map(l => l.ball).filter(Boolean)).size;
   const allCounts      = allLog.map(l => l.count).filter(c => c > 0);
-  const totalEncounters= hunts.reduce((s, h) => s + h.count, 0);
+  const activeEnc      = hunts.reduce((s, h) => s + (h.count || 0), 0);
+  const completedEnc   = allLog.reduce((s, l) => s + (l.count || 0), 0);
+  const totalEncounters= activeEnc + completedEnc;
   const avgEnc         = allCounts.length ? Math.round(allCounts.reduce((a,b)=>a+b,0) / allCounts.length) : 0;
 
   // Luckiest — lowest count with known odds
@@ -6009,45 +6017,9 @@ function gpRenderNotes(save) {
   thread.scrollTop = thread.scrollHeight;
 }
 
-
-// ── Rotom Notes unread badge ──────────────────────────────────────────────────
-let gpUnreadNotes = 0;
-
-function gpMarkNoteUnread() {
-  gpUnreadNotes++;
-  const badge = document.getElementById('gp-notes-unread');
-  if (!badge) return;
-  badge.textContent = gpUnreadNotes > 9 ? '9+' : gpUnreadNotes;
-  badge.style.display = 'inline-flex';
-  // Re-trigger pop animation
-  badge.style.animation = 'none';
-  void badge.offsetWidth;
-  badge.style.animation = 'notes-badge-pop .3s cubic-bezier(.34,1.56,.64,1)';
-  // Shake the latest Rotom sprite in the thread
-  setTimeout(() => {
-    const sprites = document.querySelectorAll('.gp-note-rotom-sprite');
-    const last = sprites[sprites.length - 1];
-    if (last) {
-      last.classList.remove('shake');
-      void last.offsetWidth;
-      last.classList.add('shake');
-      last.addEventListener('animationend', () => last.classList.remove('shake'), { once: true });
-    }
-  }, 100);
-}
-
-function gpClearUnreadNotes() {
-  gpUnreadNotes = 0;
-  const badge = document.getElementById('gp-notes-unread');
-  if (badge) badge.style.display = 'none';
-}
-
 function gpAddRotomNote(save, text, saveId) {
   if (!save.notes) save.notes = [];
   save.notes.push({ from:'rotom', text, time: gpTimeString() });
-  // Mark unread unless the notes tab is currently open
-  const notesTabVisible = document.getElementById('gp-notes-tab')?.style.display !== 'none';
-  if (!notesTabVisible) gpMarkNoteUnread();
   gpUpdateSave(save);
   // Live update if notes tab is visible
   const notesTab = document.getElementById('gp-notes-tab');
@@ -6115,7 +6087,6 @@ function gpSwitchTab(tab) {
     const id   = gpGetActive();
     const save = gpGetSave(id);
     if (save) gpRenderNotes(save);
-    gpClearUnreadNotes();
     setTimeout(() => {
       const thread = document.getElementById('gp-notes-thread');
       if (thread) thread.scrollTop = thread.scrollHeight;
