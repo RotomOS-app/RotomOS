@@ -1294,6 +1294,19 @@
   <img id="screenshot-lightbox-img" src="" alt="screenshot" class="sslb-img" onclick="event.stopPropagation()">
 </div>
 
+<!-- Tutorial overlay -->
+<div id="tutorial-overlay" style="display:none">
+  <div id="tutorial-spotlight"></div>
+  <div id="tutorial-bubble">
+    <div id="tutorial-step-label"></div>
+    <div id="tutorial-text"></div>
+    <div id="tutorial-actions">
+      <button class="tutorial-skip-btn" onclick="tutorialEnd()">Skip tutorial</button>
+      <button class="tutorial-next-btn" id="tutorial-next-btn" onclick="tutorialAdvance()">Next →</button>
+    </div>
+  </div>
+</div>
+
 <!-- Rotom trainer name onboarding -->
 <div id="rotom-onboarding" onclick="if(event.target===this&&document.getElementById('trainer-name-input').value.trim())saveTrainerName()">
   <div id="rotom-onboarding-card">
@@ -1438,6 +1451,16 @@
         <span style="font-size:12px;color:#5b4690">Restore ›</span>
       </div>
       <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImportFile(event)"/>
+      <div class="settings-row" onclick="closeSettings();tutorialReplay()">
+        <div class="settings-row-left">
+          <span class="settings-row-icon">🎓</span>
+          <div>
+            <div class="settings-row-text">Replay Tutorial</div>
+            <div class="settings-row-sub">Walk through the app again from the start</div>
+          </div>
+        </div>
+        <span style="font-size:12px;color:#5b4690">Replay ›</span>
+      </div>
       <div class="settings-row" onclick="confirmClearFromSettings()" style="border-color:#fda4af22">
         <div class="settings-row-left">
           <span class="settings-row-icon">🗑️</span>

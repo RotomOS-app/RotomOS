@@ -4139,3 +4139,94 @@ body.theme-light .guide-tip-desc       { color: #7c6aaa !important; }
   }
   .gp-dex-name { font-size: 11px; max-width: 100px; }
 }
+
+/* ── Tutorial overlay ── */
+#tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99990;
+  pointer-events: none;
+  background: transparent;
+}
+#tutorial-overlay.active {
+  pointer-events: all;
+}
+
+/* Dark backdrop rendered via box-shadow on the spotlight */
+#tutorial-spotlight {
+  position: fixed;
+  border-radius: 12px;
+  box-shadow: 0 0 0 9999px #00000088;
+  border: 2px solid #d4a8ff88;
+  outline: none;
+  transition: all .35s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+  z-index: 99991;
+}
+
+/* Speech bubble */
+#tutorial-bubble {
+  position: fixed;
+  width: min(340px, calc(100vw - 32px));
+  background: #2f2358;
+  border: 1px solid #5b4690;
+  border-radius: 14px;
+  box-shadow: 0 8px 40px #00000088;
+  padding: 18px 18px 14px;
+  z-index: 99992;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  pointer-events: all;
+}
+
+#tutorial-step-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #5b4690;
+  margin-bottom: 8px;
+}
+
+#tutorial-text {
+  font-size: 14px;
+  color: #ede9ff;
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+
+#tutorial-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tutorial-skip-btn {
+  background: none;
+  border: none;
+  color: #5b4690;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 6px 0;
+  transition: color .15s;
+}
+.tutorial-skip-btn:hover { color: #9d93c0; }
+
+.tutorial-next-btn {
+  background: #d4a8ff;
+  color: #1a0f2e;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s;
+}
+.tutorial-next-btn:hover { background: #e9d5ff; }
+
+/* Light mode */
+body.theme-light #tutorial-bubble    { background: #f0ecff !important; border-color: #ccccff !important; }
+body.theme-light #tutorial-text      { color: #2d1f5e !important; }
+body.theme-light #tutorial-step-label{ color: #9b7fe8 !important; }
+body.theme-light .tutorial-next-btn  { background: #7c3aed !important; color: #fff !important; }
+body.theme-light .tutorial-skip-btn  { color: #9b8ec0 !important; }

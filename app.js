@@ -4753,22 +4753,26 @@ function saveTrainerName(override) {
 function checkTrainerOnboarding() {
   const name = lsGet(LS_TRAINER_NAME, null);
   if (!name) {
-    // First time — show onboarding after a brief delay
+    // Fresh install — run tutorial first, onboarding fires at tutorial end
     setTimeout(() => {
-      const ob = document.getElementById('rotom-onboarding');
-      if (ob) {
-        ob.style.display = 'flex';
-        requestAnimationFrame(() => requestAnimationFrame(() => ob.classList.add('show')));
-        setTimeout(() => document.getElementById('trainer-name-input')?.focus(), 500);
+      if (tutorialShouldRun()) {
+        tutorialStart();
+      } else {
+        // Tutorial already done (e.g. skipped) but no name set — show onboarding directly
+        const ob = document.getElementById('rotom-onboarding');
+        if (ob) {
+          ob.style.display = 'flex';
+          requestAnimationFrame(() => requestAnimationFrame(() => ob.classList.add('show')));
+          setTimeout(() => document.getElementById('trainer-name-input')?.focus(), 500);
+        }
       }
     }, 600);
-    return false; // don't fire regular boot greeting
+    return false;
   } else {
     trainerName = name;
-    // Update status text with known name
     const status = document.getElementById('rotom-status-text');
     if (status) setTimeout(() => status.textContent = `Welcome back, ${name}-zzzt! ⚡`, 900);
-    return true; // fire regular boot greeting
+    return true;
   }
 }
 
@@ -5603,6 +5607,188 @@ function getLegalityWarning(species, ball) {
 }
 
 // ══ ABOUT ════════════════════════════════════════════════════════════════════
+// ══ TUTORIAL ═════════════════════════════════════════════════════════════════
+
+const LS_TUTORIAL_DONE = 'at_tutorial_done';
+let tutorialStep = 0;
+
+const TUTORIAL_STEPS = [
+  {
+    section:  'home',
+    target:   '#sidebar',
+    position: 'right',
+    label:    'Step 1 of 7',
+    text:     'You can get around using the navigation bar on the left, or the Quick Links right here on your dashboard.',
+  },
+  {
+    section:  'shiny',
+    target:   '#shiny-section',
+    position: 'center',
+    label:    'Step 2 of 7',
+    text:     'Shiny Hunts is where you track your active hunts, log phases, and mark a catch when it happens. Shiny Log shows everything you\'ve ever logged in one place. Stats gives you the numbers — good for a quick flex, or a reality check.',
+  },
+  {
+    section:  'pokedex',
+    target:   '#pokedex-section',
+    position: 'center',
+    label:    'Step 3 of 7',
+    text:     'Search any Pokémon to pull up its data, and your own personal history with it.',
+  },
+  {
+    section:  'livingdex',
+    target:   '#livingdex-section',
+    position: 'center',
+    label:    'Step 4 of 7',
+    text:     'Track your collection here. Left click to mark a Pokémon as caught, right click to mark the shiny.',
+  },
+  {
+    section:  'aprimon',
+    target:   '#aprimon-section',
+    position: 'center',
+    label:    'Step 5 of 7',
+    text:     'Log your on-hand Aprimon, track what you\'re looking for, and note what you\'d be willing to trade for them.',
+  },
+  {
+    section:  'progress',
+    target:   '#progress-section',
+    position: 'center',
+    label:    'Step 6 of 7',
+    text:     'If you\'re doing a playthrough, this is where you track your badges, team, locations visited, and Pokédex completion.',
+  },
+  {
+    section:  'home',
+    target:   '.guide-help-btn',
+    position: 'below',
+    label:    'Step 7 of 7',
+    text:     'If you get stuck or want to know what the app can do, the guide button up here has everything you need.',
+  },
+];
+
+function tutorialShouldRun() {
+  return !lsGet(LS_TUTORIAL_DONE, false);
+}
+
+function tutorialStart() {
+  tutorialStep = 0;
+  document.getElementById('tutorial-overlay').style.display = 'block';
+  requestAnimationFrame(() => {
+    document.getElementById('tutorial-overlay').classList.add('active');
+    tutorialShow(0);
+  });
+}
+
+function tutorialShow(idx) {
+  const step = TUTORIAL_STEPS[idx];
+  if (!step) return;
+
+  // Navigate to the section
+  goSection(step.section);
+
+  // Give section a moment to render before measuring
+  setTimeout(() => {
+    const target = document.querySelector(step.target);
+    const bubble = document.getElementById('tutorial-bubble');
+    const spotlight = document.getElementById('tutorial-spotlight');
+
+    document.getElementById('tutorial-step-label').textContent = step.label;
+    document.getElementById('tutorial-text').textContent = step.text;
+
+    const nextBtn = document.getElementById('tutorial-next-btn');
+    const isLast = idx === TUTORIAL_STEPS.length - 1;
+    nextBtn.textContent = isLast ? 'Got it →' : 'Next →';
+
+    if (!target) {
+      // Fallback: centre spotlight off-screen
+      tutorialPositionBubble(bubble, null, 'center');
+      return;
+    }
+
+    const rect = target.getBoundingClientRect();
+    const pad  = 8;
+
+    // Position spotlight
+    spotlight.style.left   = (rect.left   - pad) + 'px';
+    spotlight.style.top    = (rect.top    - pad) + 'px';
+    spotlight.style.width  = (rect.width  + pad * 2) + 'px';
+    spotlight.style.height = (rect.height + pad * 2) + 'px';
+
+    tutorialPositionBubble(bubble, rect, step.position);
+  }, 320);
+}
+
+function tutorialPositionBubble(bubble, rect, position) {
+  const bw = bubble.offsetWidth  || 340;
+  const bh = bubble.offsetHeight || 160;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const pad = 16;
+
+  let top, left;
+
+  if (!rect || position === 'center') {
+    // Centre of screen
+    top  = (vh - bh) / 2;
+    left = (vw - bw) / 2;
+  } else if (position === 'right') {
+    top  = Math.min(rect.top, vh - bh - pad);
+    left = rect.right + pad;
+    if (left + bw > vw) left = rect.left - bw - pad;
+  } else if (position === 'below') {
+    top  = rect.bottom + pad;
+    left = Math.min(Math.max(rect.left, pad), vw - bw - pad);
+    if (top + bh > vh) top = rect.top - bh - pad;
+  } else {
+    top  = rect.bottom + pad;
+    left = Math.min(Math.max(rect.left, pad), vw - bw - pad);
+  }
+
+  // Clamp to viewport
+  top  = Math.max(pad, Math.min(top,  vh - bh - pad));
+  left = Math.max(pad, Math.min(left, vw - bw - pad));
+
+  bubble.style.top  = top  + 'px';
+  bubble.style.left = left + 'px';
+}
+
+function tutorialAdvance() {
+  tutorialStep++;
+  if (tutorialStep >= TUTORIAL_STEPS.length) {
+    tutorialEnd(true);
+  } else {
+    tutorialShow(tutorialStep);
+  }
+}
+
+function tutorialEnd(fireOnboarding) {
+  lsSet(LS_TUTORIAL_DONE, true);
+  const overlay = document.getElementById('tutorial-overlay');
+  overlay.classList.remove('active');
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    // Clear spotlight
+    const sl = document.getElementById('tutorial-spotlight');
+    if (sl) { sl.style.width = '0'; sl.style.height = '0'; }
+  }, 300);
+
+  // Navigate home then fire onboarding if we finished naturally
+  goSection('home');
+  if (fireOnboarding) {
+    setTimeout(() => {
+      const ob = document.getElementById('rotom-onboarding');
+      if (ob) {
+        ob.style.display = 'flex';
+        requestAnimationFrame(() => requestAnimationFrame(() => ob.classList.add('show')));
+        setTimeout(() => document.getElementById('trainer-name-input')?.focus(), 300);
+      }
+    }, 400);
+  }
+}
+
+function tutorialReplay() {
+  lsSet(LS_TUTORIAL_DONE, false);
+  tutorialStart();
+}
+
 // ══ GUIDE / FAQ ══════════════════════════════════════════════════════════════
 
 let guideCurrentTab = 'toasts';
