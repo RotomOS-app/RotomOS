@@ -628,7 +628,8 @@ async function loadDexPage(species) {
   }
 
   // Caught status badges in header
-  const entry = dexData[species] || {};
+  const dexKey = Object.keys(dexData).find(k => k.toLowerCase() === species.toLowerCase()) || species;
+  const entry = dexData[dexKey] || {};
   document.getElementById('dexCaughtBadges').innerHTML = `
     ${entry.caught     ? '<span style="background:#86efac22;border:1px solid #86efac44;color:#86efac;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px">✓ Caught</span>' : ''}
     ${entry.shinyFound ? '<span style="background:#fde68a22;border:1px solid #fde68a44;color:#fde68a;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px">★ Shiny</span>' : ''}
@@ -1031,7 +1032,9 @@ function renderEvolutionTab(species, poke, spec, evo) {
 
 // ── MY DATA TAB ───────────────────────────────────────────────────────────────
 function renderMyData(species) {
-  const entry    = dexData[species] || { caught:false, shinyFound:false, encounters:[] };
+  // Case-insensitive lookup — handles slug vs display name mismatches
+  const dexKey = Object.keys(dexData).find(k => k.toLowerCase() === species.toLowerCase()) || species;
+  const entry    = dexData[dexKey] || { caught:false, shinyFound:false, encounters:[] };
   const variants = mons.filter(m => m.species.toLowerCase() === species.toLowerCase());
   const owned    = variants.filter(m => m.tradeStatus !== 'wanted');
   const wanted   = variants.filter(m => m.tradeStatus === 'wanted');
@@ -1640,6 +1643,7 @@ function confirmPhase() {
   lsSet(LSH.HUNTS, hunts);
 
   // ── Add phase shiny to log ────────────────────────────────────────────────
+  const phaseEncId = Date.now();
   const logEntry = {
     id:      nextLid++,
     species: pSpecies,
@@ -1656,6 +1660,7 @@ function confirmPhase() {
     phaseNum:    h.phases.length - 1,
     huntSpecies: h.species,
     odds:        getOdds(h.method, false, h.game),
+    encounterId: phaseEncId,
   };
   shinyLog.unshift(logEntry);
   lsSet(LSH.LOG, shinyLog);
@@ -1666,7 +1671,7 @@ function confirmPhase() {
   dexData[pSpecies].caught     = true;
   dexData[pSpecies].shinyFound = true;
   dexData[pSpecies].encounters.unshift({
-    id:      Date.now(),
+    id:      phaseEncId,
     date:    today(),
     method:  h.method,
     game:    h.game,
@@ -1719,6 +1724,7 @@ function confirmFound() {
   lsSet(LSH.HUNTS, hunts);
 
   // Add to shiny log
+  const foundEncId = Date.now();
   const entry = {
     id:       nextLid++,
     species:  h.species,
@@ -1734,6 +1740,7 @@ function confirmFound() {
     hasCharm: h.hasCharm,
     odds,
     prob,
+    encounterId: foundEncId,
   };
   shinyLog.unshift(entry);
   lsSet(LSH.LOG, shinyLog);
@@ -1746,7 +1753,7 @@ function confirmFound() {
   dexData[sp].shinyFound = true;
   // Add a shiny encounter record
   dexData[sp].encounters.unshift({
-    id:      Date.now(),
+    id:      foundEncId,
     date:    today(),
     method:  h.method,
     game:    h.game,
@@ -1785,6 +1792,7 @@ function saveQuickLog() {
   if (!species) { alert('Species required'); return; }
   const count = parseInt(document.getElementById('ql-count').value) || 0;
   const method = document.getElementById('ql-method').value;
+  const qlEncId = Date.now();
   const entry = {
     id:      nextLid++,
     species,
@@ -1797,6 +1805,7 @@ function saveQuickLog() {
     notes:   document.getElementById('ql-notes').value.trim(),
     date:    document.getElementById('ql-date').value,
     odds:    getOdds(method, false, document.getElementById('ql-game').value),
+    encounterId: qlEncId,
   };
   shinyLog.unshift(entry);
   lsSet(LSH.LOG, shinyLog);
@@ -1807,7 +1816,7 @@ function saveQuickLog() {
   dexData[species].caught = true;
   dexData[species].shinyFound = true;
   dexData[species].encounters.unshift({
-    id: Date.now(), date: entry.date, method: entry.method, game: entry.game,
+    id: qlEncId, date: entry.date, method: entry.method, game: entry.game,
     notes: `✨ Manually logged${entry.count ? ' · ' + entry.count.toLocaleString() + ' encounters' : ''}${entry.notes ? ' — ' + entry.notes : ''}`,
     isShiny: true,
   });
@@ -5063,9 +5072,9 @@ function initPdexPage() {
   if (input) {
     input.value = '';
     setTimeout(() => {
-      initSpeciesAC('pdex-species-input', (name) => {
+      initSpeciesAC('pdex-species-input', (name, display) => {
         document.getElementById('pdex-species-input').value = '';
-        pdexGoToDex(name);
+        pdexGoToDex(display);
       });
     }, 100);
   }
@@ -5109,8 +5118,29 @@ function renderPdexRecent() {
 // ── Delete shiny log entry ───────────────────────────────────────────────────
 function deleteShinyLog(id) {
   if (!confirm('Remove this shiny from your log?')) return;
+  const entry = shinyLog.find(l => l.id === id);
   shinyLog = shinyLog.filter(l => l.id !== id);
   lsSet(LSH.LOG, shinyLog);
+
+  // Remove the linked encounter from dexData
+  if (entry) {
+    const dexKey = Object.keys(dexData).find(k => k.toLowerCase() === entry.species.toLowerCase());
+    if (dexKey && dexData[dexKey]?.encounters) {
+      if (entry.encounterId) {
+        // Precise match via stored ID
+        dexData[dexKey].encounters = dexData[dexKey].encounters.filter(e => e.id !== entry.encounterId);
+      } else {
+        // Fallback for legacy entries without encounterId — remove first matching shiny encounter by date
+        const idx = dexData[dexKey].encounters.findIndex(e => e.isShiny && e.date === entry.date);
+        if (idx !== -1) dexData[dexKey].encounters.splice(idx, 1);
+      }
+      // Re-evaluate shinyFound — only true if a shiny encounter still exists
+      const stillHasShiny = dexData[dexKey].encounters.some(e => e.isShiny && !e.isFailed);
+      if (!stillHasShiny) dexData[dexKey].shinyFound = false;
+      lsSet(LS.D, dexData);
+    }
+  }
+
   renderShinyLog();
 }
 
@@ -5573,8 +5603,215 @@ function getLegalityWarning(species, ball) {
 }
 
 // ══ ABOUT ════════════════════════════════════════════════════════════════════
+// ══ GUIDE / FAQ ══════════════════════════════════════════════════════════════
+
+let guideCurrentTab = 'toasts';
+
+function openGuide(tab) {
+  guideCurrentTab = tab || 'toasts';
+  guideRenderTab(guideCurrentTab);
+  document.getElementById('guide-modal').style.display = 'flex';
+  // sync rotom sprite
+  const sprite = document.getElementById('guide-rotom-sprite');
+  if (sprite) sprite.src = shinyRotomActive
+    ? 'https://img.pokemondb.net/sprites/sword-shield/icon/rotom-heat.png'
+    : 'https://img.pokemondb.net/sprites/sword-shield/icon/rotom.png';
+}
+
+function closeGuide() {
+  document.getElementById('guide-modal').style.display = 'none';
+}
+
+function guideSwitchTab(tab) {
+  guideCurrentTab = tab;
+  ['toasts','tips','faq'].forEach(t => {
+    document.getElementById('gtab-' + t)?.classList.toggle('active', t === tab);
+  });
+  guideRenderTab(tab);
+}
+
+function guideRenderTab(tab) {
+  const body = document.getElementById('guide-modal-body');
+  if (!body) return;
+  if (tab === 'toasts') body.innerHTML = guideToastsHTML();
+  if (tab === 'tips')   body.innerHTML = guideTipsHTML();
+  if (tab === 'faq')    body.innerHTML = guideFaqHTML();
+}
+
+// ── Toasts tab ────────────────────────────────────────────────────────────────
+function guideToastsHTML() {
+  const rotomIntro = `<div class="guide-rotom-intro">
+    <img src="${shinyRotomActive ? 'https://img.pokemondb.net/sprites/sword-shield/icon/rotom-heat.png' : 'https://img.pokemondb.net/sprites/sword-shield/icon/rotom.png'}" width="40" height="30" onerror="this.style.display='none'">
+    <div class="guide-rotom-intro-text">Bzzt! Rotom has many thingzzz to say — but only at the right moment, and only once-zzzt! Here's everything I might tell you, and what triggers it. Keep an eye on me, Trainer-zzzt! ⚡</div>
+  </div>`;
+
+  const sections = [
+    {
+      title: '⚡ Every session',
+      items: [
+        { trigger: 'Opening the app', icon: '🌅', example: '"Morning already?! Zzzoning in... Rotom online! Let\'zzz do this!"', note: 'Rotom greets you differently depending on time of day — morning, afternoon, evening, night, and early hours.' },
+        { trigger: 'Clicking Rotom\'s sprite', icon: '👆', example: '"Watch it! Don\'t you know Rotom is trying to WORK here-zzzt?!"', note: 'Never one-time — Rotom always has something to say when poked.' },
+      ]
+    },
+    {
+      title: '✨ Shiny Hunting',
+      items: [
+        { trigger: 'Starting a new hunt', icon: '🎯', example: '"Zzt-zzt! Now let\'zzz get this hunt going! My circuitz are READY!"', note: 'Fires every time.' },
+        { trigger: 'Marking a shiny as found', icon: '⭐', example: '"KZZZZRRT?! I knew I picked a good Trainer! ZZT-ZZT!! ⚡"', note: 'Fires every time a hunt is completed.' },
+        { trigger: 'Logging a failed shiny (fled / KO\'d)', icon: '💔', example: '"Bzzt... my circuitzzz are heavy. But Rotom believezzz in you. Always-zzzt."', note: 'Fires every time.' },
+        { trigger: 'Unlocking Shiny Rotom (50 shinies logged, or 10% shiny living dex)', icon: '★', example: '"BZZT!! HOT DIGGITY!! Rotom can\'t believe it — you EARNED thizzz, bucko!!"', note: 'One-time only — fires the first time you hit the threshold.' },
+      ]
+    },
+    {
+      title: '📸 Screenshots',
+      items: [
+        { trigger: 'First screenshot saved to a shiny log entry', icon: '📸', example: '"Bzzt! Screenshot saved-zzzt! Find it in the Pokédex under [Species] → My Data ⚡"', note: 'One-time only — tells you where screenshots live. Never fires again.' },
+      ]
+    },
+    {
+      title: '📖 Living Dex & Pokédex',
+      items: [
+        { trigger: 'Adding a Pokémon to the Living Dex', icon: '📦', example: '"Hot diggity! Another one for the Living Dex, bucko! Zz-zz-zz!"', note: 'Fires every time.' },
+        { trigger: 'Living Dex milestone (every 50 entries)', icon: '🏅', example: '"Kzzzzrrt?! You\'ve met this many Pokémon?! I knew I picked a good Trainer!"', note: 'Fires at each milestone.' },
+      ]
+    },
+    {
+      title: '🥚 Breeding',
+      items: [
+        { trigger: 'Saving a breeding project', icon: '🥚', example: '"Ooh, why don\'t you see what kind of Pokémon wazzz born from that Egg, kiddo?"', note: 'Fires every time.' },
+        { trigger: 'Selecting a species in the Egg Move Finder', icon: '🔗', example: '"Bzzt! Excellent choice-zzzt! Let\'zzz get this Egg warmed up!"', note: 'Fires every time.' },
+        { trigger: 'Setting a goal of Shiny', icon: '✨', example: '"Oooh, chasing sparkliezzz? Rotom can\'t WAIT to see it-zzzt!"', note: 'Fires every time.' },
+        { trigger: 'Setting a goal of Competitive Stats', icon: '⚔️', example: '"Bzzt! Now we\'re cooking with electricity! Let\'zzz nail those stats-zzzt!"', note: 'Fires every time.' },
+        { trigger: 'Setting a goal of Both', icon: '✨⚔️', example: '"Shiny AND stats?! You really don\'t do things by halves, do you-zzzt!"', note: 'Fires every time.' },
+      ]
+    },
+    {
+      title: '🗺️ Game Progress',
+      items: [
+        { trigger: 'Earning a badge', icon: '🏅', example: '"Bzzt! Boulder Badge get — Brock is no match for you Trainer-zzzt! ⚡"', note: 'Appears in Rotom\'s Notes — fires for each of the 8 badges.' },
+        { trigger: 'Defeating an Elite Four member', icon: '🎖️', example: '"Bzzt! Lorelei defeated — one step closer to the Championship-zzzt ⚡"', note: 'Appears in Rotom\'s Notes.' },
+        { trigger: 'Defeating Champion Blue', icon: '🏆', example: '"Bzzt! You\'re the Champion Trainer-zzzt! CHAMPION! ⚡⚡⚡"', note: 'Appears in Rotom\'s Notes.' },
+        { trigger: 'All 8 badges collected', icon: '✨', example: '"Bzzt! All 8 badges collected Trainer-zzzt! The Elite Four awaits-zzzt ⚡"', note: 'Appears in Rotom\'s Notes.' },
+        { trigger: 'Visiting a gym trigger location (underlevelled)', icon: '⚠️', example: '"Bzzt! Brock\'s ace is level 14 — your team averages level 8. Some serious training is needed-zzzt ⚡"', note: 'Fires when visiting a route near a gym with a weaker-than-recommended team.' },
+        { trigger: 'Visiting a gym trigger location (missing type coverage)', icon: '🎯', example: '"Bzzt! Brock uses rock types — your team is missing super effective coverage! You\'ll want a water or grass type ⚡"', note: 'Only fires if your levels are sufficient — skipped if you\'re already overlevelled.' },
+        { trigger: 'Pokédex: 50 caught', icon: '📖', example: '"Bzzt! 50 Pokémon caught Trainer-zzzt — you\'re on a roll ⚡"', note: 'Appears in Rotom\'s Notes.' },
+        { trigger: 'Pokédex: 100 caught', icon: '📖', example: '"Bzzt! 100 Pokémon caught-zzzt! The end is in sight Trainer ⚡"', note: 'Appears in Rotom\'s Notes.' },
+        { trigger: 'Pokédex: all 151 caught', icon: '🌟', example: '"Bzzt! 151 out of 151 Trainer-zzzt — YOU CAUGHT THEM ALL! ⚡⚡⚡"', note: 'Appears in Rotom\'s Notes.' },
+      ]
+    },
+    {
+      title: '🏆 Secrets',
+      items: [
+        { trigger: 'Achieving a full shiny living dex', icon: '★', example: '"A full shiny Living Dex... Rotom still thinkkzzz about it sometimes. Zzt."', note: 'One-time idle messages unlock after completing a shiny living dex. Rotom will never stop thinking about what you\'ve done.' },
+      ]
+    },
+  ];
+
+  return rotomIntro + sections.map(s => `
+    <div>
+      <div class="guide-section-title">${s.title}</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${s.items.map(item => `
+          <div class="guide-toast-item">
+            <div class="guide-toast-trigger"><span class="trigger-icon">${item.icon}</span>${item.trigger}</div>
+            <div class="guide-toast-example">${item.example}</div>
+            ${item.note ? `<div class="guide-toast-note">ℹ️ ${item.note}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Tips tab ──────────────────────────────────────────────────────────────────
+function guideTipsHTML() {
+  const intro = `<div class="guide-rotom-intro">
+    <img src="${shinyRotomActive ? 'https://img.pokemondb.net/sprites/sword-shield/icon/rotom-heat.png' : 'https://img.pokemondb.net/sprites/sword-shield/icon/rotom.png'}" width="40" height="30" onerror="this.style.display='none'">
+    <div class="guide-rotom-intro-text">Bzzt! Rotom knows all the tricks of the trade-zzzt! Here are some thingzzz worth knowing before you dive in ⚡</div>
+  </div>`;
+
+  const tips = [
+    { icon: '🎯', title: 'Ball Legality is built in', desc: 'When adding an Aprimon, RotomOS automatically checks which Poké Balls are legally obtainable for that Pokémon based on its egg groups and game availability. Grayed-out balls can\'t legally hold that species.' },
+    { icon: '🔗', title: 'Egg Move Finder traces full chains', desc: 'Type a target species in the Egg Move Finder and it maps every possible breeding chain — including multi-step routes through intermediary Pokémon. Click any species in the chain to set it as a parent.' },
+    { icon: '📸', title: 'Screenshots compress automatically', desc: 'When you log a caught shiny, you\'ll be prompted to upload a screenshot. RotomOS compresses it to ~80KB before saving so it doesn\'t eat your storage. Find it later in Pokédex → [Species] → My Data.' },
+    { icon: '🗺️', title: 'Game Progress tracks your whole playthrough', desc: 'Use the Game Progress section to track badges, your team, locations visited, and Pokédex completion for FireRed & LeafGreen. Rotom leaves notes in the Notes tab as you play — check them for tips and reactions.' },
+    { icon: '📖', title: 'Pokédex version exclusives are flagged', desc: 'In Game Progress → Pokédex, Pokémon that are exclusive to the other version (FireRed vs LeafGreen) are shown at reduced opacity. They can still be marked as caught — you just need to trade for them.' },
+    { icon: '⚡', title: 'Rotom only says some things once', desc: 'Several toasts are one-time-only (Shiny Rotom unlock, screenshot hint, etc.). Check the Rotom Toasts tab in this guide so you don\'t miss what they mean.' },
+    { icon: '🌙', title: 'Shiny Rotom is a real unlock', desc: 'Once you\'ve logged 50 shinies or have 10% of the living dex as shiny, Shiny Rotom becomes available in Settings. It changes Rotom\'s sprite throughout the whole app and unlocks special idle messages.' },
+    { icon: '💾', title: 'Everything saves locally', desc: 'RotomOS stores all your data in your browser\'s localStorage — no account needed. This means data is tied to this browser and device. Use the Export option in Settings to back it up.' },
+    { icon: '🏅', title: 'Multiple save files in Game Progress', desc: 'You can create multiple playthroughs in Game Progress — one for FireRed, one for LeafGreen, a Nuzlocke, whatever you like. Switch between them from the dropdown at the top.' },
+    { icon: '🔍', title: 'Phase hunting is supported', desc: 'In an active shiny hunt, use the Phase button to record a shiny you found that wasn\'t your target. It gets logged separately, a new phase of the hunt begins, and Rotom reacts accordingly.' },
+  ];
+
+  return intro + `<div style="display:flex;flex-direction:column;gap:14px">` +
+    tips.map(t => `
+      <div class="guide-tip-item">
+        <div class="guide-tip-icon">${t.icon}</div>
+        <div class="guide-tip-body">
+          <div class="guide-tip-title">${t.title}</div>
+          <div class="guide-tip-desc">${t.desc}</div>
+        </div>
+      </div>
+    `).join('<hr class="guide-divider">') + `</div>`;
+}
+
+// ── FAQ tab ───────────────────────────────────────────────────────────────────
+function guideFaqHTML() {
+  const intro = `<div class="guide-rotom-intro">
+    <img src="${shinyRotomActive ? 'https://img.pokemondb.net/sprites/sword-shield/icon/rotom-heat.png' : 'https://img.pokemondb.net/sprites/sword-shield/icon/rotom.png'}" width="40" height="30" onerror="this.style.display='none'">
+    <div class="guide-rotom-intro-text">Bzzt! Got questionzzz? Rotom has answers-zzzt! ⚡</div>
+  </div>`;
+
+  const faqs = [
+    { q: 'Where do my screenshots go?', a: 'Screenshots are saved to the shiny log entry and also to the Pokédex. Open the Pokédex, search for the species, go to the My Data tab, and you\'ll see a thumbnail in the encounter log. Tap it to view full size.' },
+    { q: 'What is phase hunting?', a: 'A phase occurs when you find a shiny Pokémon during a hunt, but it\'s not your target species. You can log it as a phase — it gets added to your shiny log — and then your hunt counter resets for the next phase. Useful for chain-based methods like SOS or Poké Radar.' },
+    { q: 'Will I lose my data if I clear my browser cache?', a: 'Yes — RotomOS stores everything in localStorage, which can be wiped by clearing browser data. Use Settings → Export to save a backup file. You can re-import it any time.' },
+    { q: 'What\'s the difference between the Shiny Log and Living Dex?', a: 'The Shiny Log tracks every individual shiny hunt — the method, encounter count, ball used, nature, and outcome. The Living Dex tracks one entry per species, marking whether you own it and whether you have the shiny form. They\'re linked: logging a caught shiny automatically marks that species in the Pokédex.' },
+    { q: 'Why are some Poké Balls grayed out in the Aprimon form?', a: 'Ball legality — some balls simply can\'t legally contain certain Pokémon due to game mechanics (e.g. you can\'t get a Safari Ball Pokémon that was never in the Safari Zone, or a Dream Ball Pokémon that\'s not in the Dream World list). RotomOS checks this automatically.' },
+    { q: 'I missed a Rotom toast — what did it say?', a: 'Check the Rotom Toasts tab in this guide for the full list of messages and what triggers them. For Game Progress, all Rotom messages are also saved permanently in the Rotom\'s Notes tab of your playthrough.' },
+    { q: 'Can I use Game Progress for games other than FireRed / LeafGreen?', a: 'Currently Game Progress is built around FRLG — badges, locations, encounters, and Rotom\'s gym tips are all FRLG-specific. Support for other games is on the roadmap.' },
+    { q: 'What does Shiny Rotom actually do?', a: 'It changes Rotom\'s sprite everywhere in the app to the shiny Heat Rotom form, and unlocks a special set of idle messages that only a Trainer who\'s achieved something legendary gets to see.' },
+    { q: 'How do I track a Pokémon I\'m hunting that\'s a version exclusive?', a: 'Just start a hunt like normal — version exclusives aren\'t restricted in the Shiny Hunter. In Game Progress → Pokédex, version exclusives are shown at reduced opacity as a reminder that you\'ll need to trade for them.' },
+    { q: 'Is there a way to see all my shinies at once?', a: 'Yes — the Shiny Hunter section has a Shiny Log view showing every logged shiny with its details. You can also see which species you\'ve found in the Pokédex under each species\' My Data tab.' },
+  ];
+
+  return intro + `<div style="display:flex;flex-direction:column;gap:12px">` +
+    faqs.map((f, i) => `
+      <div class="guide-faq-item">
+        <div class="guide-faq-q" onclick="guideFaqToggle(${i})">
+          <span>${f.q}</span>
+          <span id="guide-faq-arrow-${i}" style="font-size:11px;color:#5b4690;transition:transform .15s">▼</span>
+        </div>
+        <div class="guide-faq-a" id="guide-faq-a-${i}" style="display:none">${f.a}</div>
+      </div>
+    `).join('<hr class="guide-divider">') + `</div>`;
+}
+
+function guideFaqToggle(i) {
+  const ans   = document.getElementById('guide-faq-a-' + i);
+  const arrow = document.getElementById('guide-faq-arrow-' + i);
+  if (!ans) return;
+  const open = ans.style.display !== 'none';
+  ans.style.display   = open ? 'none' : 'block';
+  if (arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+// ══ About section: prepend guide card ═══════════════════════════════════════
 function renderAbout() {
   document.getElementById('about-content').innerHTML = `
+
+    <!-- Guide card -->
+    <div class="about-card" style="cursor:default">
+      <div class="about-section-title cinzel">Help & Guide</div>
+      <p style="font-size:13px;color:#9d93c0;line-height:1.6;margin:0 0 14px">
+        New to RotomOS, or just want to know what Rotom might say next? The guide covers every toast Rotom can fire, tips for getting the most out of each section, and answers to common questions.
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-primary" style="font-size:13px" onclick="openGuide('toasts')">⚡ Rotom Toasts</button>
+        <button class="btn-secondary" style="font-size:13px" onclick="openGuide('tips')">💡 Tips & Tricks</button>
+        <button class="btn-secondary" style="font-size:13px" onclick="openGuide('faq')">❓ FAQ</button>
+      </div>
+    </div>
 
     <!-- Meet the Dev -->
     <div class="about-card">

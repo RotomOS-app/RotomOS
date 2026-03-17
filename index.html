@@ -162,6 +162,7 @@
         <div class="tb-section-sub"  id="tbSectionSub">Your Pokémon dashboard</div>
       </div>
       <div id="top-bar-actions">
+        <button class="guide-help-btn" onclick="openGuide()" title="Help & Guide">?</button>
         <button id="headerActionBtn" class="btn btn-primary" onclick="headerAction()" style="display:none">+ Add Aprimon</button>
       </div>
     </div>
@@ -1234,6 +1235,25 @@
 <div id="rotom-toast">
   <img src="https://img.pokemondb.net/sprites/sword-shield/icon/rotom.png" width="40" height="30" onerror="this.style.display='none'"/>
   <span id="rotom-toast-text"></span>
+</div>
+
+<!-- Guide / FAQ modal -->
+<div id="guide-modal" class="guide-modal-backdrop" style="display:none" onclick="if(event.target===this)closeGuide()">
+  <div class="guide-modal-panel">
+    <div class="guide-modal-header">
+      <div class="guide-modal-title">
+        <img src="https://img.pokemondb.net/sprites/sword-shield/icon/rotom.png" width="32" height="24" id="guide-rotom-sprite" onerror="this.style.display='none'">
+        <span class="cinzel">RotomOS Guide</span>
+      </div>
+      <button class="guide-modal-close" onclick="closeGuide()">✕</button>
+    </div>
+    <div class="guide-tabs">
+      <button class="guide-tab active" id="gtab-toasts"  onclick="guideSwitchTab('toasts')">⚡ Rotom Toasts</button>
+      <button class="guide-tab"        id="gtab-tips"    onclick="guideSwitchTab('tips')">💡 Tips & Tricks</button>
+      <button class="guide-tab"        id="gtab-faq"     onclick="guideSwitchTab('faq')">❓ FAQ</button>
+    </div>
+    <div class="guide-modal-body" id="guide-modal-body"></div>
+  </div>
 </div>
 
 <!-- Screenshot upload prompt -->
