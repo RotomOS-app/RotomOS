@@ -62,6 +62,7 @@ let formEggMoves=[];
 let formWantList=[];
 let selBalls={};
 let currentDex=null;
+let ballLegality=null; // { "Bulbasaur": ["Moon","Dream",...], ... }
 
 const poke=(n,s)=>{if(!n?.trim())return'';const x=n.toLowerCase().trim().replace(/\s+/g,'-').replace(/[.']/g,'').replace(/♀/g,'-f').replace(/♂/g,'-m');return s?`https://img.pokemondb.net/sprites/home/shiny/${x}.png`:`https://img.pokemondb.net/sprites/home/normal/${x}.png`;};
 const ballUrl=n=>`https://img.pokemondb.net/sprites/items/${n.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}-ball.png`;
@@ -1083,6 +1084,7 @@ function renderMyData(species) {
             <span style="color:#7c6fa0;font-size:11px">${e.date}</span>
           </div>
           ${e.notes?`<div style="color:#9d93c0;font-size:12px;font-style:italic;margin-top:6px">${e.notes}</div>`:''}
+          ${e.screenshot?`<div class="enc-screenshot"><img class="enc-screenshot-thumb" src="${e.screenshot}" alt="screenshot" onclick="openScreenshotLightbox('${e.screenshot}')"><span class="enc-screenshot-label">📸 tap to view</span></div>`:''}
         </div>`).join('')
     : '<div class="empty-state" style="padding:24px 0">No encounters logged yet.</div>';
 
@@ -1675,6 +1677,7 @@ function confirmPhase() {
 
   closePhaseModal();
   renderHunts();
+  setTimeout(() => showScreenshotPrompt(logEntry.id, pSpecies), 400);
 }
 
 // ── Found modal ───────────────────────────────────────────────────────────────
@@ -1756,6 +1759,7 @@ function confirmFound() {
   updateShinyBadge();
   renderHuntStats();
   renderHunts();
+  setTimeout(() => showScreenshotPrompt(entry.id, h.species), 400);
 }
 
 function abandonHunt(id) {
@@ -1811,6 +1815,7 @@ function saveQuickLog() {
 
   closeQuickLogModal();
   renderShinyLog();
+  setTimeout(() => showScreenshotPrompt(entry.id, species), 400);
 }
 
 // ── Modal helpers ─────────────────────────────────────────────────────────────
@@ -4440,6 +4445,123 @@ function toggleShinyRotom() {
 }
 
 
+// ══ SCREENSHOT SYSTEM ════════════════════════════════════════════════════════
+
+const LS_SCREENSHOT_HINT = 'at_screenshot_hint_shown';
+let _sspPendingEntryId  = null;
+let _sspPendingSpecies  = null;
+let _sspPendingBase64   = null;
+
+function showScreenshotPrompt(entryId, species) {
+  _sspPendingEntryId = entryId;
+  _sspPendingSpecies = species;
+  _sspPendingBase64  = null;
+  clearScreenshotPreview();
+  document.getElementById('screenshot-prompt').style.display = 'block';
+}
+
+function dismissScreenshotPrompt() {
+  document.getElementById('screenshot-prompt').style.display = 'none';
+  _sspPendingEntryId = null;
+  _sspPendingSpecies = null;
+  _sspPendingBase64  = null;
+}
+
+function handleScreenshotDrop(e) {
+  e.preventDefault();
+  document.getElementById('ssp-dropzone').classList.remove('drag-over');
+  const file = e.dataTransfer.files?.[0];
+  if (file && file.type.startsWith('image/')) processScreenshotFile(file);
+}
+
+function handleScreenshotFile(input) {
+  const file = input.files?.[0];
+  if (file) processScreenshotFile(file);
+  input.value = '';
+}
+
+function processScreenshotFile(file) {
+  compressScreenshot(file).then(base64 => {
+    _sspPendingBase64 = base64;
+    document.getElementById('ssp-preview-img').src = base64;
+    document.getElementById('ssp-dropzone').style.display = 'none';
+    document.getElementById('ssp-preview').style.display  = 'flex';
+  }).catch(err => console.error('Screenshot compression failed:', err));
+}
+
+function clearScreenshotPreview() {
+  _sspPendingBase64 = null;
+  const dz = document.getElementById('ssp-dropzone');
+  const pv = document.getElementById('ssp-preview');
+  const pi = document.getElementById('ssp-preview-img');
+  if (dz) dz.style.display = 'block';
+  if (pv) pv.style.display = 'none';
+  if (pi) pi.src = '';
+}
+
+function confirmScreenshotSave() {
+  if (!_sspPendingBase64 || _sspPendingEntryId == null) return;
+
+  // Save onto shiny log entry
+  const logEntry = shinyLog.find(e => e.id === _sspPendingEntryId);
+  if (logEntry) {
+    logEntry.screenshot = _sspPendingBase64;
+    lsSet(LSH.LOG, shinyLog);
+  }
+
+  // Save onto most-recent shiny encounter in dex
+  const sp = _sspPendingSpecies;
+  if (sp && dexData[sp]?.encounters?.length) {
+    const enc = dexData[sp].encounters.find(e => e.isShiny && !e.isFailed);
+    if (enc) {
+      enc.screenshot = _sspPendingBase64;
+      lsSet(LS.D, dexData);
+    }
+  }
+
+  dismissScreenshotPrompt();
+
+  // One-time Rotom hint
+  if (!lsGet(LS_SCREENSHOT_HINT, false)) {
+    lsSet(LS_SCREENSHOT_HINT, true);
+    setTimeout(() => rotomSay(
+      `Bzzt! Screenshot saved-zzzt! Find it in the Pokédex under ${sp} → My Data ⚡`
+    ), 400);
+  }
+}
+
+function compressScreenshot(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = evt => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const MAX_W = 600;
+        let w = img.width, h = img.height;
+        if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.70));
+      };
+      img.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function openScreenshotLightbox(src) {
+  document.getElementById('screenshot-lightbox-img').src = src;
+  document.getElementById('screenshot-lightbox').style.display = 'flex';
+}
+
+function closeScreenshotLightbox() {
+  document.getElementById('screenshot-lightbox').style.display = 'none';
+  document.getElementById('screenshot-lightbox-img').src = '';
+}
+
 // ══ REUSABLE SPECIES AUTOCOMPLETE ════════════════════════════════════════════
 // Usage: initSpeciesAC('input-id', onSelectCallback)
 // onSelectCallback(name, display, id) is called when user picks
@@ -5387,8 +5509,6 @@ const LEGALITY_CACHE_KEY = 'at_ball_legality';
 const LEGALITY_CACHE_TS  = 'at_ball_legality_ts';
 const LEGALITY_TTL       = 7 * 24 * 60 * 60 * 1000; // 1 week
 const APRI_BALLS         = new Set(['Fast','Friend','Heavy','Level','Love','Lure','Moon','Dream','Beast','Safari','Sport']);
-
-let ballLegality = null; // { "Bulbasaur": ["Moon","Dream",...], ... }
 
 async function ensureLegality() {
   if (ballLegality) return ballLegality;

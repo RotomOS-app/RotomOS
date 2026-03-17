@@ -1236,6 +1236,44 @@
   <span id="rotom-toast-text"></span>
 </div>
 
+<!-- Screenshot upload prompt -->
+<div id="screenshot-prompt" class="screenshot-prompt-card" style="display:none">
+  <div class="ssp-header">
+    <span class="ssp-icon">📸</span>
+    <div class="ssp-title">Save a screenshot?</div>
+    <button class="ssp-dismiss" onclick="dismissScreenshotPrompt()" title="Skip">✕</button>
+  </div>
+  <div class="ssp-body">
+    <div id="ssp-dropzone" class="ssp-dropzone"
+         ondragover="event.preventDefault();this.classList.add('drag-over')"
+         ondragleave="this.classList.remove('drag-over')"
+         ondrop="handleScreenshotDrop(event)">
+      <div class="ssp-drop-inner">
+        <span style="font-size:28px">🖼️</span>
+        <span class="ssp-drop-label">Drop image here</span>
+        <span class="ssp-drop-or">or</span>
+        <label class="btn-primary ssp-file-btn">
+          Browse
+          <input type="file" accept="image/*" style="display:none" onchange="handleScreenshotFile(this)">
+        </label>
+      </div>
+    </div>
+    <div id="ssp-preview" class="ssp-preview" style="display:none">
+      <img id="ssp-preview-img" src="" alt="preview" class="ssp-preview-img">
+      <div class="ssp-preview-actions">
+        <button class="btn-primary" onclick="confirmScreenshotSave()">Save ✓</button>
+        <button class="btn-secondary" onclick="clearScreenshotPreview()">Retry</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Screenshot lightbox -->
+<div id="screenshot-lightbox" class="screenshot-lightbox" style="display:none" onclick="closeScreenshotLightbox()">
+  <button class="sslb-close" onclick="closeScreenshotLightbox()">✕</button>
+  <img id="screenshot-lightbox-img" src="" alt="screenshot" class="sslb-img" onclick="event.stopPropagation()">
+</div>
+
 <!-- Rotom trainer name onboarding -->
 <div id="rotom-onboarding" onclick="if(event.target===this&&document.getElementById('trainer-name-input').value.trim())saveTrainerName()">
   <div id="rotom-onboarding-card">
